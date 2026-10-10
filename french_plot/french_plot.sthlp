@@ -226,8 +226,9 @@ for example {cmd:name()}, {cmd:scheme()} or {cmd:title()}.{p_end}
 {phang2}{cmd:. net get did_multiplegt_dyn}{p_end}
 {phang2}{cmd:. use favara_imbs_did_multiplegt_dyn.dta, clear}{p_end}
 
-{pstd}Estimate eight effects and three placebos of banking deregulations on loan volume{p_end}
+{pstd}Estimate eight effects and three placebos of banking deregulations on loan volume; {cmd:did_multiplegt_dyn} draws its own graph, which the next line keeps under the name {cmd:dyn_own} for comparison with the plots below{p_end}
 {phang2}{cmd:. did_multiplegt_dyn Dl_vloans_b county year inter_bra, effects(8) placebo(3) cluster(state_n)}{p_end}
+{phang2}{cmd:. graph rename Graph dyn_own, replace}{p_end}
 
 {pstd}Plot them{p_end}
 {phang2}{cmd:. french_plot, effects(8) placebo(3) name(f1, replace)}{p_end}
