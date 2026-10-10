@@ -1,4 +1,4 @@
-*! lpdid_plot 0.1.1  10oct2026  Jerg Gutmann
+*! lpdid_plot 0.1.2  11oct2026  Jerg Gutmann
 *! Event-study plot after lpdid; same layout as french_plot
 program define lpdid_plot
 	version 16
@@ -79,8 +79,9 @@ program define lpdid_plot
 	if "`level'" != "" & "`normalci'" == "" {
 		di as text "note: level() implies normal-based intervals (normalci)"
 	}
+	* normal intervals without level(): 95, the default level of lpdid
 	if "`level'" == "" {
-		local level = c(level)
+		local level = 95
 	}
 	else {
 		cap numlist "`level'", min(1) max(2) range(>0 <100) sort
