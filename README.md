@@ -13,7 +13,7 @@ Small Stata programs by Jerg Gutmann. Each package lives in its own folder and i
 
 ## french_plot
 
-Version 0.3.6 (beta). Package folder: [`french_plot/`](french_plot/).
+Version 0.3.7 (beta). Package folder: [`french_plot/`](french_plot/).
 
 Event-study plot after `did_multiplegt_dyn` (one event). Shows the dynamic effects and placebos with confidence intervals, and optionally the average total effect, the pooled placebo, p-values and more.
 
@@ -53,7 +53,7 @@ french_plot, effects(5) placebo(3) avg avgpre pvalues shade export("event_study.
 | `avgpre` | pooled placebo (mean of the plotted placebos) as dashed line over the pre-treatment periods |
 | `avgvalues` | print the value of the average line(s) at their ends |
 | `noci`, `cibars` | no intervals / intervals as bars instead of a shaded area |
-| `level(# [#])` | confidence level; `level(90 95)` draws a darker inner and a lighter outer band |
+| `level(# [#])` | confidence level, default 95 as in `did_multiplegt_dyn`, which does not store its intervals (they are recalculated as b ± z·se); `level(90 95)` draws a darker inner and a lighter outer band |
 | `scale(#)`, `pctof(#)` | multiply estimates by #; express estimates in percent of # (e.g. a baseline mean) |
 
 **Statistics**

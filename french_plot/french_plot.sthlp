@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.3.6  10oct2026  Jerg Gutmann}{...}
+{* *! version 0.3.7  11oct2026  Jerg Gutmann}{...}
 {vieweralsosee "did_multiplegt_dyn" "help did_multiplegt_dyn"}{...}
 {vieweralsosee "[G-2] graph twoway" "help twoway"}{...}
 {vieweralsosee "[G-2] graph export" "help graph_export"}{...}
@@ -129,7 +129,11 @@ It sets {cmd:xscale(range())}, so do not also pass {cmd:xscale()}.{p_end}
 {phang}{opt cibars} draws the confidence intervals as bars instead of a shaded area.{p_end}
 
 {phang}{opt level(# [#])} sets the confidence level.
-The default is {cmd:c(level)}.
+The default is 95, the default of {cmd:did_multiplegt_dyn}.
+{cmd:did_multiplegt_dyn} does not store its confidence intervals in {cmd:e()}, so {cmd:french_plot} calculates them as {it:b} ± {it:z} × {it:se} from the stored standard errors.
+At the default level this reproduces the intervals displayed by {cmd:did_multiplegt_dyn}.
+If you ran {cmd:did_multiplegt_dyn} with {cmd:ci_level()}, specify the same level here.
+Without {opt level()}, the command prints a note to this effect.
 With two values, for example {cmd:level(90 95)}, the smaller level is drawn as a darker inner band
 and the larger as a lighter outer band.{p_end}
 
@@ -258,6 +262,12 @@ for example {cmd:name()}, {cmd:scheme()} or {cmd:title()}.{p_end}
 for example {cmd:Placebo_1}.
 The effects and placebos are read from {cmd:e(Effect_}{it:l}{cmd:)}, {cmd:e(se_effect_}{it:l}{cmd:)},
 {cmd:e(Placebo_}{it:l}{cmd:)} and {cmd:e(se_placebo_}{it:l}{cmd:)}.{p_end}
+
+{pstd}Standard errors, effects and placebos are those stored by {cmd:did_multiplegt_dyn}.
+Its confidence intervals are not stored, so they are recalculated from the standard errors under the normal distribution (see {opt level()}).
+This is a deviation from using the displayed output and is therefore announced by a note.
+The p-values of the average effect and the pooled placebo are also calculated from the estimate and the standard error using the normal distribution.
+The joint p-values are those stored by {cmd:did_multiplegt_dyn}.{p_end}
 
 {pstd}This is a beta version. Please check the plotted values against the output of {cmd:did_multiplegt_dyn}.{p_end}
 

@@ -1,4 +1,4 @@
-*! french_plot 0.3.6  10oct2026  Jerg Gutmann
+*! french_plot 0.3.7  11oct2026  Jerg Gutmann
 *! Event-study plot after did_multiplegt_dyn (single event)
 program define french_plot
 	version 16
@@ -61,8 +61,11 @@ program define french_plot
 	local sc = `scale'
 	if `pctof' != 0 local sc = 100/`pctof'
 
+	* did_multiplegt_dyn does not store its confidence intervals; its default is the 95% normal interval
+	local lvlnote 0
 	if "`level'" == "" {
-		local level = c(level)
+		local level = 95
+		if "`noci'" == "" local lvlnote 1
 	}
 	else {
 		cap numlist "`level'", min(1) max(2) range(>0 <100) sort
@@ -77,6 +80,10 @@ program define french_plot
 	local lev_out : word `nlev' of `level'
 	local z_out = invnormal(1 - (100 - `lev_out')/200)
 	local z_in  = invnormal(1 - (100 - `lev_in')/200)
+	if `lvlnote' {
+		di as text "note: did_multiplegt_dyn does not store its confidence intervals in e(); plotting b +/- z*se at the 95% level,"
+		di as text "      which reproduces the intervals it displays (default ci_level(95)). Specify level() if you used ci_level()."
+	}
 
 	if "`color'" == "" local color "0 114 178"
 	if "`avgcolor'" == "" local avgcolor "`color'"
