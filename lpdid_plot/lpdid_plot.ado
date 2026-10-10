@@ -1,9 +1,9 @@
-*! lpdid_plot 0.1.2  11oct2026  Jerg Gutmann
+*! lpdid_plot 0.2.0  11oct2026  Jerg Gutmann
 *! Event-study plot after lpdid; same layout as french_plot
 program define lpdid_plot
 	version 16
-	syntax , PRE(integer) POST(integer) ///
-		[ SHOWPRE(integer -1) SHOWPOST(integer -1) ///
+	syntax , [ PRE(integer -999) POST(integer -999) ///
+		SHOWPRE(integer -1) SHOWPOST(integer -1) ///
 		AVG AVGPre AVGValues PVAlues PNOte ///
 		NOCI CIBars NORMalci LEvel(string) CIOpacity(integer 20) ///
 		SHADE SHADEColor(string) VLINE ///
@@ -19,14 +19,29 @@ program define lpdid_plot
 	tempname R P
 	cap matrix `R' = e(results)
 	if _rc {
-		di as error "e(results) not found; run lpdid first"
+		di as error "last estimates not found; run lpdid first"
 		exit 301
 	}
-	if `pre' < 1 {
+	* pre() and post() default to the windows stored by lpdid
+	if `pre' == -999 {
+		local pre = e(pre_window)
+		if missing(`pre') {
+			di as error "e(pre_window) not found; specify pre()"
+			exit 198
+		}
+	}
+	else if `pre' < 1 {
 		di as error "pre() must be at least 1"
 		exit 198
 	}
-	if `post' < 0 {
+	if `post' == -999 {
+		local post = e(post_window)
+		if missing(`post') {
+			di as error "e(post_window) not found; specify post()"
+			exit 198
+		}
+	}
+	else if `post' < 0 {
 		di as error "post() must be 0 or larger"
 		exit 198
 	}
@@ -72,12 +87,16 @@ program define lpdid_plot
 	local ccl = colnumb(`R', "ci_low")
 	local cch = colnumb(`R', "ci_high")
 	local ccp = colnumb(`R', "p")
-	if `usel' & (`ccl' >= . | `cch' >= .) {
-		di as text "note: e(results) has no ci_low/ci_high; using normal-based intervals"
-		local usel 0
+	local cireason
+	if "`normalci'" != "" {
+		local cireason "normalci specified"
 	}
-	if "`level'" != "" & "`normalci'" == "" {
-		di as text "note: level() implies normal-based intervals (normalci)"
+	else if "`level'" != "" {
+		local cireason "level() specified"
+	}
+	if `usel' & (`ccl' >= . | `cch' >= .) {
+		local cireason "e(results) has no ci_low/ci_high"
+		local usel 0
 	}
 	* normal intervals without level(): 95, the default level of lpdid
 	if "`level'" == "" {
@@ -96,6 +115,10 @@ program define lpdid_plot
 	local lev_out : word `nlev' of `level'
 	local z_out = invnormal(1 - (100 - `lev_out')/200)
 	local z_in  = invnormal(1 - (100 - `lev_in')/200)
+	if !`usel' & "`noci'" == "" {
+		local lvtxt = cond(`nlev' == 2, "`lev_in'/`lev_out'% levels", "`lev_out'% level")
+		di as text "note: confidence intervals are b +/- z*se at the `lvtxt' and not those of lpdid (`cireason')"
+	}
 
 	if "`color'" == "" local color "0 114 178"
 	if "`avgcolor'" == "" local avgcolor "`color'"
@@ -155,10 +178,17 @@ program define lpdid_plot
 		exit 198
 	}
 	if `showpre' < `pre' & ("`avgpre'" != "" | "`pvalues'" != "") {
-		di as text "note: pooled pre-treatment estimate uses all pre-treatment periods of lpdid, not only those shown"
+		di as text "note: average placebo of lpdid uses all pre-treatment periods, not only those shown"
 	}
 	if `showpost' < `post' & ("`avg'" != "" | "`pvalues'" != "") {
-		di as text "note: pooled post-treatment estimate uses all post-treatment periods of lpdid, not only those shown"
+		di as text "note: average effect of lpdid uses all post-treatment periods, not only those shown"
+	}
+
+	* joint pre-trend test, only if lpdid was run with pretrend_test
+	local pjp = .
+	if !missing(e(pretrend_p)) local pjp = e(pretrend_p)
+	if !missing(`pjp') & `showpre' < `pre' & ("`pvalues'" != "" | "`pnote'" != "") {
+		di as text "note: joint placebo test of lpdid uses all pre-treatment coefficients, not only those shown"
 	}
 
 	if "`pvalues'" != "" {
@@ -175,7 +205,10 @@ program define lpdid_plot
 		di as text "{hline 62}"
 		di as text %-30s "Average effect" as result %10s "`sb'" %10s "`ss'" %10s "`sp'"
 		if `pre' >= 2 {
-			di as text %-30s "Pooled placebo" as result %10s "`pb'" %10s "`ps'" %10s "`pp'"
+			di as text %-30s "Average placebo" as result %10s "`pb'" %10s "`ps'" %10s "`pp'"
+		}
+		if !missing(`pjp') {
+			di as text %-30s "Joint test: all placebos = 0" as result %30s string(`pjp', "`fmt'")
 		}
 		di as text "{hline 62}"
 	}
@@ -188,7 +221,7 @@ program define lpdid_plot
 		gen x         = .
 		gen eventtime = .
 		gen str8 type = ""
-		gen str8 lpdidname = ""
+		gen str8 coefname = ""
 		gen b  = .
 		gen se = .
 		gen double lpl = .
@@ -201,7 +234,7 @@ program define lpdid_plot
 			replace x          = -`n'             in `i'
 			replace eventtime  = -`n'             in `i'
 			replace type       = "placebo"        in `i'
-			replace lpdidname  = "pre`n'"         in `i'
+			replace coefname  = "pre`n'"         in `i'
 			local r = rownumb(`R', "pre`n'")
 			if `r' < . {
 				replace b  = `sc'*`R'[`r',1] in `i'
@@ -217,7 +250,7 @@ program define lpdid_plot
 		replace x = -1 in `i'
 		replace eventtime = -1 in `i'
 		replace type = "baseline" in `i'
-		replace lpdidname = "pre1" in `i'
+		replace coefname = "pre1" in `i'
 		replace b = 0  in `i'
 		replace se = 0 in `i'
 		replace lpl = 0 in `i'
@@ -227,7 +260,7 @@ program define lpdid_plot
 			replace x          = `k'              in `i'
 			replace eventtime  = `k' + 1          in `i'
 			replace type       = "effect"         in `i'
-			replace lpdidname  = "tau`k'"         in `i'
+			replace coefname  = "tau`k'"         in `i'
 			local r = rownumb(`R', "tau`k'")
 			if `r' < . {
 				replace b  = `sc'*`R'[`r',1] in `i'
@@ -258,7 +291,7 @@ program define lpdid_plot
 		}
 		drop lpl lph lpp
 	}
-	if `nmiss' > 0 di as text "note: `nmiss' plotted coefficient(s) not found in e(results); shown as gaps"
+	if `nmiss' > 0 di as text "note: `nmiss' plotted event time(s) have no estimate; shown as gaps"
 	if "`savedata'" != "" {
 		qui save "`savedata'", replace
 		di as text "plotted data saved to `savedata'"
@@ -418,10 +451,10 @@ program define lpdid_plot
 			local s2 : display string(`pavg', "`fmt'")
 			local nt "Average effect: `s1' (p = `s2')"
 		}
-		if !missing(`ppre') {
-			local s3 : display string(`ppre', "`fmt'")
+		if !missing(`pjp') {
+			local s3 : display string(`pjp', "`fmt'")
 			if "`nt'" != "" local nt "`nt'; "
-			local nt "`nt'pooled placebo: p = `s3'"
+			local nt "`nt'joint placebo test: p = `s3'"
 		}
 		if "`nt'" != "" local notecmd note("`nt'", size(small))
 	}

@@ -1,7 +1,7 @@
 v 3
 d did2s_plot - Event-study plot after did2s
 d Jerg Gutmann
-d Version 0.1.0 (beta). Plots did2s event-study coefficients with confidence intervals in the same layout as french_plot and lpdid_plot; optionally averages, joint tests and p-values. Requires Stata 16 or newer.
-d Distribution-Date: 20261011
+d Version 0.1.1 (beta). Plots did2s event-study coefficients with confidence intervals in the same layout as french_plot and lpdid_plot; optionally averages, joint tests and p-values. Requires Stata 16 or newer.
+d Distribution-Date: 20261013
 f did2s_plot.ado
 f did2s_plot.sthlp

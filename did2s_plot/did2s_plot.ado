@@ -1,11 +1,11 @@
-*! did2s_plot 0.1.0  11oct2026  Jerg Gutmann
+*! did2s_plot 0.1.1  11oct2026  Jerg Gutmann
 *! Event-study plot after did2s; same layout as french_plot and lpdid_plot
 program define did2s_plot
 	version 16
 	syntax , [ EVENTVAR(string) SHIFT(integer 0) LEAD(string) LAG(string) ///
 		PRE(integer -999) POST(integer -999) ///
 		AVG AVGPre AVGValues PVAlues PNOte ///
-		NOCI CIBars LEvel(string) CIOpacity(integer 20) ///
+		NOCI CIBars NORMalci LEvel(string) CIOpacity(integer 20) ///
 		SHADE SHADEColor(string) VLINE ///
 		SCale(real 1) PCTof(real 0) ///
 		COLor(string) AVGColor(string) PRECOLor(string) MSymbol(string) ///
@@ -55,7 +55,7 @@ program define did2s_plot
 	local sc = `scale'
 	if `pctof' != 0 local sc = 100/`pctof'
 
-	* confidence intervals are normal-based (did2s reports z-based intervals)
+	* confidence intervals are normal-based (did2s displays z-based intervals but does not store them)
 	if "`level'" == "" {
 		local level = c(level)
 	}
@@ -72,6 +72,11 @@ program define did2s_plot
 	local lev_out : word `nlev' of `level'
 	local z_out = invnormal(1 - (100 - `lev_out')/200)
 	local z_in  = invnormal(1 - (100 - `lev_in')/200)
+	if "`noci'" == "" {
+		local lvtxt = cond(`nlev' == 2, "`lev_in'/`lev_out'% levels", "`lev_out'% level")
+		di as text "note: confidence intervals are b +/- z*se at the `lvtxt' (did2s does not store its intervals;"
+		di as text "      they are identical to the displayed ones at the same level, computed from e(b) and e(V))"
+	}
 
 	if "`color'" == "" local color "0 114 178"
 	if "`avgcolor'" == "" local avgcolor "`color'"
@@ -314,17 +319,9 @@ program define did2s_plot
 			local s3 : display string(`ppre', "`fmt'")
 			di as text %-30s "Average placebo" as result %10s "`s1'" %10s "`s2'" %10s "`s3'"
 		}
+		if !missing(`jpost') di as text %-30s "Joint test: all effects = 0" as result %30s string(`jpost', "`fmt'")
+		if !missing(`jpre') di as text %-30s "Joint test: all placebos = 0" as result %30s string(`jpre', "`fmt'")
 		di as text "{hline 62}"
-		if `npre' >= 2 & !missing(`jpre') {
-			local s1 : display string(`cpre', "%7.2f")
-			local s2 : display string(`jpre', "`fmt'")
-			di as text "Joint test, pre-treatment (`npre' coef.): chi2(" as result `dpre' as text ") = " as result "`s1'" as text ", p = " as result "`s2'"
-		}
-		if `npost' >= 2 & !missing(`jpost') {
-			local s1 : display string(`cpost', "%7.2f")
-			local s2 : display string(`jpost', "`fmt'")
-			di as text "Joint test, post-treatment (`npost' coef.): chi2(" as result `dpost' as text ") = " as result "`s1'" as text ", p = " as result "`s2'"
-		}
 	}
 
 	* ---- data for the plot ----
@@ -333,9 +330,9 @@ program define did2s_plot
 		clear
 		set obs `=`pre' + 1 + `post''
 		gen x = _n - `pre' - 1
-		gen eventtime = x
+		gen eventtime = cond(x >= 0, x + 1, x)
 		gen str8 type = cond(x <= -1, "placebo", "effect")
-		gen str60 coef = ""
+		gen str60 coefname = ""
 		gen b  = .
 		gen se = .
 		gen byte est = 0
@@ -343,7 +340,7 @@ program define did2s_plot
 			local tt = `et_`m''
 			if `tt' >= -`pre' & `tt' <= `post' & `eo_`m'' < 2 {
 				local i = `tt' + `pre' + 1
-				replace coef = "`en_`m''" in `i'
+				replace coefname = "`en_`m''" in `i'
 				if `eo_`m'' == 0 {
 					replace b   = `sc'*`B'[1, `ec_`m''] in `i'
 					replace se  = `sc'*sqrt(`V'[`ec_`m'', `ec_`m'']) in `i'
@@ -370,7 +367,7 @@ program define did2s_plot
 		gen p = 2*normal(-abs(b/se)) if se > 0 & !missing(se)
 		drop est
 	}
-	if `nmiss' > 0 di as text "note: `nmiss' plotted event time(s) without coefficient; shown as gaps"
+	if `nmiss' > 0 di as text "note: `nmiss' plotted event time(s) have no estimate; shown as gaps"
 	if "`savedata'" != "" {
 		qui save "`savedata'", replace
 		di as text "plotted data saved to `savedata'"
@@ -534,7 +531,7 @@ program define did2s_plot
 		if !missing(`jpre') {
 			local s3 : display string(`jpre', "`fmt'")
 			if "`nt'" != "" local nt "`nt'; "
-			local nt "`nt'joint test of pre-treatment coefficients: p = `s3'"
+			local nt "`nt'joint placebo test: p = `s3'"
 		}
 		if "`nt'" != "" local notecmd note("`nt'", size(small))
 	}

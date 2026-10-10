@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.3.7  11oct2026  Jerg Gutmann}{...}
+{* *! version 0.3.8  11oct2026  Jerg Gutmann}{...}
 {vieweralsosee "did_multiplegt_dyn" "help did_multiplegt_dyn"}{...}
 {vieweralsosee "[G-2] graph twoway" "help twoway"}{...}
 {vieweralsosee "[G-2] graph export" "help graph_export"}{...}
@@ -16,22 +16,21 @@
 {marker syntax}{...}
 {title:Syntax}
 
-{p 8 17 2}{cmd:french_plot,} {opt eff:ects(#)} {opt pla:cebo(#)} [{it:options}]{p_end}
+{p 8 17 2}{cmd:french_plot} [{cmd:,} {it:options}]{p_end}
 
 {synoptset 26 tabbed}{...}
 {synopthdr}
 {synoptline}
-{syntab:Required}
-{synopt:{opt eff:ects(#)}}number of effects estimated{p_end}
-{synopt:{opt pla:cebo(#)}}number of placebos estimated{p_end}
-
 {syntab:Contents}
+{synopt:{opt eff:ects(#)}}number of effects estimated; default is all{p_end}
+{synopt:{opt pla:cebo(#)}}number of placebos estimated; default is all{p_end}
 {synopt:{opt showeff:ects(#)}}plot only the first {it:#} effects{p_end}
 {synopt:{opt showpla:cebo(#)}}plot only the first {it:#} placebos{p_end}
 {synopt:{opt avg}}add the average total effect{p_end}
-{synopt:{opt avgp:re}}add the pooled placebo{p_end}
+{synopt:{opt avgp:re}}add the average placebo{p_end}
 {synopt:{opt avgv:alues}}print the values of the average lines{p_end}
 {synopt:{opt noci}}no confidence intervals{p_end}
+{synopt:{opt norm:alci}}accepted for compatibility with the other plot commands; no effect{p_end}
 {synopt:{opt cib:ars}}confidence intervals as bars{p_end}
 {synopt:{opt le:vel(# [#])}}one or two confidence levels{p_end}
 {synopt:{opt sc:ale(#)}}multiply all estimates by {it:#}{p_end}
@@ -48,12 +47,12 @@
 {synopt:{opt vline}}vertical line between baseline and first effect{p_end}
 {synopt:{opt col:or(string)}}colour of the series; default is {cmd:0 114 178}{p_end}
 {synopt:{opt avgc:olor(string)}}colour of the average effect line{p_end}
-{synopt:{opt precol:or(string)}}colour of the pooled placebo line{p_end}
+{synopt:{opt precol:or(string)}}colour of the average placebo line{p_end}
 {synopt:{opt ms:ymbol(symbolstyle)}}marker symbol; default is {cmd:o}{p_end}
 {synopt:{opt lpa:ttern(patternstyle)}}line pattern of the series{p_end}
 {synopt:{opt lw:idth(linewidthstyle)}}line width of the series{p_end}
 {synopt:{opt avgl:pattern(patternstyle)}}line pattern of the average effect line{p_end}
-{synopt:{opt prelp:attern(patternstyle)}}line pattern of the pooled placebo line{p_end}
+{synopt:{opt prelp:attern(patternstyle)}}line pattern of the average placebo line{p_end}
 {synopt:{opt cio:pacity(#)}}opacity of the confidence bands in percent; default is {cmd:20}{p_end}
 {synopt:{opt noz:ero}}no zero line{p_end}
 {synopt:{opt nocap:tions}}no pre-/post-treatment captions{p_end}
@@ -62,7 +61,7 @@
 {synopt:{opt noleg:end}}no legend{p_end}
 {synopt:{opt lbld:yn(string)}}legend label of the dynamic effects{p_end}
 {synopt:{opt lbla:vg(string)}}legend label of the average effect{p_end}
-{synopt:{opt lblp:re(string)}}legend label of the pooled placebo{p_end}
+{synopt:{opt lblp:re(string)}}legend label of the average placebo{p_end}
 {synopt:{opt yti:tle(string)}}title left of the y-axis; default is none{p_end}
 {synopt:{opt xti:tle(string)}}title of the x-axis; default is none{p_end}
 {synopt:{opt ylab(rule)}}y-axis labels; requires {opt tpos()}{p_end}
@@ -86,7 +85,7 @@ It shows the dynamic effects and the placebos with confidence intervals.
 The baseline period is plotted at -1, placebo {it:l} at -({it:l}+1) and effect {it:l} at {it:l}-1, labelled {it:l}.
 Periods that could not be estimated appear as gaps.{p_end}
 
-{pstd}Optionally, the plot also shows the average total effect and the pooled placebo as horizontal lines,
+{pstd}Optionally, the plot also shows the average total effect and the average placebo as horizontal lines,
 the corresponding p-values, and a shaded post-treatment area.
 The plot does not compare two events.{p_end}
 
@@ -97,15 +96,13 @@ It can therefore be called repeatedly with different options.{p_end}
 {marker options}{...}
 {title:Options}
 
-{dlgtab:Required}
+{dlgtab:Contents}
 
 {phang}{opt effects(#)} and {opt placebo(#)} give the number of effects and placebos.
-Specify the same numbers as in the {cmd:did_multiplegt_dyn} command that produced the estimates.
+By default, all effects and placebos stored by {cmd:did_multiplegt_dyn} ({cmd:e(effects)} and {cmd:e(placebo)}) are used.
+Specify the numbers of the {cmd:did_multiplegt_dyn} command only if you want to override this.
 {opt placebo(0)} is allowed.
-Because the numbers are given explicitly, a period that could not be estimated is shown as a gap
-and a note reports how many coefficients are missing.{p_end}
-
-{dlgtab:Contents}
+A period that could not be estimated is shown as a gap, and a note reports how many.{p_end}
 
 {phang}{opt showeffects(#)} and {opt showplacebo(#)} plot only the first {it:#} effects or placebos.
 The default is to plot all.
@@ -115,8 +112,8 @@ The default is to plot all.
 as a dashed horizontal line over the post-treatment periods.
 It is based on all estimated effects, also if fewer are shown with {opt showeffects()}.{p_end}
 
-{phang}{opt avgpre} adds the pooled placebo as a dashed horizontal line over the pre-treatment periods.
-The pooled placebo is the simple mean of the plotted placebo coefficients.
+{phang}{opt avgpre} adds the average placebo as a dashed horizontal line over the pre-treatment periods.
+The average placebo is the simple mean of the plotted placebo coefficients.
 Its standard error is calculated from {cmd:e(V)}.
 At least one placebo must be plotted.{p_end}
 
@@ -128,12 +125,16 @@ It sets {cmd:xscale(range())}, so do not also pass {cmd:xscale()}.{p_end}
 
 {phang}{opt cibars} draws the confidence intervals as bars instead of a shaded area.{p_end}
 
+{phang}{opt normalci} is accepted so that the same command line works for all plot commands.
+It has no effect here, because the intervals are always normal-based.{p_end}
+
 {phang}{opt level(# [#])} sets the confidence level.
 The default is 95, the default of {cmd:did_multiplegt_dyn}.
 {cmd:did_multiplegt_dyn} does not store its confidence intervals in {cmd:e()}, so {cmd:french_plot} calculates them as {it:b} ± {it:z} × {it:se} from the stored standard errors.
 At the default level this reproduces the intervals displayed by {cmd:did_multiplegt_dyn}.
 If you ran {cmd:did_multiplegt_dyn} with {cmd:ci_level()}, specify the same level here.
-Without {opt level()}, the command prints a note to this effect.
+Whenever the plotted intervals are not those displayed by the estimator, the command prints a note.
+Here it does so on every call without {opt noci}.
 With two values, for example {cmd:level(90 95)}, the smaller level is drawn as a darker inner band
 and the larger as a lighter outer band.{p_end}
 
@@ -147,7 +148,7 @@ Neither changes the p-values.{p_end}
 {dlgtab:Statistics}
 
 {phang}{opt pvalues} displays a table in the Results window.
-It contains the estimate, standard error and p-value of the average effect and of the pooled placebo,
+It contains the estimate, standard error and p-value of the average effect and of the average placebo,
 and the p-values of the joint tests that all effects and all placebos are zero.
 The joint tests are taken from {cmd:e(p_jointeffects)} and {cmd:e(p_jointplacebo)} and are shown if available.
 The p-values are two-sided and based on the normal distribution.{p_end}
@@ -171,7 +172,7 @@ so neither can be combined with {opt ylab()}.{p_end}
 {phang}{opt color(string)} sets the colour of the series and of the confidence intervals.
 Give an RGB triple in quotes, as in {cmd:color("0 114 178")}, which is the default.
 {opt avgcolor()} sets the colour of the average effect line; the default is {opt color()}.
-{opt precolor()} sets the colour of the pooled placebo line; the default is {opt avgcolor()}.{p_end}
+{opt precolor()} sets the colour of the average placebo line; the default is {opt avgcolor()}.{p_end}
 
 {phang}{opt msymbol()}, {opt lpattern()} and {opt lwidth()}
 set the marker symbol, line pattern and line width of the series.
@@ -191,7 +192,7 @@ Unless you set {opt tpos()}, the captions are placed just above the top y-axis l
 {phang}{opt nolegend} suppresses the legend.
 A legend is only drawn if {opt avg} or {opt avgpre} is specified.
 {opt lbldyn()}, {opt lblavg()} and {opt lblpre()} change the legend labels of the dynamic effects,
-the average effect and the pooled placebo.{p_end}
+the average effect and the average placebo.{p_end}
 
 {phang}{opt ytitle(string)} and {opt xtitle(string)} add titles to the axes.
 By default, neither axis has a title.{p_end}
@@ -205,7 +206,7 @@ It covers the estimates, the intervals, the average lines and zero.{p_end}
 
 {phang}{opt savedata(filename)} saves the plotted data as a Stata dataset.
 It contains the variables {cmd:x} (position in the plot), {cmd:eventtime} (as labelled on the x-axis),
-{cmd:type} ({cmd:placebo}, {cmd:baseline} or {cmd:effect}), {cmd:b}, {cmd:se}, {cmd:lb}, {cmd:ub} and {cmd:p}.
+{cmd:type} ({cmd:placebo}, {cmd:baseline} or {cmd:effect}), {cmd:coefname} (name of the coefficient in {cmd:e()}), {cmd:b}, {cmd:se}, {cmd:lb}, {cmd:ub} and {cmd:p}.
 With two levels, {cmd:lb} and {cmd:ub} belong to the larger level, and {cmd:lb_in} and {cmd:ub_in} to the smaller.
 The data in memory are not changed.{p_end}
 
@@ -231,7 +232,7 @@ for example {cmd:name()}, {cmd:scheme()} or {cmd:title()}.{p_end}
 {pstd}Plot them{p_end}
 {phang2}{cmd:. french_plot, effects(8) placebo(3)}{p_end}
 
-{pstd}Add the average effect and the pooled placebo, with their values{p_end}
+{pstd}Add the average effect and the average placebo, with their values{p_end}
 {phang2}{cmd:. french_plot, effects(8) placebo(3) avg avgpre avgvalues}{p_end}
 
 {pstd}Show the 90 and 95 percent confidence bands, shade the post-treatment area and add the baseline line{p_end}
@@ -258,7 +259,7 @@ for example {cmd:name()}, {cmd:scheme()} or {cmd:title()}.{p_end}
 
 {pstd}Requires Stata 16 or newer.{p_end}
 
-{pstd}The pooled placebo relies on the coefficient names that {cmd:did_multiplegt_dyn} stores in {cmd:e(b)},
+{pstd}The average placebo relies on the coefficient names that {cmd:did_multiplegt_dyn} stores in {cmd:e(b)},
 for example {cmd:Placebo_1}.
 The effects and placebos are read from {cmd:e(Effect_}{it:l}{cmd:)}, {cmd:e(se_effect_}{it:l}{cmd:)},
 {cmd:e(Placebo_}{it:l}{cmd:)} and {cmd:e(se_placebo_}{it:l}{cmd:)}.{p_end}
@@ -266,7 +267,7 @@ The effects and placebos are read from {cmd:e(Effect_}{it:l}{cmd:)}, {cmd:e(se_e
 {pstd}Standard errors, effects and placebos are those stored by {cmd:did_multiplegt_dyn}.
 Its confidence intervals are not stored, so they are recalculated from the standard errors under the normal distribution (see {opt level()}).
 This is a deviation from using the displayed output and is therefore announced by a note.
-The p-values of the average effect and the pooled placebo are also calculated from the estimate and the standard error using the normal distribution.
+The p-values of the average effect and the average placebo are also calculated from the estimate and the standard error using the normal distribution.
 The joint p-values are those stored by {cmd:did_multiplegt_dyn}.{p_end}
 
 {pstd}This is a beta version. Please check the plotted values against the output of {cmd:did_multiplegt_dyn}.{p_end}

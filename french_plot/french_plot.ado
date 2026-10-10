@@ -1,11 +1,11 @@
-*! french_plot 0.3.7  11oct2026  Jerg Gutmann
+*! french_plot 0.3.8  11oct2026  Jerg Gutmann
 *! Event-study plot after did_multiplegt_dyn (single event)
 program define french_plot
 	version 16
-	syntax , EFFects(integer) PLAcebo(integer) ///
-		[ SHOWEFFects(integer -1) SHOWPLAcebo(integer -1) ///
+	syntax , [ EFFects(integer -999) PLAcebo(integer -999) ///
+		SHOWEFFects(integer -1) SHOWPLAcebo(integer -1) ///
 		AVG AVGPre AVGValues PVAlues PNOte ///
-		NOCI CIBars LEvel(string) CIOpacity(integer 20) ///
+		NOCI CIBars NORMalci LEvel(string) CIOpacity(integer 20) ///
 		SHADE SHADEColor(string) VLINE ///
 		SCale(real 1) PCTof(real 0) ///
 		COLor(string) AVGColor(string) PRECOLor(string) MSymbol(string) ///
@@ -16,15 +16,26 @@ program define french_plot
 		FMT(string) SAVEData(string) EXPort(string) * ]
 
 	* ---- checks and defaults ----
-	if "`e(cmd)'" == "" {
-		di as error "no estimation results found; run did_multiplegt_dyn first"
+	if "`e(cmd)'" != "did_multiplegt_dyn" {
+		di as error "last estimates not found; run did_multiplegt_dyn first"
 		exit 301
 	}
-	if `effects' < 1 {
+	* effects() and placebo() default to all effects and placebos stored by did_multiplegt_dyn
+	if `effects' == -999 {
+		local effects : word count `e(effects)'
+		if `effects' < 1 {
+			di as error "effects not found in e(effects); specify effects()"
+			exit 198
+		}
+	}
+	else if `effects' < 1 {
 		di as error "effects() must be at least 1"
 		exit 198
 	}
-	if `placebo' < 0 {
+	if `placebo' == -999 {
+		local placebo : word count `e(placebo)'
+	}
+	else if `placebo' < 0 {
 		di as error "placebo() must be 0 or larger"
 		exit 198
 	}
@@ -62,10 +73,8 @@ program define french_plot
 	if `pctof' != 0 local sc = 100/`pctof'
 
 	* did_multiplegt_dyn does not store its confidence intervals; its default is the 95% normal interval
-	local lvlnote 0
 	if "`level'" == "" {
 		local level = 95
-		if "`noci'" == "" local lvlnote 1
 	}
 	else {
 		cap numlist "`level'", min(1) max(2) range(>0 <100) sort
@@ -80,9 +89,10 @@ program define french_plot
 	local lev_out : word `nlev' of `level'
 	local z_out = invnormal(1 - (100 - `lev_out')/200)
 	local z_in  = invnormal(1 - (100 - `lev_in')/200)
-	if `lvlnote' {
-		di as text "note: did_multiplegt_dyn does not store its confidence intervals in e(); plotting b +/- z*se at the 95% level,"
-		di as text "      which reproduces the intervals it displays (default ci_level(95)). Specify level() if you used ci_level()."
+	if "`noci'" == "" {
+		local lvtxt = cond(`nlev' == 2, "`lev_in'/`lev_out'% levels", "`lev_out'% level")
+		di as text "note: confidence intervals are b +/- z*se at the `lvtxt' (did_multiplegt_dyn does not store its intervals;"
+		di as text "      they are identical to the displayed ones at its default level of 95; specify level() if you used ci_level())"
 	}
 
 	if "`color'" == "" local color "0 114 178"
@@ -99,7 +109,7 @@ program define french_plot
 	if "`postcaption'" == "" local postcaption "post-treatment"
 	if "`fmt'" == "" local fmt "%5.3f"
 
-	* periods that were specified but could not be estimated show up as gaps in the plot
+	* periods without an estimate show up as gaps in the plot
 	local nmiss 0
 	forvalues l = 1/`showeffects' {
 		if missing(e(Effect_`l')) local ++nmiss
@@ -107,7 +117,7 @@ program define french_plot
 	forvalues l = 1/`showplacebo' {
 		if missing(e(Placebo_`l')) local ++nmiss
 	}
-	if `nmiss' > 0 di as text "note: `nmiss' plotted coefficient(s) not estimated; shown as gaps"
+	if `nmiss' > 0 di as text "note: `nmiss' plotted event time(s) have no estimate; shown as gaps"
 
 	* ---- summary statistics: average effect, pooled placebo, joint tests ----
 	local bavg  = e(Av_tot_effect)*`sc'
@@ -149,7 +159,7 @@ program define french_plot
 		di as text "{hline 62}"
 		di as text %-30s "Average effect" as result %10s "`sb'" %10s "`ss'" %10s "`sp'"
 		if `showplacebo' >= 1 {
-			di as text %-30s "Pooled placebo" as result %10s "`pb'" %10s "`ps'" %10s "`pp'"
+			di as text %-30s "Average placebo" as result %10s "`pb'" %10s "`ps'" %10s "`pp'"
 		}
 		if !missing(`pje') {
 			di as text %-30s "Joint test: all effects = 0" as result %30s string(`pje', "`fmt'")
@@ -168,6 +178,7 @@ program define french_plot
 		gen x         = .
 		gen eventtime = .
 		gen str8 type = ""
+		gen str12 coefname = ""
 		gen b  = .
 		gen se = .
 		local i = 0
@@ -177,6 +188,7 @@ program define french_plot
 			replace x         = -(`l' + 1)               in `i'
 			replace eventtime = -(`l' + 1)               in `i'
 			replace type      = "placebo"                in `i'
+			replace coefname  = "Placebo_`l'"            in `i'
 			replace b         = `sc'*e(Placebo_`l')      in `i'
 			replace se        = `sc'*e(se_placebo_`l')   in `i'
 		}
@@ -191,6 +203,7 @@ program define french_plot
 			replace x         = `l' - 1                  in `i'
 			replace eventtime = `l'                      in `i'
 			replace type      = "effect"                 in `i'
+			replace coefname  = "Effect_`l'"             in `i'
 			replace b         = `sc'*e(Effect_`l')       in `i'
 			replace se        = `sc'*e(se_effect_`l')    in `i'
 		}

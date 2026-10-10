@@ -141,7 +141,7 @@ It sets {cmd:xscale(range())}, so do not also pass {cmd:xscale()}.{p_end}
 
 {phang}{opt normalci} replaces the intervals of {cmd:estat event} with pointwise normal intervals,
 {it:b} ± {it:z} × {it:se}, at the 95 percent level (the default level of {cmd:csdid}) unless {opt level()} is given.
-The command prints a note whenever it deviates from the intervals of {cmd:estat event}.
+Whenever the plotted intervals are not those of {cmd:estat event}, the command prints a note that says why.
 By default, the plot uses the columns {cmd:ll} and {cmd:ul} of {cmd:r(table)}, which are uniform bands if {cmd:csdid} used the wild bootstrap
 and pointwise intervals otherwise.
 The default p-values are those of {cmd:estat event}.{p_end}
@@ -219,9 +219,9 @@ It covers the estimates, the intervals, the average lines and zero.{p_end}
 {dlgtab:Output}
 
 {phang}{opt savedata(filename)} saves the plotted data as a Stata dataset.
-It contains the variables {cmd:x} (position in the plot), {cmd:eventtime} (event time; 0 is the first treated period),
+It contains the variables {cmd:x} (position in the plot), {cmd:eventtime} (as labelled on the x-axis),
 {cmd:type} ({cmd:placebo}, {cmd:baseline} or {cmd:effect}),
-{cmd:csdidname} (column of {cmd:r(table)}), {cmd:b}, {cmd:se}, {cmd:lb}, {cmd:ub} and {cmd:p}.
+{cmd:coefname} (column of {cmd:r(table)}), {cmd:b}, {cmd:se}, {cmd:lb}, {cmd:ub} and {cmd:p}.
 With two levels, {cmd:lb} and {cmd:ub} belong to the larger level, and {cmd:lb_in} and {cmd:ub_in} to the smaller.
 The data in memory are not changed.{p_end}
 

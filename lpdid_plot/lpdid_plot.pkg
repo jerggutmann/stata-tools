@@ -1,7 +1,7 @@
 v 3
 d lpdid_plot - Event-study plot after lpdid
 d Jerg Gutmann
-d Version 0.1.2 (beta). Plots lpdid event-study coefficients with confidence intervals in the same layout as french_plot; optionally the pooled estimates and p-values. Requires Stata 16 or newer.
-d Distribution-Date: 20261012
+d Version 0.2.0 (beta). Plots lpdid event-study coefficients with confidence intervals in the same layout as french_plot; optionally the pooled estimates and p-values. Requires Stata 16 or newer.
+d Distribution-Date: 20261013
 f lpdid_plot.ado
 f lpdid_plot.sthlp

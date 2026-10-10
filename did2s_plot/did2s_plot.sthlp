@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.1.0  11oct2026  Jerg Gutmann}{...}
+{* *! version 0.1.1  11oct2026  Jerg Gutmann}{...}
 {vieweralsosee "did2s" "help did2s"}{...}
 {vieweralsosee "french_plot" "help french_plot"}{...}
 {vieweralsosee "lpdid_plot" "help lpdid_plot"}{...}
@@ -38,6 +38,7 @@
 {synopt:{opt avgv:alues}}print the values of the average lines{p_end}
 {synopt:{opt noci}}no confidence intervals{p_end}
 {synopt:{opt cib:ars}}confidence intervals as bars{p_end}
+{synopt:{opt norm:alci}}accepted for compatibility with the other plot commands; no effect{p_end}
 {synopt:{opt le:vel(# [#])}}one or two confidence levels{p_end}
 {synopt:{opt sc:ale(#)}}multiply all estimates by {it:#}{p_end}
 {synopt:{opt pct:of(#)}}express estimates in percent of {it:#}{p_end}
@@ -159,8 +160,12 @@ It sets {cmd:xscale(range())}, so do not also pass {cmd:xscale()}.{p_end}
 
 {phang}{opt cibars} draws the confidence intervals as bars instead of a shaded area.{p_end}
 
+{phang}{opt normalci} is accepted so that the same command line works for all plot commands.
+It has no effect here, because the intervals are always normal-based.{p_end}
+
 {phang}{opt level(# [#])} sets the confidence level; the default is {cmd:c(level)}.
-The intervals are {it:b} ± {it:z} × {it:se}, as in {cmd:did2s}.
+The intervals are {it:b} ± {it:z} × {it:se}, as displayed by {cmd:did2s}, which does not store them.
+The command prints a note to this effect on every call without {opt noci}.
 With two values, for example {cmd:level(90 95)}, the smaller level is drawn as a darker inner band
 and the larger as a lighter outer band.{p_end}
 
@@ -177,7 +182,7 @@ Neither changes the p-values.{p_end}
 It contains the estimate, standard error and p-value of the average of the post-treatment coefficients and of the pre-treatment coefficients
 (the latter if at least two are plotted).
 In addition, it reports joint Wald tests that all plotted pre-treatment coefficients, and all plotted post-treatment coefficients, are zero.
-They use the full covariance matrix {cmd:e(V)} of the coefficients.
+They use the full covariance matrix {cmd:e(V)} of the coefficients and are shown as p-values only.
 Omitted, base and zero-baseline periods are not part of the tests.
 The p-values are two-sided; the averages use the normal distribution.{p_end}
 
@@ -233,9 +238,9 @@ It covers the estimates, the intervals, the average lines and zero.{p_end}
 {dlgtab:Output}
 
 {phang}{opt savedata(filename)} saves the plotted data as a Stata dataset.
-It contains the variables {cmd:x} (position in the plot), {cmd:eventtime} (event time; 0 is the first treated period),
+It contains the variables {cmd:x} (position in the plot), {cmd:eventtime} (as labelled on the x-axis),
 {cmd:type} ({cmd:placebo}, {cmd:baseline} or {cmd:effect}),
-{cmd:coef} (name of the coefficient in {cmd:e(b)}), {cmd:b}, {cmd:se}, {cmd:lb}, {cmd:ub} and {cmd:p}.
+{cmd:coefname} (name of the coefficient in {cmd:e(b)}), {cmd:b}, {cmd:se}, {cmd:lb}, {cmd:ub} and {cmd:p}.
 With two levels, {cmd:lb} and {cmd:ub} belong to the larger level, and {cmd:lb_in} and {cmd:ub_in} to the smaller.
 The data in memory are not changed.{p_end}
 

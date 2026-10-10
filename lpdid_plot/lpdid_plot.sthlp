@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.1.2  11oct2026  Jerg Gutmann}{...}
+{* *! version 0.2.0  11oct2026  Jerg Gutmann}{...}
 {vieweralsosee "lpdid" "help lpdid"}{...}
 {vieweralsosee "lpdid_plot" "help lpdid_plot"}{...}
 {vieweralsosee "[G-2] graph twoway" "help twoway"}{...}
@@ -17,16 +17,14 @@
 {marker syntax}{...}
 {title:Syntax}
 
-{p 8 17 2}{cmd:lpdid_plot,} {opt pre(#)} {opt post(#)} [{it:options}]{p_end}
+{p 8 17 2}{cmd:lpdid_plot} [{cmd:,} {it:options}]{p_end}
 
 {synoptset 26 tabbed}{...}
 {synopthdr}
 {synoptline}
-{syntab:Required}
-{synopt:{opt pre(#)}}number of pre-treatment periods used in {cmd:lpdid}{p_end}
-{synopt:{opt post(#)}}number of post-treatment periods used in {cmd:lpdid}{p_end}
-
 {syntab:Contents}
+{synopt:{opt pre(#)}}number of pre-treatment periods used in {cmd:lpdid}; default is all{p_end}
+{synopt:{opt post(#)}}number of post-treatment periods used in {cmd:lpdid}; default is all{p_end}
 {synopt:{opt showpre(#)}}plot only pre-treatment periods up to {it:#}{p_end}
 {synopt:{opt showpost(#)}}plot only post-treatment periods up to {it:#}{p_end}
 {synopt:{opt avg}}add the pooled post-treatment effect{p_end}
@@ -64,7 +62,7 @@
 {synopt:{opt noleg:end}}no legend{p_end}
 {synopt:{opt lbld:yn(string)}}legend label of the dynamic effects{p_end}
 {synopt:{opt lbla:vg(string)}}legend label of the average effect{p_end}
-{synopt:{opt lblp:re(string)}}legend label of the pooled placebo{p_end}
+{synopt:{opt lblp:re(string)}}legend label of the average placebo{p_end}
 {synopt:{opt yti:tle(string)}}title left of the y-axis; default is none{p_end}
 {synopt:{opt xti:tle(string)}}title of the x-axis; default is none{p_end}
 {synopt:{opt ylab(rule)}}y-axis labels; requires {opt tpos()}{p_end}
@@ -103,16 +101,15 @@ It can therefore be called repeatedly with different options.{p_end}
 {marker options}{...}
 {title:Options}
 
-{dlgtab:Required}
+{dlgtab:Contents}
 
 {phang}{opt pre(#)} and {opt post(#)} give the numbers of pre- and post-treatment periods.
-Specify the same numbers as in the {cmd:lpdid} command that produced the estimates.
+By default, the windows stored by {cmd:lpdid} ({cmd:e(pre_window)} and {cmd:e(post_window)}) are used.
+Specify the numbers of the {cmd:lpdid} command only if you want to override this.
 {opt pre(1)} is allowed and shows only the baseline.
 {cmd:pre(}{it:U}{cmd:)} corresponds to {cmd:placebo(}{it:U}-1{cmd:)}
 and {cmd:post(}{it:T}-1{cmd:)} to {cmd:effects(}{it:T}{cmd:)}
 in {helpb french_plot}.{p_end}
-
-{dlgtab:Contents}
 
 {phang}{opt showpre(#)} and {opt showpost(#)} restrict the plot to the pre-treatment periods {cmd:pre2}, ..., {cmd:pre}{it:#}
 and the post-treatment periods {cmd:tau0}, ..., {cmd:tau}{it:#}.
@@ -145,6 +142,7 @@ The default p-values are also those of {cmd:lpdid}.
 
 {phang}{opt level(# [#])} sets the confidence level and implies {opt normalci}.
 Without {opt level()} and {opt normalci}, the intervals are those of {cmd:lpdid}, with the level chosen there (default 95).
+Whenever the plotted intervals are not those of {cmd:lpdid}, the command prints a note that says why.
 With {opt normalci} alone, the level is 95, the default of {cmd:lpdid}; if you ran {cmd:lpdid} with {cmd:level()}, specify the same level here.
 With two values, for example {cmd:level(90 95)}, the smaller level is drawn as a darker inner band
 and the larger as a lighter outer band.
@@ -161,10 +159,11 @@ Neither changes the p-values.{p_end}
 
 {phang}{opt pvalues} displays a table in the Results window.
 It contains the estimate, standard error and p-value of the pooled post-treatment estimate (average effect)
-and of the pooled pre-treatment estimate (pooled placebo), both from {cmd:e(pooled_results)}.
+and of the pooled pre-treatment estimate (average placebo), both from {cmd:e(pooled_results)}.
+If {cmd:lpdid} was run with {opt pretrend_test}, the p-value of its joint test that all pre-treatment coefficients are zero ({cmd:e(pretrend_p)}) is added.
 The p-values are two-sided and based on the normal distribution.{p_end}
 
-{phang}{opt pnote} adds the p-value of the pooled post-treatment estimate and of the pooled pre-treatment estimate
+{phang}{opt pnote} adds the p-value of the pooled post-treatment estimate and, if available, the p-value of the joint pre-trend test
 as a note below the plot.
 It uses the {cmd:note()} option of the graph, so do not also pass {cmd:note()}.{p_end}
 
@@ -203,7 +202,7 @@ Unless you set {opt tpos()}, the captions are placed just above the top y-axis l
 {phang}{opt nolegend} suppresses the legend.
 A legend is only drawn if {opt avg} or {opt avgpre} is specified.
 {opt lbldyn()}, {opt lblavg()} and {opt lblpre()} change the legend labels of the dynamic effects,
-the average effect and the pooled placebo.{p_end}
+the average effect and the average placebo.{p_end}
 
 {phang}{opt ytitle(string)} and {opt xtitle(string)} add titles to the axes.
 By default, neither axis has a title.{p_end}
@@ -218,7 +217,7 @@ It covers the estimates, the intervals, the average lines and zero.{p_end}
 {phang}{opt savedata(filename)} saves the plotted data as a Stata dataset.
 It contains the variables {cmd:x} (position in the plot), {cmd:eventtime} (as labelled on the x-axis),
 {cmd:type} ({cmd:placebo}, {cmd:baseline} or {cmd:effect}),
-{cmd:lpdidname} (row name in {cmd:e(results)}), {cmd:b}, {cmd:se}, {cmd:lb}, {cmd:ub} and {cmd:p}.
+{cmd:coefname} (row name in {cmd:e(results)}), {cmd:b}, {cmd:se}, {cmd:lb}, {cmd:ub} and {cmd:p}.
 With two levels, {cmd:lb} and {cmd:ub} belong to the larger level, and {cmd:lb_in} and {cmd:ub_in} to the smaller.
 The data in memory are not changed.{p_end}
 
@@ -281,7 +280,8 @@ If you restrict the pooled windows there, the lines show those windows.
 By default, the confidence intervals and p-values are those stored by {cmd:lpdid} (columns {cmd:ci_low}, {cmd:ci_high} and {cmd:p}).
 With {opt normalci} or {opt level()}, they are calculated from the estimate and the standard error using the normal distribution, as in {helpb french_plot}.{p_end}
 
-{pstd}{cmd:lpdid_plot} does not report joint tests, because {cmd:lpdid} does not store them in a fixed place.{p_end}
+{pstd}The joint test of the pre-treatment coefficients is only reported if {cmd:lpdid} was run with {opt pretrend_test}; it covers all pre-treatment coefficients, also if fewer are shown.
+{cmd:lpdid} does not store a joint test of the post-treatment coefficients.{p_end}
 
 {pstd}This is a beta version. Please check the plotted values against the output of {cmd:lpdid}.{p_end}
 

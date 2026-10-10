@@ -86,14 +86,17 @@ program define csdid_plot, rclass
 	local usel 1
 	if "`normalci'" != "" | "`level'" != "" local usel 0
 	if `usel' & (`cll' >= . | `cul' >= .) {
-		di as text "note: r(table) has no ll/ul; using normal-based intervals"
 		local usel 0
 	}
-	if "`level'" != "" & "`normalci'" == "" {
-		di as text "note: level() implies pointwise normal intervals (normalci), not the intervals of estat event"
+	local cireason
+	if "`normalci'" != "" {
+		local cireason "normalci specified"
 	}
-	if `usel' == 0 {
-		di as text "note: plotting pointwise normal intervals b +/- z*se instead of the intervals of estat event"
+	else if "`level'" != "" {
+		local cireason "level() specified"
+	}
+	if `cll' >= . | `cul' >= . {
+		local cireason "r(table) has no ll/ul"
 	}
 	* normal intervals without level(): 95, the default level of csdid
 	if "`level'" == "" {
@@ -112,6 +115,10 @@ program define csdid_plot, rclass
 	local lev_out : word `nlev' of `level'
 	local z_out = invnormal(1 - (100 - `lev_out')/200)
 	local z_in  = invnormal(1 - (100 - `lev_in')/200)
+	if !`usel' & "`noci'" == "" {
+		local lvtxt = cond(`nlev' == 2, "`lev_in'/`lev_out'% levels", "`lev_out'% level")
+		di as text "note: confidence intervals are b +/- z*se at the `lvtxt' and not those of estat event (`cireason')"
+	}
 
 	if "`color'" == "" local color "0 114 178"
 	if "`avgcolor'" == "" local avgcolor "`color'"
@@ -206,10 +213,10 @@ program define csdid_plot, rclass
 		exit 198
 	}
 	if `pre' < max(1, -`tmin') & ("`avgpre'" != "" | "`pvalues'" != "") {
-		di as text "note: Pre_avg of csdid uses all pre-treatment periods, not only those shown"
+		di as text "note: average placebo (Pre_avg) of csdid uses all pre-treatment periods, not only those shown"
 	}
 	if `post' < `tmax' & ("`avg'" != "" | "`pvalues'" != "") {
-		di as text "note: Post_avg of csdid uses all post-treatment periods, not only those shown"
+		di as text "note: average effect (Post_avg) of csdid uses all post-treatment periods, not only those shown"
 	}
 
 	* ---- joint Wald tests from r(bb) and r(vv), only if they match r(table) ----
@@ -282,9 +289,9 @@ program define csdid_plot, rclass
 		clear
 		set obs `=`pre' + 1 + `post''
 		gen x = _n - `pre' - 1
-		gen eventtime = x
+		gen eventtime = cond(x >= 0, x + 1, x)
 		gen str8 type = cond(x <= -1, "placebo", "effect")
-		gen str12 csdidname = ""
+		gen str12 coefname = ""
 		gen b  = .
 		gen se = .
 		gen double lpl = .
@@ -295,7 +302,7 @@ program define csdid_plot, rclass
 			if `tt' >= -`pre' & `tt' <= `post' {
 				local i = `tt' + `pre' + 1
 				local c = `ec_`m''
-				replace csdidname = "`en_`m''" in `i'
+				replace coefname = "`en_`m''" in `i'
 				replace b  = `sc'*`T'[`ctb', `c'] in `i'
 				replace se = `sc'*`T'[`cse', `c'] in `i'
 				if `usel' {
@@ -330,7 +337,7 @@ program define csdid_plot, rclass
 		}
 		drop lpl lph lpp
 	}
-	if `nmiss' > 0 di as text "note: `nmiss' plotted event time(s) without coefficient; shown as gaps"
+	if `nmiss' > 0 di as text "note: `nmiss' plotted event time(s) have no estimate; shown as gaps"
 	if "`savedata'" != "" {
 		qui save "`savedata'", replace
 		di as text "plotted data saved to `savedata'"
@@ -494,7 +501,7 @@ program define csdid_plot, rclass
 		if !missing(`jpre') {
 			local s3 : display string(`jpre', "`fmt'")
 			if "`nt'" != "" local nt "`nt'; "
-			local nt "`nt'joint test of pre-treatment coefficients: p = `s3'"
+			local nt "`nt'joint placebo test: p = `s3'"
 		}
 		if "`nt'" != "" local notecmd note("`nt'", size(small))
 	}
