@@ -142,12 +142,12 @@ use https://github.com/kylebutts/did2s_stata/raw/main/data/df_hom.dta, clear
 gen rel_year_shift = rel_year + 20
 replace rel_year_shift = 100 if rel_year_shift == .
 did2s dep_var, first_stage(i.state i.year) second_stage(ib100.rel_year_shift) treatment(treat) cluster(state)
-did2s_plot, evvar(rel_year_shift) shift(20) pre(5) post(10) avg avgpre pvalues shade
+did2s_plot, eventvar(rel_year_shift) shift(20) pre(5) post(10) avg avgpre pvalues shade
 ```
 
-`evvar()` names the factor variable; level `v` is event time `v - shift()`. Base levels outside the estimated range (here the never-treated group 100) are ignored. With dummy variables, name patterns are used instead: `lead(F#_treat) lag(L#_treat)` (`F3_treat` is event time -3, `L0_treat` is event time 0). A table of the coefficients used is shown in the Results window.
+`eventvar()` names the factor variable; level `v` is event time `v - shift()`. Base levels outside the estimated range (here the never-treated group 100) are ignored. With dummy variables, name patterns are used instead: `lead(F#_treat) lag(L#_treat)` (`F3_treat` is event time -3, `L0_treat` is event time 0). A table of the coefficients used is shown in the Results window.
 
-Event time -1 is the baseline: plotted as estimated if the regression contains it, otherwise as zero. `avg` and `avgpre` are unweighted means of the plotted coefficients (not the `did2s` average treatment effect); `pvalues` and `pnote` also report joint Wald tests from `e(V)`. Confidence intervals are normal-based, as in `did2s`; `level(90 95)` draws two bands. `pre()`/`post()` limit the plotted event times. All other options are identical to `french_plot` (see above), except that `savedata()` adds the variable `coef`. Details: `help did2s_plot`.
+Event time -1 is the baseline and plotted as zero if it is the omitted reference period. If the regression estimates it, the estimate is plotted and a warning says that the coefficients are not normalized at t-1 (as in the `did2s` help example); leaving out the dummy for t-1 avoids this. Factor variable and dummies cannot be combined. `avg` and `avgpre` are unweighted means of the plotted coefficients (not the `did2s` average treatment effect); `pvalues` and `pnote` also report joint Wald tests from `e(V)`. Confidence intervals are normal-based, as in `did2s`; `level(90 95)` draws two bands. `pre()`/`post()` limit the plotted event times. All other options are identical to `french_plot` (see above), except that `savedata()` adds the variable `coef`. Details: `help did2s_plot`.
 
 ## cname_std
 

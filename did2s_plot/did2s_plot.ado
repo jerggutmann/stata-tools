@@ -2,7 +2,7 @@
 *! Event-study plot after did2s; same layout as french_plot and lpdid_plot
 program define did2s_plot
 	version 16
-	syntax , [ EVVAR(string) SHIFT(integer 0) LEAD(string) LAG(string) ///
+	syntax , [ EVENTVAR(string) SHIFT(integer 0) LEAD(string) LAG(string) ///
 		PRE(integer -999) POST(integer -999) ///
 		AVG AVGPre AVGValues PVAlues PNOte ///
 		NOCI CIBars LEvel(string) CIOpacity(integer 20) ///
@@ -20,12 +20,12 @@ program define did2s_plot
 		di as error "last estimates not found; run did2s first"
 		exit 301
 	}
-	if "`evvar'" == "" & "`lead'" == "" & "`lag'" == "" {
-		di as error "specify evvar() or lead() and/or lag()"
+	if "`eventvar'" == "" & "`lead'" == "" & "`lag'" == "" {
+		di as error "specify eventvar() or lead() and/or lag()"
 		exit 198
 	}
-	if "`evvar'" != "" & ("`lead'" != "" | "`lag'" != "") {
-		di as error "evvar() cannot be combined with lead() or lag()"
+	if "`eventvar'" != "" & ("`lead'" != "" | "`lag'" != "") {
+		di as error "eventvar() cannot be combined with lead() or lag()"
 		exit 198
 	}
 	if `pre' != -999 & `pre' < 1 {
@@ -115,13 +115,13 @@ program define did2s_plot
 		local ++j
 		local omit 0
 		local t = .
-		if "`evvar'" != "" {
-			* factor-variable coefficients: <level>[b|o|bn|...].<evvar>
+		if "`eventvar'" != "" {
+			* factor-variable coefficients: <level>[b|o|bn|...].<eventvar>
 			if regexm("`nm'", "^([0-9]+)(b|bn|o|bno|on|n)?\.") {
 				local lev = regexs(1)
 				local sfx = regexs(2)
 				local rest = substr("`nm'", strpos("`nm'", ".") + 1, .)
-				if "`rest'" == "`evvar'" {
+				if "`rest'" == "`eventvar'" {
 					local t = `lev' - `shift'
 					if inlist("`sfx'", "b", "bn", "o", "bno", "on") local omit 1
 				}
@@ -230,6 +230,10 @@ program define did2s_plot
 	}
 	if `base_est' == 0 {
 		di as text "note: event time -1 is not estimated; plotted as zero baseline"
+	}
+	else {
+		di as error "warning: event time -1 is estimated, i.e. the coefficients are not normalized to zero at t-1."
+		di as error "         The plot shows the estimate as it is. Please reconsider the specification (the omitted reference period should be t-1)."
 	}
 	local xend = cond(`base_est', -1, -2)
 

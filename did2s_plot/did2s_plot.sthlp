@@ -18,14 +18,14 @@
 {marker syntax}{...}
 {title:Syntax}
 
-{p 8 17 2}{cmd:did2s_plot,} {opt evvar(varname)} [{opt shift(#)} {it:options}]{p_end}
+{p 8 17 2}{cmd:did2s_plot,} {opt eventvar(varname)} [{opt shift(#)} {it:options}]{p_end}
 {p 8 17 2}{cmd:did2s_plot,} {opt lead(template)} {opt lag(template)} [{it:options}]{p_end}
 
 {synoptset 26 tabbed}{...}
 {synopthdr}
 {synoptline}
 {syntab:Event-time variables (one of the two forms)}
-{synopt:{opt evvar(varname)}}event-time factor variable used in {cmd:second_stage()}{p_end}
+{synopt:{opt eventvar(varname)}}event-time factor variable used in {cmd:second_stage()}{p_end}
 {synopt:{opt shift(#)}}value of {it:varname} that corresponds to event time 0; default is {cmd:0}{p_end}
 {synopt:{opt lead(template)}}name pattern of lead dummies, for example {cmd:F#_treat}{p_end}
 {synopt:{opt lag(template)}}name pattern of lag dummies, for example {cmd:L#_treat}{p_end}
@@ -108,7 +108,7 @@ Event times without a coefficient appear as gaps.{p_end}
 There are two ways to tell {cmd:did2s_plot} which coefficients to use.
 In both, a table of the coefficients and their event times is shown in the Results window.{p_end}
 
-{phang2}1. {opt evvar(varname)}: {cmd:second_stage()} contains one factor variable, for example {cmd:ib100.rel_year_shift}.
+{phang2}1. {opt eventvar(varname)}: {cmd:second_stage()} contains one factor variable, for example {cmd:ib100.rel_year_shift}.
 Its levels are non-negative integers, so event times that are negative must be shifted.
 Level {it:v} corresponds to event time {it:v} - {opt shift()}.
 Omitted and base levels (for example {cmd:100b.}) are recognised.
@@ -129,7 +129,7 @@ Neither form can be combined with the other.{p_end}
 
 {dlgtab:Event-time variables}
 
-{phang}{opt evvar(varname)} and {opt shift(#)} specify the factor variable as described under {help did2s_plot##naming:Naming the coefficients}.
+{phang}{opt eventvar(varname)} and {opt shift(#)} specify the factor variable as described under {help did2s_plot##naming:Naming the coefficients}.
 Only coefficients named {it:level}{cmd:.}{it:varname} (with the usual {cmd:b}, {cmd:o} or {cmd:n} suffix after the level) are used.
 Example: if you generated {cmd:rel_year_shift = rel_year + 20}, specify {cmd:shift(20)}.{p_end}
 
@@ -253,38 +253,36 @@ for example {cmd:name()}, {cmd:scheme()} or {cmd:title()}.{p_end}
 {pstd}Load the example data of {cmd:did2s}{p_end}
 {phang2}{cmd:. use https://github.com/kylebutts/did2s_stata/raw/main/data/df_hom.dta, clear}{p_end}
 
-{pstd}Event-study model: shift the relative years to non-negative values and code never-treated units as 100{p_end}
+{pstd}Event-study model from the help of {cmd:did2s}: shift the relative years to non-negative values and code never-treated units as 100{p_end}
 {phang2}{cmd:. gen rel_year_shift = rel_year + 20}{p_end}
 {phang2}{cmd:. replace rel_year_shift = 100 if rel_year_shift == .}{p_end}
 {phang2}{cmd:. did2s dep_var, first_stage(i.state i.year) second_stage(ib100.rel_year_shift) treatment(treat) cluster(state)}{p_end}
 
-{pstd}Plot all coefficients; event time = level minus 20{p_end}
-{phang2}{cmd:. did2s_plot, evvar(rel_year_shift) shift(20)}{p_end}
+{pstd}Plot all coefficients; event time = level minus 20.
+Here event time -1 is estimated, so {cmd:did2s_plot} prints a warning (see Remarks){p_end}
+{phang2}{cmd:. did2s_plot, eventvar(rel_year_shift) shift(20)}{p_end}
 
 {pstd}Show five pre-treatment periods and ten post-treatment periods, with the average lines and their values{p_end}
-{phang2}{cmd:. did2s_plot, evvar(rel_year_shift) shift(20) pre(5) post(10) avg avgpre avgvalues}{p_end}
+{phang2}{cmd:. did2s_plot, eventvar(rel_year_shift) shift(20) pre(5) post(10) avg avgpre avgvalues}{p_end}
 
 {pstd}Show the 90 and 95 percent confidence bands, shade the post-treatment area and add the baseline line{p_end}
-{phang2}{cmd:. did2s_plot, evvar(rel_year_shift) shift(20) pre(5) post(10) level(90 95) shade vline}{p_end}
+{phang2}{cmd:. did2s_plot, eventvar(rel_year_shift) shift(20) pre(5) post(10) level(90 95) shade vline}{p_end}
 
 {pstd}Display averages and joint tests in the Results window and as a note below the plot{p_end}
-{phang2}{cmd:. did2s_plot, evvar(rel_year_shift) shift(20) pre(5) post(10) avg avgpre pvalues pnote}{p_end}
+{phang2}{cmd:. did2s_plot, eventvar(rel_year_shift) shift(20) pre(5) post(10) avg avgpre pvalues pnote}{p_end}
 
 {pstd}Express the estimates in percent of a baseline mean of 12.5{p_end}
-{phang2}{cmd:. did2s_plot, evvar(rel_year_shift) shift(20) pre(5) post(10) pctof(12.5)}{p_end}
+{phang2}{cmd:. did2s_plot, eventvar(rel_year_shift) shift(20) pre(5) post(10) pctof(12.5)}{p_end}
 
 {pstd}Save the graph{p_end}
-{phang2}{cmd:. did2s_plot, evvar(rel_year_shift) shift(20) pre(5) post(10) avg export("event_study.png")}{p_end}
+{phang2}{cmd:. did2s_plot, eventvar(rel_year_shift) shift(20) pre(5) post(10) avg export("event_study.png")}{p_end}
 
-{pstd}With dummy variables instead of a factor variable: generate lead and lag dummies and use name templates{p_end}
-{phang2}{cmd:. forvalues k = 2/5 {c -(}}{p_end}
-{phang2}{cmd:.     gen F`k'_treat = (rel_year == -`k') & !missing(rel_year)}{p_end}
-{phang2}{cmd:. {c )-}}{p_end}
-{phang2}{cmd:. forvalues k = 0/10 {c -(}}{p_end}
-{phang2}{cmd:.     gen L`k'_treat = (rel_year == `k') & !missing(rel_year)}{p_end}
-{phang2}{cmd:. {c )-}}{p_end}
+{pstd}The same model with dummy variables instead of the factor variable.
+Leave out the dummy for event time -1 ({cmd:F1_treat}), so that t-1 is the reference period and no warning appears{p_end}
+{phang2}{cmd:. forvalues k = 2/20 {c -(} gen F`k'_treat = (rel_year_shift == 20 - `k') {c )-}}{p_end}
+{phang2}{cmd:. forvalues k = 0/20 {c -(} gen L`k'_treat = (rel_year_shift == 20 + `k') {c )-}}{p_end}
 {phang2}{cmd:. did2s dep_var, first_stage(i.state i.year) second_stage(F*_treat L*_treat) treatment(treat) cluster(state)}{p_end}
-{phang2}{cmd:. did2s_plot, lead(F#_treat) lag(L#_treat)}{p_end}
+{phang2}{cmd:. did2s_plot, lead(F#_treat) lag(L#_treat) pre(5) post(10) avg avgpre}{p_end}
 
 
 {marker remarks}{...}
@@ -297,9 +295,14 @@ Confidence intervals are normal-based, like those of {cmd:did2s}, and p-values a
 They are therefore comparable to {helpb french_plot}.
 Base and omitted categories have a coefficient of zero and a standard error of zero.{p_end}
 
-{pstd}In the dummy form, the baseline (event time -1) is the omitted period.
-Leave out the dummy for event time -1 (for example {cmd:F1_treat}) and the baseline is plotted as zero;
-include it and its estimate is plotted.{p_end}
+{pstd}{bf:Normalisation at t-1.}
+Event-study estimates are only comparable to those of {cmd:french_plot} and {cmd:lpdid_plot} if the reference period is event time -1.
+If your regression estimates a coefficient for event time -1, {cmd:did2s_plot} plots it as estimated and prints a warning,
+because the coefficients are then not normalised to zero at t-1.
+The graph is still drawn, but the specification should be reconsidered.
+With dummy variables, leave out the dummy for event time -1 (for example {cmd:F1_treat}); the baseline is then plotted as zero.
+With a factor variable, make event time -1 the base level, for example with {cmd:ib}{it:#}{cmd:.}, and make sure that never-treated observations are handled as in your model.
+The factor-variable form and the dummy form cannot be combined in one call.{p_end}
 
 {pstd}The averages and joint tests refer only to the coefficients that are plotted.
 Changing {opt pre()} or {opt post()} changes them.{p_end}
