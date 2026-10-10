@@ -1,0 +1,3 @@
+v 3
+d Personal Stata programs (Jerg Gutmann)
+p did2s_plot Event-study plot after did2s (beta)
