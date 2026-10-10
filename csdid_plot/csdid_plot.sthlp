@@ -101,7 +101,7 @@ If {cmd:Tm1} is not in the table, the baseline is set to zero; see {help csdid_p
 Event times without a column appear as gaps.{p_end}
 
 {pstd}By default, the plot uses the standard errors, confidence intervals and p-values that {cmd:estat event} reports.
-This includes uniform confidence bands if {cmd:csdid} was run with {opt wboot}.
+These are asymptotic and pointwise, also if {cmd:csdid} was run with {opt wboot}, because {cmd:estat event} always uses the asymptotic variance matrix.
 The average lines are {cmd:Pre_avg} and {cmd:Post_avg} of {cmd:csdid}.{p_end}
 
 {marker norm}{...}
@@ -142,8 +142,7 @@ It sets {cmd:xscale(range())}, so do not also pass {cmd:xscale()}.{p_end}
 {phang}{opt normalci} replaces the intervals of {cmd:estat event} with pointwise normal intervals,
 {it:b} ± {it:z} × {it:se}, at the 95 percent level (the default level of {cmd:csdid}) unless {opt level()} is given.
 Whenever the plotted intervals are not those of {cmd:estat event}, the command prints a note that says why.
-By default, the plot uses the columns {cmd:ll} and {cmd:ul} of {cmd:r(table)}, which are uniform bands if {cmd:csdid} used the wild bootstrap
-and pointwise intervals otherwise.
+By default, the plot uses the columns {cmd:ll} and {cmd:ul} of {cmd:r(table)}, which are pointwise intervals based on the asymptotic variance matrix, also after {opt wboot}.
 The default p-values are those of {cmd:estat event}.{p_end}
 
 {phang}{opt level(# [#])} sets the confidence level and implies {opt normalci}.
@@ -252,7 +251,7 @@ for example {cmd:name()}, {cmd:scheme()} or {cmd:title()}.{p_end}
 {phang2}{cmd:. csdid lemp lpop, ivar(countyreal) time(year) gvar(first_treat) method(dripw) long2}{p_end}
 {phang2}{cmd:. csdid_plot, avg avgpre}{p_end}
 
-{pstd}Wild bootstrap: the plot shows the uniform confidence bands of {cmd:csdid}{p_end}
+{pstd}After {opt wboot}, {cmd:estat event} still reports asymptotic intervals, and the plot shows these{p_end}
 {phang2}{cmd:. csdid lemp lpop, ivar(countyreal) time(year) gvar(first_treat) method(dripw) wboot rseed(1) long2}{p_end}
 {phang2}{cmd:. csdid_plot, avg avgpre}{p_end}
 

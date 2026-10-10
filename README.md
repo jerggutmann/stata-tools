@@ -172,7 +172,7 @@ estat event
 csdid_plot, avg avgpre pvalues pnote
 ```
 
-Standard errors, confidence intervals and p-values are those of `estat event` (uniform bands if `csdid` used `wboot`); `normalci` or `level()` switches to pointwise normal intervals. `avg` and `avgpre` draw `Post_avg` and `Pre_avg` of `csdid`. With the default short gaps, event time -1 is estimated and a warning says that the coefficients are not normalized at t-1; with `long2` in `csdid`, the baseline is zero. `pre()`/`post()` limit the plotted event times. A console note states whenever the intervals are not those of `estat event`. All other options are identical to `french_plot` (see above). Details: `help csdid_plot`.
+Standard errors, confidence intervals and p-values are those of `estat event` (asymptotic and pointwise, also if `csdid` used `wboot`); `normalci` or `level()` switches to pointwise normal intervals. `avg` and `avgpre` draw `Post_avg` and `Pre_avg` of `csdid`. With the default short gaps, event time -1 is estimated and a warning says that the coefficients are not normalized at t-1; with `long2` in `csdid`, the baseline is zero. `pre()`/`post()` limit the plotted event times. A console note states whenever the intervals are not those of `estat event`. All other options are identical to `french_plot` (see above). Details: `help csdid_plot`.
 
 ## cname_std
 
