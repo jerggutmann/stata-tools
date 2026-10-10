@@ -8,6 +8,7 @@ Small Stata programs by Jerg Gutmann. Each package lives in its own folder and i
 |---|---|
 | [`french_plot`](#french_plot) | event-study plot after `did_multiplegt_dyn` |
 | [`lpdid_plot`](#lpdid_plot) | event-study plot after `lpdid`, same layout as `french_plot` |
+| [`did2s_plot`](#did2s_plot) | event-study plot after `did2s`, same layout as `french_plot` |
 | [`cname_std`](#cname_std) | standardize spellings of country names |
 
 ## french_plot
@@ -115,6 +116,38 @@ lpdid_plot, pre(5) post(10) avg avgpre pvalues shade export("event_study.png")
 ```
 
 `pre(U)` and `post(T-1)` correspond to `placebo(U-1)` and `effects(T)` in `french_plot`. The pooled lines and p-values (`avg`, `avgpre`, `pvalues`, `pnote`) come from `e(pooled_results)`, which `lpdid` stores only with its option `pooled`. Confidence intervals and p-values are those stored by `lpdid` (t-based); `normalci` or `level()` switches to normal-based ones, identical to `french_plot`. All other options are identical to `french_plot` (see above), except `showpre()`/`showpost()` instead of `showplacebo()`/`showeffects()` and `savedata()` with the additional variable `lpdidname`. There are no joint tests. Details: `help lpdid_plot`.
+
+## did2s_plot
+
+Version 0.1.0 (beta). Package folder: [`did2s_plot/`](did2s_plot/).
+
+Event-study plot after `did2s` (Butts and Gardner; two-stage difference-in-differences). Counterpart of `french_plot` and `lpdid_plot` with the same layout, axis positions, defaults and options. Because `did2s` leaves the definition of the treatment variables to the user, `did2s_plot` identifies the event-study coefficients by name (see below).
+
+**This is a beta version. Please check results against the `did2s` output and report problems via GitHub issues.**
+
+### Installation
+
+```stata
+net install did2s_plot, from("https://raw.githubusercontent.com/jerggutmann/stata-tools/main/did2s_plot/") replace
+```
+
+Re-run the same line to update. Remove with `ado uninstall did2s_plot`.
+
+### Usage
+
+With an event-time factor variable in `second_stage()` (example from the help of `did2s`):
+
+```stata
+use https://github.com/kylebutts/did2s_stata/raw/main/data/df_hom.dta, clear
+gen rel_year_shift = rel_year + 20
+replace rel_year_shift = 100 if rel_year_shift == .
+did2s dep_var, first_stage(i.state i.year) second_stage(ib100.rel_year_shift) treatment(treat) cluster(state)
+did2s_plot, evvar(rel_year_shift) shift(20) pre(5) post(10) avg avgpre pvalues shade
+```
+
+`evvar()` names the factor variable; level `v` is event time `v - shift()`. Base levels outside the estimated range (here the never-treated group 100) are ignored. With dummy variables, name patterns are used instead: `lead(F#_treat) lag(L#_treat)` (`F3_treat` is event time -3, `L0_treat` is event time 0). A table of the coefficients used is shown in the Results window.
+
+Event time -1 is the baseline: plotted as estimated if the regression contains it, otherwise as zero. `avg` and `avgpre` are unweighted means of the plotted coefficients (not the `did2s` average treatment effect); `pvalues` and `pnote` also report joint Wald tests from `e(V)`. Confidence intervals are normal-based, as in `did2s`; `level(90 95)` draws two bands. `pre()`/`post()` limit the plotted event times. All other options are identical to `french_plot` (see above), except that `savedata()` adds the variable `coef`. Details: `help did2s_plot`.
 
 ## cname_std
 
