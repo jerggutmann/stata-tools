@@ -9,6 +9,7 @@ Small Stata programs by Jerg Gutmann. Each package lives in its own folder and i
 | [`french_plot`](#french_plot) | event-study plot after `did_multiplegt_dyn` |
 | [`lpdid_plot`](#lpdid_plot) | event-study plot after `lpdid`, same layout as `french_plot` |
 | [`did2s_plot`](#did2s_plot) | event-study plot after `did2s`, same layout as `french_plot` |
+| [`csdid_plot`](#csdid_plot) | event-study plot after `csdid` (`estat event`), same layout as `french_plot` |
 | [`cname_std`](#cname_std) | standardize spellings of country names |
 
 ## french_plot
@@ -148,6 +149,35 @@ did2s_plot, eventvar(rel_year_shift) shift(20) pre(5) post(10) avg avgpre pvalue
 `eventvar()` names the factor variable; level `v` is event time `v - shift()`. Base levels outside the estimated range (here the never-treated group 100) are ignored. With dummy variables, name patterns are used instead: `lead(F#_treat) lag(L#_treat)` (`F3_treat` is event time -3, `L0_treat` is event time 0). A table of the coefficients used is shown in the Results window.
 
 Event time -1 is the baseline and plotted as zero if it is the omitted reference period. If the regression estimates it, the estimate is plotted and a warning says that the coefficients are not normalized at t-1 (as in the `did2s` help example); leaving out the dummy for t-1 avoids this. Factor variable and dummies cannot be combined. `avg` and `avgpre` are unweighted means of the plotted coefficients (not the `did2s` average treatment effect); `pvalues` and `pnote` also report joint Wald tests from `e(V)`. Confidence intervals are normal-based, as in `did2s`; `level(90 95)` draws two bands. `pre()`/`post()` limit the plotted event times. All other options are identical to `french_plot` (see above), except that `savedata()` adds the variable `coef`. Details: `help did2s_plot`.
+
+## csdid_plot
+
+Version 0.1.0 (beta). Package folder: [`csdid_plot/`](csdid_plot/).
+
+Event-study plot after `csdid` (Callaway and Sant'Anna; Stata implementation by Rios-Avila, Sant'Anna and Callaway, written for version 1.81). Counterpart of `french_plot`, `lpdid_plot` and `did2s_plot` with the same layout, axis positions, defaults and options. It plots the table of `estat event` (`Tm#`, `Tp#`, `Pre_avg`, `Post_avg`).
+
+**This is a beta version. Please check results against the `estat event` output and report problems via GitHub issues.**
+
+### Installation
+
+```stata
+net install csdid_plot, from("https://raw.githubusercontent.com/jerggutmann/stata-tools/main/csdid_plot/") replace
+```
+
+Re-run the same line to update. Remove with `ado uninstall csdid_plot`.
+
+### Usage
+
+Directly after `estat event`, or directly after `csdid` (then `csdid_plot` calls `estat event` itself):
+
+```stata
+use https://friosavila.github.io/playingwithstata/drdid/mpdta.dta, clear
+csdid lemp lpop, ivar(countyreal) time(year) gvar(first_treat) method(dripw) long2
+estat event
+csdid_plot, avg avgpre pvalues pnote
+```
+
+Standard errors, confidence intervals and p-values are those of `estat event` (uniform bands if `csdid` used `wboot`); `normalci` or `level()` switches to pointwise normal intervals. `avg` and `avgpre` draw `Post_avg` and `Pre_avg` of `csdid`. With the default short gaps, event time -1 is estimated and a warning says that the coefficients are not normalized at t-1; with `long2` in `csdid`, the baseline is zero. `pre()`/`post()` limit the plotted event times. All other options are identical to `french_plot` (see above), except that `savedata()` adds the variable `csdidname`. Details: `help csdid_plot`.
 
 ## cname_std
 
