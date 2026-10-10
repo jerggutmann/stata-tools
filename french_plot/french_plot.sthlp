@@ -230,28 +230,28 @@ for example {cmd:name()}, {cmd:scheme()} or {cmd:title()}.{p_end}
 {phang2}{cmd:. did_multiplegt_dyn Dl_vloans_b county year inter_bra, effects(8) placebo(3) cluster(state_n)}{p_end}
 
 {pstd}Plot them{p_end}
-{phang2}{cmd:. french_plot, effects(8) placebo(3)}{p_end}
+{phang2}{cmd:. french_plot, effects(8) placebo(3) name(f1, replace)}{p_end}
 
 {pstd}Add the average effect and the average placebo, with their values{p_end}
-{phang2}{cmd:. french_plot, effects(8) placebo(3) avg avgpre avgvalues}{p_end}
+{phang2}{cmd:. french_plot, effects(8) placebo(3) avg avgpre avgvalues name(f2, replace)}{p_end}
 
 {pstd}Show the 90 and 95 percent confidence bands, shade the post-treatment area and add the baseline line{p_end}
-{phang2}{cmd:. french_plot, effects(8) placebo(3) level(90 95) shade vline}{p_end}
+{phang2}{cmd:. french_plot, effects(8) placebo(3) level(90 95) shade vline name(f3, replace)}{p_end}
 
 {pstd}Display the p-values in the Results window and as a note below the plot{p_end}
-{phang2}{cmd:. french_plot, effects(8) placebo(3) avg pvalues pnote}{p_end}
+{phang2}{cmd:. french_plot, effects(8) placebo(3) avg pvalues pnote name(f4, replace)}{p_end}
 
 {pstd}Show only the first three effects and the first two placebos{p_end}
-{phang2}{cmd:. french_plot, effects(8) placebo(3) showeffects(3) showplacebo(2)}{p_end}
+{phang2}{cmd:. french_plot, effects(8) placebo(3) showeffects(3) showplacebo(2) name(f5, replace)}{p_end}
 
 {pstd}Express the estimates in percent of a baseline mean of 12.5{p_end}
-{phang2}{cmd:. french_plot, effects(8) placebo(3) pctof(12.5)}{p_end}
+{phang2}{cmd:. french_plot, effects(8) placebo(3) pctof(12.5) name(f6, replace)}{p_end}
 
 {pstd}Change a caption and a legend label{p_end}
-{phang2}{cmd:. french_plot, effects(8) placebo(3) avg postcaption("after the reform") lblavg("mean effect")}{p_end}
+{phang2}{cmd:. french_plot, effects(8) placebo(3) avg postcaption("after the reform") lblavg("mean effect") name(f7, replace)}{p_end}
 
 {pstd}Save the graph{p_end}
-{phang2}{cmd:. french_plot, effects(8) placebo(3) avg export("event_study.png")}{p_end}
+{phang2}{cmd:. french_plot, effects(8) placebo(3) avg export("event_study.png") name(f8, replace)}{p_end}
 
 
 {marker remarks}{...}

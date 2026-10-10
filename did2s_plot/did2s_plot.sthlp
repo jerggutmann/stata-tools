@@ -265,22 +265,22 @@ for example {cmd:name()}, {cmd:scheme()} or {cmd:title()}.{p_end}
 
 {pstd}Plot all coefficients; event time = level minus 20.
 Here event time -1 is estimated, so {cmd:did2s_plot} prints a warning (see Remarks){p_end}
-{phang2}{cmd:. did2s_plot, eventvar(rel_year_shift) shift(20)}{p_end}
+{phang2}{cmd:. did2s_plot, eventvar(rel_year_shift) shift(20) name(d1, replace)}{p_end}
 
 {pstd}Show five pre-treatment periods and ten post-treatment periods, with the average lines and their values{p_end}
-{phang2}{cmd:. did2s_plot, eventvar(rel_year_shift) shift(20) pre(5) post(10) avg avgpre avgvalues}{p_end}
+{phang2}{cmd:. did2s_plot, eventvar(rel_year_shift) shift(20) pre(5) post(10) avg avgpre avgvalues name(d2, replace)}{p_end}
 
 {pstd}Show the 90 and 95 percent confidence bands, shade the post-treatment area and add the baseline line{p_end}
-{phang2}{cmd:. did2s_plot, eventvar(rel_year_shift) shift(20) pre(5) post(10) level(90 95) shade vline}{p_end}
+{phang2}{cmd:. did2s_plot, eventvar(rel_year_shift) shift(20) pre(5) post(10) level(90 95) shade vline name(d3, replace)}{p_end}
 
 {pstd}Display averages and joint tests in the Results window and as a note below the plot{p_end}
-{phang2}{cmd:. did2s_plot, eventvar(rel_year_shift) shift(20) pre(5) post(10) avg avgpre pvalues pnote}{p_end}
+{phang2}{cmd:. did2s_plot, eventvar(rel_year_shift) shift(20) pre(5) post(10) avg avgpre pvalues pnote name(d4, replace)}{p_end}
 
 {pstd}Express the estimates in percent of a baseline mean of 12.5{p_end}
-{phang2}{cmd:. did2s_plot, eventvar(rel_year_shift) shift(20) pre(5) post(10) pctof(12.5)}{p_end}
+{phang2}{cmd:. did2s_plot, eventvar(rel_year_shift) shift(20) pre(5) post(10) pctof(12.5) name(d5, replace)}{p_end}
 
 {pstd}Save the graph{p_end}
-{phang2}{cmd:. did2s_plot, eventvar(rel_year_shift) shift(20) pre(5) post(10) avg export("event_study.png")}{p_end}
+{phang2}{cmd:. did2s_plot, eventvar(rel_year_shift) shift(20) pre(5) post(10) avg export("event_study.png") name(d6, replace)}{p_end}
 
 {pstd}The same model with dummy variables instead of the factor variable.
 Leave out the dummy for event time -1 ({cmd:F1_treat}), so that t-1 is the reference period and no warning appears{p_end}
@@ -291,7 +291,7 @@ Leave out the dummy for event time -1 ({cmd:F1_treat}), so that t-1 is the refer
 {phang3}{cmd:. gen L`k'_treat = (rel_year_shift == 20 + `k')}{p_end}
 {phang2}{cmd:. {c )-}}{p_end}
 {phang2}{cmd:. did2s dep_var, first_stage(i.state i.year) second_stage(F*_treat L*_treat) treatment(treat) cluster(state)}{p_end}
-{phang2}{cmd:. did2s_plot, lead(F#_treat) lag(L#_treat) pre(5) post(10) avg avgpre}{p_end}
+{phang2}{cmd:. did2s_plot, lead(F#_treat) lag(L#_treat) pre(5) post(10) avg avgpre name(d7, replace)}{p_end}
 
 
 {marker remarks}{...}

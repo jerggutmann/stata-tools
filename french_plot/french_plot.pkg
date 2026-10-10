@@ -2,6 +2,6 @@ v 3
 d french_plot - Event-study plot after did_multiplegt_dyn
 d Jerg Gutmann
 d Version 0.3.8 (beta). Plots dynamic effects and placebos with confidence intervals; optionally the average effect, the pooled placebo and p-values. Requires Stata 16 or newer.
-d Distribution-Date: 20261013
+d Distribution-Date: 20261014
 f french_plot.ado
 f french_plot.sthlp

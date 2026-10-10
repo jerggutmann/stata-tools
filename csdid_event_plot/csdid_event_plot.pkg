@@ -2,6 +2,6 @@ v 3
 d csdid_event_plot - Event-study plot after csdid
 d Jerg Gutmann
 d Version 0.1.0 (beta). Plots csdid event-study results (estat event) with the confidence intervals of csdid in the same layout as french_plot, lpdid_plot and did2s_plot; optionally the averages, joint tests and p-values. Requires Stata 16 or newer and csdid.
-d Distribution-Date: 20261013
+d Distribution-Date: 20261014
 f csdid_event_plot.ado
 f csdid_event_plot.sthlp
