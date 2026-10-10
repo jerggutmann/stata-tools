@@ -1,0 +1,6 @@
+pattern;standard;note
+ivoire$;Cote d'Ivoire;cname.do: *Ivoire (broken accents, e.g. Cote D'Ivoire (Ivory Coast))
+^saotom;Sao Tome and Principe;cname.do: Sao Tom*
+^koreadem;Korea, North;cname.do: Korea, Dem*
+^people.*republicofchina$;China;cname.do: People* Republic Of China
+^r[a-z0-9]{1,3}union$;Reunion;cname.do: R?Union (broken accent)

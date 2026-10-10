@@ -1,0 +1,11 @@
+v 3
+d cname_std - Standardize spellings of country names
+d Jerg Gutmann
+d Version 0.2.2 (beta). Replaces or adds a variable with standardized country names, using the plain-text dictionary cname_std_dict.csv (extendable by the user). Requires Stata 16 or newer.
+d Distribution-Date: 20261010
+f cname_std.ado
+f cname_std_add.ado
+f cname_std.sthlp
+f cname_std_add.sthlp
+f cname_std_dict.csv
+f cname_std_patterns.csv
