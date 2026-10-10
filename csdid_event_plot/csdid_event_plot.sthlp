@@ -239,34 +239,34 @@ for example {cmd:name()}, {cmd:scheme()} or {cmd:title()}.{p_end}
 {title:Examples}
 
 {pstd}Load the example data of {cmd:csdid} and estimate all group-time effects{p_end}
-{phang2}{cmd:. use https://friosavila.github.io/playingwithstata/drdid/mpdta.dta, clear}{p_end}
-{phang2}{cmd:. csdid lemp lpop, ivar(countyreal) time(year) gvar(first_treat) method(dripw)}{p_end}
+{phang2}{stata "use https://friosavila.github.io/playingwithstata/drdid/mpdta.dta, clear":. use https://friosavila.github.io/playingwithstata/drdid/mpdta.dta, clear}{p_end}
+{phang2}{stata "csdid lemp lpop, ivar(countyreal) time(year) gvar(first_treat) method(dripw)":. csdid lemp lpop, ivar(countyreal) time(year) gvar(first_treat) method(dripw)}{p_end}
 
 {pstd}Aggregate to the event study; {cmd:csdid_plot} of the {cmd:csdid} package draws it and is kept under the name {cmd:csdid_own} for comparison. Then plot it with {cmd:csdid_event_plot}; the default short gaps estimate event time -1, so a warning is printed{p_end}
-{phang2}{cmd:. estat event}{p_end}
-{phang2}{cmd:. csdid_plot, name(csdid_own, replace)}{p_end}
-{phang2}{cmd:. csdid_event_plot, name(c1, replace)}{p_end}
+{phang2}{stata "estat event":. estat event}{p_end}
+{phang2}{stata "csdid_plot, name(csdid_own, replace)":. csdid_plot, name(csdid_own, replace)}{p_end}
+{phang2}{stata "csdid_event_plot, name(c1, replace)":. csdid_event_plot, name(c1, replace)}{p_end}
 
 {pstd}The same, letting {cmd:csdid_event_plot} call {cmd:estat event}, with the average lines and their values{p_end}
-{phang2}{cmd:. csdid_event_plot, avg avgpre avgvalues name(c2, replace)}{p_end}
+{phang2}{stata "csdid_event_plot, avg avgpre avgvalues name(c2, replace)":. csdid_event_plot, avg avgpre avgvalues name(c2, replace)}{p_end}
 
 {pstd}Normalise at t-1 with a universal base period (option {opt long2}); the baseline is then zero{p_end}
-{phang2}{cmd:. csdid lemp lpop, ivar(countyreal) time(year) gvar(first_treat) method(dripw) long2}{p_end}
-{phang2}{cmd:. csdid_event_plot, avg avgpre name(c3, replace)}{p_end}
+{phang2}{stata "csdid lemp lpop, ivar(countyreal) time(year) gvar(first_treat) method(dripw) long2":. csdid lemp lpop, ivar(countyreal) time(year) gvar(first_treat) method(dripw) long2}{p_end}
+{phang2}{stata "csdid_event_plot, avg avgpre name(c3, replace)":. csdid_event_plot, avg avgpre name(c3, replace)}{p_end}
 
 {pstd}After {opt wboot}, {cmd:estat event} still reports asymptotic intervals, and the plot shows these{p_end}
-{phang2}{cmd:. csdid lemp lpop, ivar(countyreal) time(year) gvar(first_treat) method(dripw) wboot rseed(1) long2}{p_end}
-{phang2}{cmd:. csdid_event_plot, avg avgpre name(c4, replace)}{p_end}
+{phang2}{stata "csdid lemp lpop, ivar(countyreal) time(year) gvar(first_treat) method(dripw) wboot rseed(1) long2":. csdid lemp lpop, ivar(countyreal) time(year) gvar(first_treat) method(dripw) wboot rseed(1) long2}{p_end}
+{phang2}{stata "csdid_event_plot, avg avgpre name(c4, replace)":. csdid_event_plot, avg avgpre name(c4, replace)}{p_end}
 
 {pstd}Pointwise normal intervals instead, at the 90 and 95 percent levels, with shading and the baseline line{p_end}
-{phang2}{cmd:. csdid_event_plot, level(90 95) shade vline name(c5, replace)}{p_end}
+{phang2}{stata "csdid_event_plot, level(90 95) shade vline name(c5, replace)":. csdid_event_plot, level(90 95) shade vline name(c5, replace)}{p_end}
 
 {pstd}Display averages and joint tests in the Results window and as a note below the plot{p_end}
-{phang2}{cmd:. csdid lemp lpop, ivar(countyreal) time(year) gvar(first_treat) method(dripw) long2}{p_end}
-{phang2}{cmd:. csdid_event_plot, avg avgpre pvalues pnote name(c6, replace)}{p_end}
+{phang2}{stata "csdid lemp lpop, ivar(countyreal) time(year) gvar(first_treat) method(dripw) long2":. csdid lemp lpop, ivar(countyreal) time(year) gvar(first_treat) method(dripw) long2}{p_end}
+{phang2}{stata "csdid_event_plot, avg avgpre pvalues pnote name(c6, replace)":. csdid_event_plot, avg avgpre pvalues pnote name(c6, replace)}{p_end}
 
 {pstd}Express the estimates in percent of a baseline mean of 12.5 and save the graph{p_end}
-{phang2}{cmd:. csdid_event_plot, pctof(12.5) avg export("event_study.png") name(c7, replace)}{p_end}
+{phang2}{stata `"csdid_event_plot, pctof(12.5) avg export("event_study.png") name(c7, replace)"':. csdid_event_plot, pctof(12.5) avg export("event_study.png") name(c7, replace)}{p_end}
 
 
 {marker remarks}{...}

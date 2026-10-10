@@ -256,42 +256,43 @@ for example {cmd:name()}, {cmd:scheme()} or {cmd:title()}.{p_end}
 {title:Examples}
 
 {pstd}Load the example data of {cmd:did2s}{p_end}
-{phang2}{cmd:. use https://github.com/kylebutts/did2s_stata/raw/main/data/df_hom.dta, clear}{p_end}
+{phang2}{stata "use https://github.com/kylebutts/did2s_stata/raw/main/data/df_hom.dta, clear":. use https://github.com/kylebutts/did2s_stata/raw/main/data/df_hom.dta, clear}{p_end}
 
 {pstd}Event-study model from the help of {cmd:did2s}: shift the relative years to non-negative values and code never-treated units as 100{p_end}
-{phang2}{cmd:. gen rel_year_shift = rel_year + 20}{p_end}
-{phang2}{cmd:. replace rel_year_shift = 100 if rel_year_shift == .}{p_end}
-{phang2}{cmd:. did2s dep_var, first_stage(i.state i.year) second_stage(ib100.rel_year_shift) treatment(treat) cluster(state)}{p_end}
+{phang2}{stata "gen rel_year_shift = rel_year + 20":. gen rel_year_shift = rel_year + 20}{p_end}
+{phang2}{stata "replace rel_year_shift = 100 if rel_year_shift == .":. replace rel_year_shift = 100 if rel_year_shift == .}{p_end}
+{phang2}{stata "did2s dep_var, first_stage(i.state i.year) second_stage(ib100.rel_year_shift) treatment(treat) cluster(state)":. did2s dep_var, first_stage(i.state i.year) second_stage(ib100.rel_year_shift) treatment(treat) cluster(state)}{p_end}
 
 {pstd}Plot all coefficients; event time = level minus 20.
 Here event time -1 is estimated, so {cmd:did2s_plot} prints a warning (see Remarks){p_end}
-{phang2}{cmd:. did2s_plot, eventvar(rel_year_shift) shift(20) name(d1, replace)}{p_end}
+{phang2}{stata "did2s_plot, eventvar(rel_year_shift) shift(20) name(d1, replace)":. did2s_plot, eventvar(rel_year_shift) shift(20) name(d1, replace)}{p_end}
 
 {pstd}Show five pre-treatment periods and ten post-treatment periods, with the average lines and their values{p_end}
-{phang2}{cmd:. did2s_plot, eventvar(rel_year_shift) shift(20) pre(5) post(10) avg avgpre avgvalues name(d2, replace)}{p_end}
+{phang2}{stata "did2s_plot, eventvar(rel_year_shift) shift(20) pre(5) post(10) avg avgpre avgvalues name(d2, replace)":. did2s_plot, eventvar(rel_year_shift) shift(20) pre(5) post(10) avg avgpre avgvalues name(d2, replace)}{p_end}
 
 {pstd}Show the 90 and 95 percent confidence bands, shade the post-treatment area and add the baseline line{p_end}
-{phang2}{cmd:. did2s_plot, eventvar(rel_year_shift) shift(20) pre(5) post(10) level(90 95) shade vline name(d3, replace)}{p_end}
+{phang2}{stata "did2s_plot, eventvar(rel_year_shift) shift(20) pre(5) post(10) level(90 95) shade vline name(d3, replace)":. did2s_plot, eventvar(rel_year_shift) shift(20) pre(5) post(10) level(90 95) shade vline name(d3, replace)}{p_end}
 
 {pstd}Display averages and joint tests in the Results window and as a note below the plot{p_end}
-{phang2}{cmd:. did2s_plot, eventvar(rel_year_shift) shift(20) pre(5) post(10) avg avgpre pvalues pnote name(d4, replace)}{p_end}
+{phang2}{stata "did2s_plot, eventvar(rel_year_shift) shift(20) pre(5) post(10) avg avgpre pvalues pnote name(d4, replace)":. did2s_plot, eventvar(rel_year_shift) shift(20) pre(5) post(10) avg avgpre pvalues pnote name(d4, replace)}{p_end}
 
 {pstd}Express the estimates in percent of a baseline mean of 12.5{p_end}
-{phang2}{cmd:. did2s_plot, eventvar(rel_year_shift) shift(20) pre(5) post(10) pctof(12.5) name(d5, replace)}{p_end}
+{phang2}{stata "did2s_plot, eventvar(rel_year_shift) shift(20) pre(5) post(10) pctof(12.5) name(d5, replace)":. did2s_plot, eventvar(rel_year_shift) shift(20) pre(5) post(10) pctof(12.5) name(d5, replace)}{p_end}
 
 {pstd}Save the graph{p_end}
-{phang2}{cmd:. did2s_plot, eventvar(rel_year_shift) shift(20) pre(5) post(10) avg export("event_study.png") name(d6, replace)}{p_end}
+{phang2}{stata `"did2s_plot, eventvar(rel_year_shift) shift(20) pre(5) post(10) avg export("event_study.png") name(d6, replace)"':. did2s_plot, eventvar(rel_year_shift) shift(20) pre(5) post(10) avg export("event_study.png") name(d6, replace)}{p_end}
 
 {pstd}The same model with dummy variables instead of the factor variable.
-Leave out the dummy for event time -1 ({cmd:F1_treat}), so that t-1 is the reference period and no warning appears{p_end}
+Leave out the dummy for event time -1 ({cmd:F1_treat}), so that t-1 is the reference period and no warning appears.
+The two loops cannot be run by clicking; copy them into the Command window or a do-file{p_end}
 {phang2}{cmd:. forvalues k = 2/20 {c -(}}{p_end}
 {phang3}{cmd:. gen F`k'_treat = (rel_year_shift == 20 - `k')}{p_end}
 {phang2}{cmd:. {c )-}}{p_end}
 {phang2}{cmd:. forvalues k = 0/20 {c -(}}{p_end}
 {phang3}{cmd:. gen L`k'_treat = (rel_year_shift == 20 + `k')}{p_end}
 {phang2}{cmd:. {c )-}}{p_end}
-{phang2}{cmd:. did2s dep_var, first_stage(i.state i.year) second_stage(F*_treat L*_treat) treatment(treat) cluster(state)}{p_end}
-{phang2}{cmd:. did2s_plot, lead(F#_treat) lag(L#_treat) pre(5) post(10) avg avgpre name(d7, replace)}{p_end}
+{phang2}{stata "did2s dep_var, first_stage(i.state i.year) second_stage(F*_treat L*_treat) treatment(treat) cluster(state)":. did2s dep_var, first_stage(i.state i.year) second_stage(F*_treat L*_treat) treatment(treat) cluster(state)}{p_end}
+{phang2}{stata "did2s_plot, lead(F#_treat) lag(L#_treat) pre(5) post(10) avg avgpre name(d7, replace)":. did2s_plot, lead(F#_treat) lag(L#_treat) pre(5) post(10) avg avgpre name(d7, replace)}{p_end}
 
 
 {marker remarks}{...}

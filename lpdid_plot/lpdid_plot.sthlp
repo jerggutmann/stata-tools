@@ -233,38 +233,38 @@ for example {cmd:name()}, {cmd:scheme()} or {cmd:title()}.{p_end}
 {title:Examples}
 
 {pstd}Load the example data of {cmd:lpdid}{p_end}
-{phang2}{cmd:. use http://fmwww.bc.edu/repec/bocode/l/lpdidtestdata1.dta, clear}{p_end}
+{phang2}{stata "use http://fmwww.bc.edu/repec/bocode/l/lpdidtestdata1.dta, clear":. use http://fmwww.bc.edu/repec/bocode/l/lpdidtestdata1.dta, clear}{p_end}
 
 {pstd}Estimate five pre-treatment and ten post-treatment periods; {opt pooled} stores the pooled estimates (the graph of {cmd:lpdid} appears; the next line keeps it under the name {cmd:lpdid_own} for comparison with the plots below){p_end}
-{phang2}{cmd:. lpdid Y, time(time) unit(unit) treat(treat) pre(5) post(10) pooled}{p_end}
-{phang2}{cmd:. graph rename Graph lpdid_own, replace}{p_end}
+{phang2}{stata "lpdid Y, time(time) unit(unit) treat(treat) pre(5) post(10) pooled":. lpdid Y, time(time) unit(unit) treat(treat) pre(5) post(10) pooled}{p_end}
+{phang2}{stata "graph rename Graph lpdid_own, replace":. graph rename Graph lpdid_own, replace}{p_end}
 
 {pstd}Plot them (same as {cmd:french_plot, effects(11) placebo(4)}){p_end}
-{phang2}{cmd:. lpdid_plot, pre(5) post(10) name(l1, replace)}{p_end}
+{phang2}{stata "lpdid_plot, pre(5) post(10) name(l1, replace)":. lpdid_plot, pre(5) post(10) name(l1, replace)}{p_end}
 
 {pstd}Add the pooled estimates, with their values{p_end}
-{phang2}{cmd:. lpdid_plot, pre(5) post(10) avg avgpre avgvalues name(l2, replace)}{p_end}
+{phang2}{stata "lpdid_plot, pre(5) post(10) avg avgpre avgvalues name(l2, replace)":. lpdid_plot, pre(5) post(10) avg avgpre avgvalues name(l2, replace)}{p_end}
 
 {pstd}Use normal-based intervals, for exact comparability with {cmd:french_plot}{p_end}
-{phang2}{cmd:. lpdid_plot, pre(5) post(10) normalci name(l3, replace)}{p_end}
+{phang2}{stata "lpdid_plot, pre(5) post(10) normalci name(l3, replace)":. lpdid_plot, pre(5) post(10) normalci name(l3, replace)}{p_end}
 
 {pstd}Show the 90 and 95 percent confidence bands, shade the post-treatment area and add the baseline line{p_end}
-{phang2}{cmd:. lpdid_plot, pre(5) post(10) level(90 95) shade vline name(l4, replace)}{p_end}
+{phang2}{stata "lpdid_plot, pre(5) post(10) level(90 95) shade vline name(l4, replace)":. lpdid_plot, pre(5) post(10) level(90 95) shade vline name(l4, replace)}{p_end}
 
 {pstd}Display the p-values in the Results window and as a note below the plot{p_end}
-{phang2}{cmd:. lpdid_plot, pre(5) post(10) avg avgpre pvalues pnote name(l5, replace)}{p_end}
+{phang2}{stata "lpdid_plot, pre(5) post(10) avg avgpre pvalues pnote name(l5, replace)":. lpdid_plot, pre(5) post(10) avg avgpre pvalues pnote name(l5, replace)}{p_end}
 
 {pstd}Show only {cmd:pre2}, {cmd:pre3} and {cmd:tau0} to {cmd:tau2}{p_end}
-{phang2}{cmd:. lpdid_plot, pre(5) post(10) showpre(3) showpost(2) name(l6, replace)}{p_end}
+{phang2}{stata "lpdid_plot, pre(5) post(10) showpre(3) showpost(2) name(l6, replace)":. lpdid_plot, pre(5) post(10) showpre(3) showpost(2) name(l6, replace)}{p_end}
 
 {pstd}Express the estimates in percent of a baseline mean of 12.5{p_end}
-{phang2}{cmd:. lpdid_plot, pre(5) post(10) pctof(12.5) name(l7, replace)}{p_end}
+{phang2}{stata "lpdid_plot, pre(5) post(10) pctof(12.5) name(l7, replace)":. lpdid_plot, pre(5) post(10) pctof(12.5) name(l7, replace)}{p_end}
 
 {pstd}Change a caption and a legend label{p_end}
-{phang2}{cmd:. lpdid_plot, pre(5) post(10) avg postcaption("after the reform") lblavg("mean effect") name(l8, replace)}{p_end}
+{phang2}{stata `"lpdid_plot, pre(5) post(10) avg postcaption("after the reform") lblavg("mean effect") name(l8, replace)"':. lpdid_plot, pre(5) post(10) avg postcaption("after the reform") lblavg("mean effect") name(l8, replace)}{p_end}
 
 {pstd}Save the graph{p_end}
-{phang2}{cmd:. lpdid_plot, pre(5) post(10) avg export("event_study.png") name(l9, replace)}{p_end}
+{phang2}{stata `"lpdid_plot, pre(5) post(10) avg export("event_study.png") name(l9, replace)"':. lpdid_plot, pre(5) post(10) avg export("event_study.png") name(l9, replace)}{p_end}
 
 
 {marker remarks}{...}
