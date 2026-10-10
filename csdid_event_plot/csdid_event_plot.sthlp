@@ -6,20 +6,20 @@
 {vieweralsosee "did2s_plot" "help did2s_plot"}{...}
 {vieweralsosee "[G-2] graph twoway" "help twoway"}{...}
 {vieweralsosee "[G-2] graph export" "help graph_export"}{...}
-{viewerjumpto "Syntax" "csdid_plot##syntax"}{...}
-{viewerjumpto "Description" "csdid_plot##description"}{...}
-{viewerjumpto "Options" "csdid_plot##options"}{...}
-{viewerjumpto "Examples" "csdid_plot##examples"}{...}
-{viewerjumpto "Remarks" "csdid_plot##remarks"}{...}
+{viewerjumpto "Syntax" "csdid_event_plot##syntax"}{...}
+{viewerjumpto "Description" "csdid_event_plot##description"}{...}
+{viewerjumpto "Options" "csdid_event_plot##options"}{...}
+{viewerjumpto "Examples" "csdid_event_plot##examples"}{...}
+{viewerjumpto "Remarks" "csdid_event_plot##remarks"}{...}
 {title:Title}
 
-{phang}{bf:csdid_plot} {hline 2} Event-study plot after {cmd:csdid}
+{phang}{bf:csdid_event_plot} {hline 2} Event-study plot after {cmd:csdid}
 
 
 {marker syntax}{...}
 {title:Syntax}
 
-{p 8 17 2}{cmd:csdid_plot} [{cmd:,} {it:options}]{p_end}
+{p 8 17 2}{cmd:csdid_event_plot} [{cmd:,} {it:options}]{p_end}
 
 {synoptset 26 tabbed}{...}
 {synopthdr}
@@ -75,29 +75,31 @@
 {synoptline}
 {p2colreset}{...}
 
-{pstd}{cmd:csdid_plot} must be run directly after {helpb csdid}.
-The command needs to know which coefficients of {cmd:second_stage()} are event-study coefficients; see {help csdid_plot##naming:Naming the coefficients}.{p_end}
+{pstd}{cmd:csdid_event_plot} must be run directly after {helpb csdid}.
+The command needs to know which coefficients of {cmd:second_stage()} are event-study coefficients; see {help csdid_event_plot##naming:Naming the coefficients}.{p_end}
 
 
 
-{pstd}{cmd:csdid_plot} works with the event-study results of {helpb csdid}.
-Run {cmd:csdid_plot} directly after {cmd:estat event}, or directly after {cmd:csdid}; then it calls {cmd:estat event} itself.{p_end}
+{pstd}{cmd:csdid_event_plot} works with the event-study results of {helpb csdid}.
+Run {cmd:csdid_event_plot} directly after {cmd:estat event}, or directly after {cmd:csdid}; then it calls {cmd:estat event} itself.{p_end}
 
 
 {marker description}{...}
 {title:Description}
 
-{pstd}{cmd:csdid_plot} draws an event-study plot for a single event from the results of {cmd:estat event} after {cmd:csdid} (Callaway and Sant'Anna 2021).
+{pstd}{cmd:csdid_event_plot} draws an event-study plot for a single event from the results of {cmd:estat event} after {cmd:csdid} (Callaway and Sant'Anna 2021).
 It is the counterpart of {helpb french_plot}, {helpb lpdid_plot} and {helpb did2s_plot}.
 All use the same layout, axis positions, defaults and options,
 so that figures from different estimators can be compared directly.{p_end}
 
+{pstd}Do not confuse it with {cmd:csdid_plot}, the plot command that comes with {cmd:csdid} itself; the two do not interfere.{p_end}
+
 {pstd}{cmd:estat event} reports the dynamic effects in columns named {cmd:Tm}{it:k} ({it:k} periods before treatment) and {cmd:Tp}{it:k} ({it:k} periods after),
 plus the averages {cmd:Pre_avg} and {cmd:Post_avg}.
-{cmd:csdid_plot} reads the table {cmd:r(table)} of {cmd:estat event}.
+{cmd:csdid_event_plot} reads the table {cmd:r(table)} of {cmd:estat event}.
 Event time -{it:k} is plotted at -{it:k}, and event time {it:k} {ul:>} 0 at {it:k}, labelled {it:k}+1, as in the other commands.
 Event time -1 ({cmd:Tm1}) is the baseline.
-If {cmd:Tm1} is not in the table, the baseline is set to zero; see {help csdid_plot##norm:Normalisation at t-1}.
+If {cmd:Tm1} is not in the table, the baseline is set to zero; see {help csdid_event_plot##norm:Normalisation at t-1}.
 Event times without a column appear as gaps.{p_end}
 
 {pstd}By default, the plot uses the standard errors, confidence intervals and p-values that {cmd:estat event} reports.
@@ -108,7 +110,7 @@ The average lines are {cmd:Pre_avg} and {cmd:Post_avg} of {cmd:csdid}.{p_end}
 {pstd}{bf:Normalisation at t-1.}
 By default, {cmd:csdid} estimates pre-treatment effects with short gaps:
 each pre-treatment effect compares period {it:t} with period {it:t}-1, so event time -1 is estimated and is not zero by construction.
-In that case {cmd:csdid_plot} plots the estimate and prints a warning, because the coefficients are not normalised to zero at t-1.
+In that case {cmd:csdid_event_plot} plots the estimate and prints a warning, because the coefficients are not normalised to zero at t-1.
 The graph is still drawn, but the specification should be reconsidered.
 With option {opt long2} in {cmd:csdid}, all pre-treatment effects use period -1 as the base; {cmd:Tm1} is then not estimated and the baseline is plotted as zero.{p_end}
 
@@ -242,28 +244,28 @@ for example {cmd:name()}, {cmd:scheme()} or {cmd:title()}.{p_end}
 
 {pstd}Aggregate to the event study and plot it; the default short gaps estimate event time -1, so a warning is printed{p_end}
 {phang2}{cmd:. estat event}{p_end}
-{phang2}{cmd:. csdid_plot}{p_end}
+{phang2}{cmd:. csdid_event_plot}{p_end}
 
-{pstd}The same, letting {cmd:csdid_plot} call {cmd:estat event}, with the average lines and their values{p_end}
-{phang2}{cmd:. csdid_plot, avg avgpre avgvalues}{p_end}
+{pstd}The same, letting {cmd:csdid_event_plot} call {cmd:estat event}, with the average lines and their values{p_end}
+{phang2}{cmd:. csdid_event_plot, avg avgpre avgvalues}{p_end}
 
 {pstd}Normalise at t-1 with a universal base period (option {opt long2}); the baseline is then zero{p_end}
 {phang2}{cmd:. csdid lemp lpop, ivar(countyreal) time(year) gvar(first_treat) method(dripw) long2}{p_end}
-{phang2}{cmd:. csdid_plot, avg avgpre}{p_end}
+{phang2}{cmd:. csdid_event_plot, avg avgpre}{p_end}
 
 {pstd}After {opt wboot}, {cmd:estat event} still reports asymptotic intervals, and the plot shows these{p_end}
 {phang2}{cmd:. csdid lemp lpop, ivar(countyreal) time(year) gvar(first_treat) method(dripw) wboot rseed(1) long2}{p_end}
-{phang2}{cmd:. csdid_plot, avg avgpre}{p_end}
+{phang2}{cmd:. csdid_event_plot, avg avgpre}{p_end}
 
 {pstd}Pointwise normal intervals instead, at the 90 and 95 percent levels, with shading and the baseline line{p_end}
-{phang2}{cmd:. csdid_plot, level(90 95) shade vline}{p_end}
+{phang2}{cmd:. csdid_event_plot, level(90 95) shade vline}{p_end}
 
 {pstd}Display averages and joint tests in the Results window and as a note below the plot{p_end}
 {phang2}{cmd:. csdid lemp lpop, ivar(countyreal) time(year) gvar(first_treat) method(dripw) long2}{p_end}
-{phang2}{cmd:. csdid_plot, avg avgpre pvalues pnote}{p_end}
+{phang2}{cmd:. csdid_event_plot, avg avgpre pvalues pnote}{p_end}
 
 {pstd}Express the estimates in percent of a baseline mean of 12.5 and save the graph{p_end}
-{phang2}{cmd:. csdid_plot, pctof(12.5) avg export("event_study.png")}{p_end}
+{phang2}{cmd:. csdid_event_plot, pctof(12.5) avg export("event_study.png")}{p_end}
 
 
 {marker remarks}{...}
@@ -271,9 +273,9 @@ for example {cmd:name()}, {cmd:scheme()} or {cmd:title()}.{p_end}
 
 {pstd}Requires Stata 16 or newer and {cmd:csdid} (written for version 1.81, the version distributed at SSC).{p_end}
 
-{pstd}{cmd:csdid_plot} reads {cmd:r()} of {cmd:estat event} when it is called directly afterwards, and the Results window states which source was used.
-Any command that changes {cmd:r()} in between makes {cmd:csdid_plot} run {cmd:estat event} again with default options.
-After the plot, {cmd:csdid_plot} returns the table, so that it can be called repeatedly with different options.
+{pstd}{cmd:csdid_event_plot} reads {cmd:r()} of {cmd:estat event} when it is called directly afterwards, and the Results window states which source was used.
+Any command that changes {cmd:r()} in between makes {cmd:csdid_event_plot} run {cmd:estat event} again with default options.
+After the plot, {cmd:csdid_event_plot} returns the table, so that it can be called repeatedly with different options.
 Other aggregations ({cmd:estat group}, {cmd:estat calendar}, {cmd:estat simple}) are not plotted.{p_end}
 
 {pstd}The coefficients, standard errors, intervals and p-values are those of {cmd:estat event}.
@@ -293,7 +295,7 @@ The plot does not re-estimate anything.{p_end}
 
 {pstd}Please report problems and suggestions at
 {browse "https://github.com/jerggutmann/stata-tools/issues"}.
-Re-run {cmd:net install csdid_plot, replace} to get the latest version.{p_end}
+Re-run {cmd:net install csdid_event_plot, replace} to get the latest version.{p_end}
 
 
 {title:Also see}

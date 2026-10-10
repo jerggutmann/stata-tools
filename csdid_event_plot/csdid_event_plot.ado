@@ -1,6 +1,6 @@
-*! csdid_plot 0.1.0  11oct2026  Jerg Gutmann
+*! csdid_event_plot 0.1.0  11oct2026  Jerg Gutmann
 *! Event-study plot after csdid (estat event); same layout as french_plot, lpdid_plot and did2s_plot
-program define csdid_plot, rclass
+program define csdid_event_plot, rclass
 	version 16
 	syntax , [ PRE(integer -999) POST(integer -999) ///
 		AVG AVGPre AVGValues PVAlues PNOte ///
@@ -23,10 +23,10 @@ program define csdid_plot, rclass
 	cap matrix `BB' = r(bb)
 	cap matrix `VV' = r(vv)
 	if "`rcmd'" == "estat" & "`ragg'" == "event" & `rt' == 0 {
-		di as text "csdid_plot: using the results of the preceding estat event"
+		di as text "csdid_event_plot: using the results of the preceding estat event"
 	}
 	else {
-		di as text "csdid_plot: running estat event"
+		di as text "csdid_event_plot: running estat event"
 		if "`e(cmd)'" != "csdid" {
 			di as error "last estimates not found; run csdid first"
 			exit 301
@@ -252,11 +252,11 @@ program define csdid_plot, rclass
 			}
 		}
 		if `npc' >= 2 {
-			_csdid_plot_wald `BB' `VV' "`pcols'"
+			_csdid_event_plot_wald `BB' `VV' "`pcols'"
 			local jpre = r(p)
 		}
 		if `nqc' >= 2 {
-			_csdid_plot_wald `BB' `VV' "`qcols'"
+			_csdid_event_plot_wald `BB' `VV' "`qcols'"
 			local jpost = r(p)
 		}
 	}
@@ -271,7 +271,7 @@ program define csdid_plot, rclass
 		local pb : display string(`bpre', "`fmt'")
 		local ps : display string(`sepre', "`fmt'")
 		local pp : display string(`ppre', "`fmt'")
-		di as text _n "csdid_plot: summary of the plotted model"
+		di as text _n "csdid_event_plot: summary of the plotted model"
 		if `sc' != 1 di as text "(estimates multiplied by " as result `sc' as text ")"
 		di as text "{hline 62}"
 		di as text %-30s "" %10s "estimate" %10s "s.e." %10s "p-value"
@@ -513,7 +513,7 @@ program define csdid_plot, rclass
 	if "`export'" != "" graph export "`export'", replace
 	restore
 
-	* pass the estat event results on, so that csdid_plot can be called repeatedly
+	* pass the estat event results on, so that csdid_event_plot can be called repeatedly
 	return local cmd "estat"
 	return local agg "event"
 	return matrix table = `T'
@@ -522,7 +522,7 @@ program define csdid_plot, rclass
 end
 
 * joint Wald test that the selected coefficients (positions in r(bb)) are all zero
-program define _csdid_plot_wald, rclass
+program define _csdid_event_plot_wald, rclass
 	args B V cols
 	local n : word count `cols'
 	tempname S bs Vs Vi q
