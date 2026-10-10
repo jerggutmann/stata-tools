@@ -284,8 +284,12 @@ Here event time -1 is estimated, so {cmd:did2s_plot} prints a warning (see Remar
 
 {pstd}The same model with dummy variables instead of the factor variable.
 Leave out the dummy for event time -1 ({cmd:F1_treat}), so that t-1 is the reference period and no warning appears{p_end}
-{phang2}{cmd:. forvalues k = 2/20 {c -(} gen F`k'_treat = (rel_year_shift == 20 - `k') {c )-}}{p_end}
-{phang2}{cmd:. forvalues k = 0/20 {c -(} gen L`k'_treat = (rel_year_shift == 20 + `k') {c )-}}{p_end}
+{phang2}{cmd:. forvalues k = 2/20 {c -(}}{p_end}
+{phang3}{cmd:. gen F`k'_treat = (rel_year_shift == 20 - `k')}{p_end}
+{phang2}{cmd:. {c )-}}{p_end}
+{phang2}{cmd:. forvalues k = 0/20 {c -(}}{p_end}
+{phang3}{cmd:. gen L`k'_treat = (rel_year_shift == 20 + `k')}{p_end}
+{phang2}{cmd:. {c )-}}{p_end}
 {phang2}{cmd:. did2s dep_var, first_stage(i.state i.year) second_stage(F*_treat L*_treat) treatment(treat) cluster(state)}{p_end}
 {phang2}{cmd:. did2s_plot, lead(F#_treat) lag(L#_treat) pre(5) post(10) avg avgpre}{p_end}
 
