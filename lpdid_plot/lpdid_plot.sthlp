@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.1.1  10oct2026  Jerg Gutmann}{...}
+{* *! version 0.1.2  11oct2026  Jerg Gutmann}{...}
 {vieweralsosee "lpdid" "help lpdid"}{...}
 {vieweralsosee "lpdid_plot" "help lpdid_plot"}{...}
 {vieweralsosee "[G-2] graph twoway" "help twoway"}{...}
@@ -144,7 +144,8 @@ The default p-values are also those of {cmd:lpdid}.
 {opt normalci} is needed for exactly the same intervals as in {helpb french_plot}.{p_end}
 
 {phang}{opt level(# [#])} sets the confidence level and implies {opt normalci}.
-Without {opt level()} and {opt normalci}, the level is the one used in {cmd:lpdid}.
+Without {opt level()} and {opt normalci}, the intervals are those of {cmd:lpdid}, with the level chosen there (default 95).
+With {opt normalci} alone, the level is 95, the default of {cmd:lpdid}; if you ran {cmd:lpdid} with {cmd:level()}, specify the same level here.
 With two values, for example {cmd:level(90 95)}, the smaller level is drawn as a darker inner band
 and the larger as a lighter outer band.
 The p-values are then calculated from the estimate and the standard error using the normal distribution.{p_end}

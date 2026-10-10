@@ -91,7 +91,7 @@ Periods that could not be estimated appear as gaps. `shade` and `vline` cannot b
 
 ## lpdid_plot
 
-Version 0.1.1 (beta). Package folder: [`lpdid_plot/`](lpdid_plot/).
+Version 0.1.2 (beta). Package folder: [`lpdid_plot/`](lpdid_plot/).
 
 Event-study plot after `lpdid` (Busch and Girardi). Counterpart of `french_plot` with the same layout, axis positions, defaults and options, so that figures from `lpdid` and `did_multiplegt_dyn` are directly comparable. Baseline at -1, `pre n` at -n, `tau k` at k (labelled k+1).
 
