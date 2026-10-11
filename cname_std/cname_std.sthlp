@@ -177,8 +177,8 @@ The standard name must already exist in the dictionary, otherwise the command st
 Create a file in the format below and pass it with {opt extra(filename)}.{p_end}
 
 {phang}3. {bf:The package dictionary.}
-Add a line to {cmd:cname_std_dict.csv} in the GitHub repository and send a pull request,
-so that everybody gets the new spelling with the next update.{p_end}
+Suggest new spellings at {browse "https://github.com/jerggutmann/stata-tools/issues"};
+they enter the package dictionary with the next update.{p_end}
 
 {pstd}Entries of {cmd:extra()} override your PERSONAL file, and both override the package dictionary.
 If one file contains the same spelling with two different standard names, the command stops with error 498.{p_end}
