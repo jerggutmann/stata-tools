@@ -2,16 +2,108 @@
 
 Small Stata programs by Jerg Gutmann. Each package lives in its own folder and is installed with `net install` from that folder. All packages are released under the MIT licence, see [Licence](#licence).
 
+All commands require Stata 16 or newer. The plot commands also require the estimation command they plot, which must be installed separately and may require further packages, as documented by its authors.
+
 ## Contents
 
 | Package | Purpose |
 |---|---|
-| [`dcdh_plot`](#dcdh_plot) | event-study plot after `did_multiplegt_dyn` |
-| [`dcdh_compare`](#dcdh_compare) | runs two `did_multiplegt_dyn` models and plots both in one figure, same layout as `dcdh_plot` |
-| [`lpdid_plot`](#lpdid_plot) | event-study plot after `lpdid`, same layout as `dcdh_plot` |
-| [`did2s_plot`](#did2s_plot) | event-study plot after `did2s`, same layout as `dcdh_plot` |
-| [`csdid_event_plot`](#csdid_event_plot) | event-study plot after `csdid` (`estat event`), same layout as `dcdh_plot` |
 | [`cname_std`](#cname_std) | standardize spellings of country names |
+| [`csdid_event_plot`](#csdid_event_plot) | event-study plot after `csdid` (`estat event`), same layout as `dcdh_plot` |
+| [`dcdh_compare`](#dcdh_compare) | runs two `did_multiplegt_dyn` models and plots both in one figure, same layout as `dcdh_plot` |
+| [`dcdh_plot`](#dcdh_plot) | event-study plot after `did_multiplegt_dyn` |
+| [`did2s_plot`](#did2s_plot) | event-study plot after `did2s`, same layout as `dcdh_plot` |
+| [`lpdid_plot`](#lpdid_plot) | event-study plot after `lpdid`, same layout as `dcdh_plot` |
+
+## cname_std
+
+Version 0.2.2 (beta). Package folder: [`cname_std/`](cname_std/).
+
+Standardizes the spelling of country names in a string variable (`cname` by default). A dictionary of about 2,000 spellings (English, German, French, Spanish, plus the spellings known from `kountry` and an own list) is matched ignoring case, accents, punctuation and spaces. Names that are not found are only trimmed and capitalized and are reported, so the dictionary can be extended step by step.
+
+**This is a beta version. Please report problems via GitHub issues.**
+
+### Installation
+
+```stata
+net install cname_std, from("https://raw.githubusercontent.com/jerggutmann/stata-tools/main/cname_std/") replace
+```
+
+Re-run the same line to update the dictionary. Remove with `ado uninstall cname_std`.
+
+### Usage
+
+```stata
+cname_std                                // overwrite cname in place
+cname_std, new marker                    // result in cname_new, flag in cname_new_marker
+cname_std, varname(country) new(iso_name)
+cname_std, alt(germany ussr)             // switch historical conventions
+cname_std_add "Netherlands, The" "Netherlands"   // add a spelling to your personal dictionary
+```
+
+`marker` is 0 (recognized, unchanged), 1 (changed), 2 (not recognized, only cleaned) or 3 (ambiguous, not standardized, e.g. "Kongo" or "Virgin Islands"). Filter on 2 to find spellings that belong in the dictionary.
+
+### Conventions
+
+The command standardizes spellings and does not merge entries. West Germany is Germany, the USSR is Russia, Czechoslovakia is Czechia; North/South Korea, Vietnam and Yemen and East Germany keep separate names; Serbia, Montenegro, Serbia and Montenegro and Yugoslavia are separate; Great Britain, England, Wales and the United Kingdom are separate (a note is shown if "Great Britain" occurs). Plain "Korea" is South Korea. The complete list and all options are in `help cname_std`.
+
+### Adding spellings
+
+Spellings that are not recognized (marker 2) can be added to a personal dictionary with `cname_std_add`; it is read automatically and survives updates. Suggestions for the general dictionary are welcome as [GitHub issues](https://github.com/jerggutmann/stata-tools/issues).
+
+## csdid_event_plot
+
+Version 0.1.0 (beta). Package folder: [`csdid_event_plot/`](csdid_event_plot/).
+
+Event-study plot after `csdid` (Callaway and Sant'Anna; Stata implementation by Rios-Avila, Sant'Anna and Callaway, written for version 1.81). Counterpart of `dcdh_plot`, `lpdid_plot` and `did2s_plot` with the same layout, axis positions, defaults and options. It plots the table of `estat event` (`Tm#`, `Tp#`, `Pre_avg`, `Post_avg`). The name differs from `csdid_plot`, which belongs to the `csdid` package itself and is not touched by this package.
+
+**This is a beta version. Please check results against the `estat event` output and report problems via GitHub issues.**
+
+### Installation
+
+```stata
+net install csdid_event_plot, from("https://raw.githubusercontent.com/jerggutmann/stata-tools/main/csdid_event_plot/") replace
+```
+
+Re-run the same line to update. Remove with `ado uninstall csdid_event_plot`.
+
+### Usage
+
+Directly after `estat event`, or directly after `csdid` (then `csdid_event_plot` calls `estat event` itself):
+
+```stata
+use https://friosavila.github.io/playingwithstata/drdid/mpdta.dta, clear
+csdid lemp lpop, ivar(countyreal) time(year) gvar(first_treat) method(dripw) long2
+estat event
+csdid_event_plot, avg avgpre pvalues pnote
+```
+
+Standard errors, confidence intervals and p-values are those of `estat event` (asymptotic and pointwise, also if `csdid` used `wboot`); `normalci` or `level()` switches to pointwise normal intervals. `avg` and `avgpre` draw `Post_avg` and `Pre_avg` of `csdid`. With the default short gaps, event time -1 is estimated and a warning says that the coefficients are not normalized at t-1; with `long2` in `csdid`, the baseline is zero. `pre()`/`post()` limit the plotted event times. A console note states whenever the intervals are not those of `estat event`. All other options are identical to `dcdh_plot` (see [`dcdh_plot`](#dcdh_plot)). Details: `help csdid_event_plot`.
+
+## dcdh_compare
+
+Version 0.1.0 (beta). Package folder: [`dcdh_compare/`](dcdh_compare/).
+
+Runs two `did_multiplegt_dyn` estimations and draws both event studies in one plot with the layout and options of `dcdh_plot`. Each model is a complete `did_multiplegt_dyn` specification in parentheses, so the models can differ in outcome, treatment, sample, controls or options. The graphs of `did_multiplegt_dyn` are kept as `dc_m1` and `dc_m2`, the joint graph as `dc_compare`, and both results are stored with `estimates store` (`dc_m1`, `dc_m2`; model 1 is active afterwards).
+
+**This is a beta version. Please check results against the `did_multiplegt_dyn` output and report problems via GitHub issues.**
+
+### Installation
+
+```stata
+net install dcdh_compare, from("https://raw.githubusercontent.com/jerggutmann/stata-tools/main/dcdh_compare/") replace
+```
+
+Re-run the same line to update. Remove with `ado uninstall dcdh_compare`.
+
+### Usage
+
+```stata
+use favara_imbs_did_multiplegt_dyn.dta, clear
+dcdh_compare (Dl_vloans_b county year inter_bra, effects(8) placebo(3) cluster(state_n)) (Dl_vloans_b county year inter_bra, effects(8) placebo(3) cluster(state_n) only_never_switchers), lbl1("not-yet-switchers") lbl2("never-switchers") avg avgpre pvalues
+```
+
+The plot covers the longer of the two event-time ranges. Confidence intervals are b ± z·se at the `ci_level()` of the models (95 by default), i.e. identical to those displayed by `did_multiplegt_dyn`; a different `level()` is announced by a note. `scale()` and `pctof()` take one value for both models or one per model. `lbl1()`/`lbl2()`, `color1()`/`color2()` and `msymbol1()`/`msymbol2()` set names, colours and markers; `stub()` changes the prefix of the graph and estimate names. All other options are those of `dcdh_plot`; `effects()`/`placebo()` are part of the model specifications. `dcdh_compare, redraw [options]` draws the stored results again with other graph options, without re-estimating. There is no test of the difference between the models. `by()` and `by_path()` are not supported. Details: `help dcdh_compare`.
 
 ## dcdh_plot
 
@@ -86,59 +178,6 @@ dcdh_plot, effects(5) placebo(3) avg avgpre pvalues shade export("event_study.pn
 
 Periods that could not be estimated appear as gaps. `shade` and `vline` cannot be combined with `ylab()`. Any other option is passed to `twoway`. Details: `help dcdh_plot`.
 
-## dcdh_compare
-
-Version 0.1.0 (beta). Package folder: [`dcdh_compare/`](dcdh_compare/).
-
-Runs two `did_multiplegt_dyn` estimations and draws both event studies in one plot with the layout and options of `dcdh_plot`. Each model is a complete `did_multiplegt_dyn` specification in parentheses, so the models can differ in outcome, treatment, sample, controls or options. The graphs of `did_multiplegt_dyn` are kept as `dc_m1` and `dc_m2`, the joint graph as `dc_compare`, and both results are stored with `estimates store` (`dc_m1`, `dc_m2`; model 1 is active afterwards).
-
-**This is a beta version. Please check results against the `did_multiplegt_dyn` output and report problems via GitHub issues.**
-
-### Installation
-
-```stata
-net install dcdh_compare, from("https://raw.githubusercontent.com/jerggutmann/stata-tools/main/dcdh_compare/") replace
-```
-
-Re-run the same line to update. Remove with `ado uninstall dcdh_compare`.
-
-### Usage
-
-```stata
-use favara_imbs_did_multiplegt_dyn.dta, clear
-dcdh_compare (Dl_vloans_b county year inter_bra, effects(8) placebo(3) cluster(state_n)) (Dl_vloans_b county year inter_bra, effects(8) placebo(3) cluster(state_n) only_never_switchers), lbl1("not-yet-switchers") lbl2("never-switchers") avg avgpre pvalues
-```
-
-The plot window covers the longer of the two models. Confidence intervals are b ± z·se at the `ci_level()` of the models (95 by default), i.e. identical to those displayed by `did_multiplegt_dyn`; a different `level()` is announced by a note. `scale()` and `pctof()` take one value for both models or one per model. `lbl1()`/`lbl2()`, `color1()`/`color2()` and `msymbol1()`/`msymbol2()` set names, colours and markers; `stub()` changes the prefix of the graph and estimate names. All other options are those of `dcdh_plot`; `effects()`/`placebo()` are part of the model specifications. `dcdh_compare, redraw [options]` draws the stored results again with other graph options, without re-estimating. There is no test of the difference between the models. `by()` and `by_path()` are not supported. Details: `help dcdh_compare`.
-
-## lpdid_plot
-
-Version 0.2.0 (beta). Package folder: [`lpdid_plot/`](lpdid_plot/).
-
-Event-study plot after `lpdid` (Busch and Girardi). Counterpart of `dcdh_plot` with the same layout, axis positions, defaults and options, so that figures from `lpdid` and `did_multiplegt_dyn` are directly comparable. Baseline at -1, `pre n` at -n, `tau k` at k (labelled k+1).
-
-**This is a beta version and has not been extensively tested. Please check results against the `lpdid` output and report problems via GitHub issues.**
-
-### Installation
-
-```stata
-net install lpdid_plot, from("https://raw.githubusercontent.com/jerggutmann/stata-tools/main/lpdid_plot/") replace
-```
-
-Re-run the same line to update. Remove with `ado uninstall lpdid_plot`.
-
-### Usage
-
-`pre()` and `post()` default to the windows of `lpdid` (taken from `e()`); they can be given to plot fewer periods:
-
-```stata
-use http://fmwww.bc.edu/repec/bocode/l/lpdidtestdata1.dta, clear
-lpdid Y, time(time) unit(unit) treat(treat) pre(5) post(10) pooled
-lpdid_plot, pre(5) post(10) avg avgpre pvalues shade export("event_study.png")
-```
-
-With `pre(U)` and `post(T-1)` in `lpdid`, the plot corresponds to `placebo(U-1)` and `effects(T)` in `dcdh_plot`. The average lines and p-values (`avg`, `avgpre`, `pvalues`, `pnote`) come from `e(pooled_results)`, which `lpdid` stores only with its option `pooled`. Confidence intervals and p-values are those stored by `lpdid` (t-based); `normalci` or `level()` switches to normal-based ones, identical to `dcdh_plot`. All other options are identical to `dcdh_plot` (see above), except `pre()`/`post()` and `showpre()`/`showpost()` instead of `effects()`/`placebo()` and `showeffects()`/`showplacebo()`. The joint placebo test is the pre-trend test of `lpdid` (option `pretrend_test`). A console note states whenever the intervals are not those of `lpdid`. Details: `help lpdid_plot`.
-
 ## did2s_plot
 
 Version 0.1.1 (beta). Package folder: [`did2s_plot/`](did2s_plot/).
@@ -169,72 +208,35 @@ did2s_plot, eventvar(rel_year_shift) shift(20) pre(5) post(10) avg avgpre pvalue
 
 `eventvar()` names the factor variable; level `v` is event time `v - shift()`. Base levels outside the estimated range (here the never-treated group 100) are ignored. With dummy variables, name patterns are used instead: `lead(F#_treat) lag(L#_treat)` (`F3_treat` is event time -3, `L0_treat` is event time 0). A table of the coefficients used is shown in the Results window.
 
-Event time -1 is the baseline and plotted as zero if it is the omitted reference period. If the regression estimates it, the estimate is plotted and a warning says that the coefficients are not normalized at t-1 (as in the `did2s` help example); leaving out the dummy for t-1 avoids this. Factor variable and dummies cannot be combined. `avg` and `avgpre` are unweighted means of the plotted coefficients (not the `did2s` average treatment effect); `pvalues` and `pnote` also report joint Wald tests from `e(V)`. Confidence intervals are normal-based, as displayed by `did2s` (`level()` defaults to the current `c(level)`; `level(90 95)` draws two bands; `normalci` is accepted for consistency). `pre()`/`post()` limit the plotted event times. All other options are identical to `dcdh_plot` (see above), except that `eventvar()`, `shift()`, `lead()` and `lag()` identify the coefficients. Details: `help did2s_plot`.
+Event time -1 is the baseline and plotted as zero if it is the omitted reference period. If the regression estimates it, the estimate is plotted and a warning says that the coefficients are not normalized at t-1 (as in the `did2s` help example); leaving out the dummy for t-1 avoids this. Factor variable and dummies cannot be combined. `avg` and `avgpre` are unweighted means of the plotted coefficients (not the `did2s` average treatment effect); `pvalues` and `pnote` also report joint Wald tests from `e(V)`. Confidence intervals are normal-based, as displayed by `did2s` (`level()` defaults to the current `c(level)`; `level(90 95)` draws two bands; `normalci` is accepted for consistency). `pre()`/`post()` limit the plotted event times. All other options are identical to `dcdh_plot` (see [`dcdh_plot`](#dcdh_plot)), except that `eventvar()`, `shift()`, `lead()` and `lag()` identify the coefficients. Details: `help did2s_plot`.
 
-## csdid_event_plot
+## lpdid_plot
 
-Version 0.1.0 (beta). Package folder: [`csdid_event_plot/`](csdid_event_plot/).
+Version 0.2.0 (beta). Package folder: [`lpdid_plot/`](lpdid_plot/).
 
-Event-study plot after `csdid` (Callaway and Sant'Anna; Stata implementation by Rios-Avila, Sant'Anna and Callaway, written for version 1.81). Counterpart of `dcdh_plot`, `lpdid_plot` and `did2s_plot` with the same layout, axis positions, defaults and options. It plots the table of `estat event` (`Tm#`, `Tp#`, `Pre_avg`, `Post_avg`). The name differs from `csdid_plot`, which belongs to the `csdid` package itself and is not touched by this package.
+Event-study plot after `lpdid` (Busch and Girardi). Counterpart of `dcdh_plot` with the same layout, axis positions, defaults and options, so that figures from `lpdid` and `did_multiplegt_dyn` are directly comparable. Baseline at -1, `pre n` at -n, `tau k` at k (labelled k+1).
 
-**This is a beta version. Please check results against the `estat event` output and report problems via GitHub issues.**
-
-### Installation
-
-```stata
-net install csdid_event_plot, from("https://raw.githubusercontent.com/jerggutmann/stata-tools/main/csdid_event_plot/") replace
-```
-
-Re-run the same line to update. Remove with `ado uninstall csdid_event_plot`.
-
-### Usage
-
-Directly after `estat event`, or directly after `csdid` (then `csdid_event_plot` calls `estat event` itself):
-
-```stata
-use https://friosavila.github.io/playingwithstata/drdid/mpdta.dta, clear
-csdid lemp lpop, ivar(countyreal) time(year) gvar(first_treat) method(dripw) long2
-estat event
-csdid_event_plot, avg avgpre pvalues pnote
-```
-
-Standard errors, confidence intervals and p-values are those of `estat event` (asymptotic and pointwise, also if `csdid` used `wboot`); `normalci` or `level()` switches to pointwise normal intervals. `avg` and `avgpre` draw `Post_avg` and `Pre_avg` of `csdid`. With the default short gaps, event time -1 is estimated and a warning says that the coefficients are not normalized at t-1; with `long2` in `csdid`, the baseline is zero. `pre()`/`post()` limit the plotted event times. A console note states whenever the intervals are not those of `estat event`. All other options are identical to `dcdh_plot` (see above). Details: `help csdid_event_plot`.
-
-## cname_std
-
-Version 0.2.2 (beta). Package folder: [`cname_std/`](cname_std/).
-
-Standardizes the spelling of country names in a string variable (`cname` by default). A dictionary of about 2,000 spellings (English, German, French, Spanish, plus the spellings known from `kountry` and an own list) is matched ignoring case, accents, punctuation and spaces. Names that are not found are only trimmed and capitalized and are reported, so the dictionary can be extended step by step.
-
-**This is a beta version. Please report problems via GitHub issues.**
+**This is a beta version and has not been extensively tested. Please check results against the `lpdid` output and report problems via GitHub issues.**
 
 ### Installation
 
 ```stata
-net install cname_std, from("https://raw.githubusercontent.com/jerggutmann/stata-tools/main/cname_std/") replace
+net install lpdid_plot, from("https://raw.githubusercontent.com/jerggutmann/stata-tools/main/lpdid_plot/") replace
 ```
 
-Re-run the same line to update the dictionary. Remove with `ado uninstall cname_std`.
+Re-run the same line to update. Remove with `ado uninstall lpdid_plot`.
 
 ### Usage
 
+`pre()` and `post()` default to the windows of `lpdid` (taken from `e()`); they can be given to plot fewer periods:
+
 ```stata
-cname_std                                // overwrite cname in place
-cname_std, new marker                    // result in cname_new, flag in cname_new_marker
-cname_std, varname(country) new(iso_name)
-cname_std, alt(germany ussr)             // switch historical conventions
-cname_std_add "Netherlands, The" "Netherlands"   // add a spelling to your personal dictionary
+use http://fmwww.bc.edu/repec/bocode/l/lpdidtestdata1.dta, clear
+lpdid Y, time(time) unit(unit) treat(treat) pre(5) post(10) pooled
+lpdid_plot, pre(5) post(10) avg avgpre pvalues shade export("event_study.png")
 ```
 
-`marker` is 0 (recognized, unchanged), 1 (changed), 2 (not recognized, only cleaned) or 3 (ambiguous, not standardized, e.g. "Kongo" or "Virgin Islands"). Filter on 2 to find spellings that belong in the dictionary.
-
-### Conventions
-
-The command standardizes spellings and does not merge entries. West Germany is Germany, the USSR is Russia, Czechoslovakia is Czechia; North/South Korea, Vietnam and Yemen and East Germany keep separate names; Serbia, Montenegro, Serbia and Montenegro and Yugoslavia are separate; Great Britain, England, Wales and the United Kingdom are separate (a note is shown if "Great Britain" occurs). Plain "Korea" is South Korea. The complete list and all options are in `help cname_std`.
-
-### Adding spellings
-
-Edit `cname_std/cname_std_dict.csv` (columns `variant;standard;note;group;alt`, semicolon-separated, UTF-8) and open a pull request, or use `cname_std_add` for a personal dictionary that survives updates. The smoke test is `cname_std/test/cname_std_test.do`.
+With `pre(U)` and `post(T-1)` in `lpdid`, the plot corresponds to `placebo(U-1)` and `effects(T)` in `dcdh_plot`. The average lines and p-values (`avg`, `avgpre`, `pvalues`, `pnote`) come from `e(pooled_results)`, which `lpdid` stores only with its option `pooled`. Confidence intervals and p-values are those stored by `lpdid` (t-based); `normalci` or `level()` switches to normal-based ones, identical to `dcdh_plot`. All other options are identical to `dcdh_plot` (see [`dcdh_plot`](#dcdh_plot)), except `pre()`/`post()` and `showpre()`/`showpost()` instead of `effects()`/`placebo()` and `showeffects()`/`showplacebo()`. The joint placebo test is the pre-trend test of `lpdid` (option `pretrend_test`). A console note states whenever the intervals are not those of `lpdid`. Details: `help lpdid_plot`.
 
 ## Licence
 
