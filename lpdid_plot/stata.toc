@@ -1,0 +1,3 @@
+v 3
+d Personal Stata programs (Jerg Gutmann)
+p lpdid_plot Event-study plot after lpdid (beta)
