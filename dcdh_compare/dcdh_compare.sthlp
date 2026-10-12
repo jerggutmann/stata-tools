@@ -56,10 +56,10 @@ The two models may differ in any respect (outcome, treatment, sample, controls, 
 
 {syntab:Appearance}
 {synopt:{opt lbl1(string)}, {opt lbl2(string)}}names of the models; default {cmd:model 1}, {cmd:model 2}{p_end}
-{synopt:{opt color1(string)}, {opt color2(string)}}colours; default {cmd:0 114 178} and {cmd:213 94 0}{p_end}
+{synopt:{opt color1(string)}, {opt color2(string)}}colors; default {cmd:0 114 178} and {cmd:213 94 0}{p_end}
 {synopt:{opt msymbol1()}, {opt msymbol2()}}marker symbols; default {cmd:o} and {cmd:d}{p_end}
 {synopt:{opt shade}}shade the post-treatment area{p_end}
-{synopt:{opt shadec:olor(colorstyle)}}colour of the shading; default is {cmd:gs12}{p_end}
+{synopt:{opt shadec:olor(colorstyle)}}color of the shading; default is {cmd:gs12}{p_end}
 {synopt:{opt vline}}vertical line between baseline and first effect{p_end}
 {synopt:{opt lpa:ttern(patternstyle)}}line pattern of both series{p_end}
 {synopt:{opt lw:idth(linewidthstyle)}}line width of both series{p_end}
@@ -93,8 +93,8 @@ The two models may differ in any respect (outcome, treatment, sample, controls, 
 
 {pstd}{cmd:dcdh_compare} estimates two models with {helpb did_multiplegt_dyn} and draws their event studies in one plot.
 The plot has the layout and options of {helpb dcdh_plot}:
-the baseline period is at -1, placebo {it:l} at -({it:l}+1) and effect {it:l} at {it:l}-1, labelled {it:l}.
-Each model has its own colour and marker; a legend identifies them.{p_end}
+the baseline period is at -1, placebo {it:l} at -({it:l}+1) and effect {it:l} at {it:l}-1, labeled {it:l}.
+Each model has its own color and marker; a legend identifies them.{p_end}
 
 {pstd}The output of both estimations appears in the Results window.
 The graphs that {cmd:did_multiplegt_dyn} draws itself are kept under the names {it:stub}{cmd:_m1} and {it:stub}{cmd:_m2},
@@ -127,7 +127,7 @@ The labels {opt lbl1()} and {opt lbl2()} and the {cmd:ci_level()} of the models 
 By default, the plot covers all effects and placebos of the model with more of them.
 A model with fewer effects or placebos than {it:#} is drawn with the ones it has.{p_end}
 
-{phang}{opt avg} and {opt avgpre} add the average total effect and the average placebo of each model, in the colour of the model.
+{phang}{opt avg} and {opt avgpre} add the average total effect and the average placebo of each model, in the color of the model.
 The line of a model covers only the periods plotted for that model.
 If a model has no average total effect (for example with {cmd:trends_lin}), its line is omitted and a note says so;
 its place in the legend is left empty.{p_end}
@@ -178,11 +178,11 @@ so a valid test of their difference depends on the application.{p_end}
 
 {phang}{opt lbl1()} and {opt lbl2()} name the models in the legend, in the tables and in the note.{p_end}
 
-{phang}{opt color1()}, {opt color2()}, {opt msymbol1()} and {opt msymbol2()} set the colour and marker of each model.
-Give colours as RGB triples in quotes, as in {cmd:color1("0 114 178")}.{p_end}
+{phang}{opt color1()}, {opt color2()}, {opt msymbol1()} and {opt msymbol2()} set the color and marker of each model.
+Give colors as RGB triples in quotes, as in {cmd:color1("0 114 178")}.{p_end}
 
 {phang}{opt shade} shades the post-treatment area.
-{opt shadecolor()} changes the colour; the default is {cmd:gs12}.
+{opt shadecolor()} changes the color; the default is {cmd:gs12}.
 The shading and {opt vline} follow the automatically chosen y-axis,
 so neither can be combined with {opt ylab()}.{p_end}
 
@@ -316,7 +316,7 @@ the joint p-values are those stored by {cmd:did_multiplegt_dyn}.{p_end}
 {pstd}Jerg Gutmann{break}
 {browse "https://github.com/jerggutmann/stata-tools"}{p_end}
 
-{pstd}Licence: MIT, see {browse "https://github.com/jerggutmann/stata-tools/blob/main/LICENSE":LICENSE} in the repository.{p_end}
+{pstd}License: MIT, see {browse "https://github.com/jerggutmann/stata-tools/blob/main/LICENSE":LICENSE} in the repository.{p_end}
 
 {title:Support and updates}
 

@@ -1,6 +1,6 @@
 # stata-tools
 
-Small Stata programs by Jerg Gutmann. Each package lives in its own folder and is installed with `net install` from that folder. All packages are released under the MIT licence, see [Licence](#licence).
+Small Stata programs by Jerg Gutmann. Each package lives in its own folder and is installed with `net install` from that folder. All packages are released under the MIT license, see [License](#license).
 
 All commands require Stata 16 or newer. The plot commands also require the estimation command they plot, which must be installed separately and may require further packages, as documented by its authors.
 
@@ -103,7 +103,7 @@ use favara_imbs_did_multiplegt_dyn.dta, clear
 dcdh_compare (Dl_vloans_b county year inter_bra, effects(8) placebo(3) cluster(state_n)) (Dl_vloans_b county year inter_bra, effects(8) placebo(3) cluster(state_n) only_never_switchers), lbl1("not-yet-switchers") lbl2("never-switchers") avg avgpre pvalues
 ```
 
-The plot covers the longer of the two event-time ranges. Confidence intervals are b ± z·se at the `ci_level()` of the models (95 by default), i.e. identical to those displayed by `did_multiplegt_dyn`; a different `level()` is announced by a note. `scale()` and `pctof()` take one value for both models or one per model. `lbl1()`/`lbl2()`, `color1()`/`color2()` and `msymbol1()`/`msymbol2()` set names, colours and markers; `stub()` changes the prefix of the graph and estimate names. All other options are those of `dcdh_plot`; `effects()`/`placebo()` are part of the model specifications. `dcdh_compare, redraw [options]` draws the stored results again with other graph options, without re-estimating. There is no test of the difference between the models. `by()` and `by_path()` are not supported. Details: `help dcdh_compare`.
+The plot covers the longer of the two event-time ranges. Confidence intervals are b ± z·se at the `ci_level()` of the models (95 by default), i.e. identical to those displayed by `did_multiplegt_dyn`; a different `level()` is announced by a note. `scale()` and `pctof()` take one value for both models or one per model. `lbl1()`/`lbl2()`, `color1()`/`color2()` and `msymbol1()`/`msymbol2()` set names, colors and markers; `stub()` changes the prefix of the graph and estimate names. All other options are those of `dcdh_plot`; `effects()`/`placebo()` are part of the model specifications. `dcdh_compare, redraw [options]` draws the stored results again with other graph options, without re-estimating. There is no test of the difference between the models. `by()` and `by_path()` are not supported. Details: `help dcdh_compare`.
 
 ## dcdh_plot
 
@@ -159,7 +159,7 @@ dcdh_plot, effects(5) placebo(3) avg avgpre pvalues shade export("event_study.pn
 |---|---|
 | `shade`, `shadecolor()` | shade the post-treatment area |
 | `vline` | vertical dashed line between baseline and first effect |
-| `color("R G B")`, `avgcolor()`, `precolor()` | colours of the series, the average line, the placebo line |
+| `color("R G B")`, `avgcolor()`, `precolor()` | colors of the series, the average line, the placebo line |
 | `msymbol()`, `lpattern()`, `lwidth()` | marker and line style of the main series |
 | `avglpattern()`, `prelpattern()` | line patterns of the two average lines |
 | `ciopacity(#)` | opacity of the shaded interval in percent |
@@ -210,7 +210,7 @@ did2s_plot, eventvar(rel_year_shift) shift(20) pre(5) post(10) avg avgpre pvalue
 
 Event time -1 is the baseline and plotted as zero if it is the omitted reference period. If the regression estimates it, the estimate is plotted and a warning says that the coefficients are not normalized at t-1 (as in the `did2s` help example); leaving out the dummy for t-1 avoids this. Factor variable and dummies cannot be combined. `avg` and `avgpre` are unweighted means of the plotted coefficients (not the `did2s` average treatment effect); `pvalues` and `pnote` also report joint Wald tests from `e(V)`. Confidence intervals are normal-based, as displayed by `did2s` (`level()` defaults to the current `c(level)`; `level(90 95)` draws two bands; `normalci` is accepted for consistency). `pre()`/`post()` limit the plotted event times. All other options are identical to `dcdh_plot` (see [`dcdh_plot`](#dcdh_plot)), except that `eventvar()`, `shift()`, `lead()` and `lag()` identify the coefficients. Details: `help did2s_plot`.
 
-With dummy variables, `after(P#_treat)` adds a block of post-treatment dummies (`P1_treat` is the first period after the end of treatment) directly to the right of the treatment periods, labelled +1, +2, ...; `nafter()` limits it, `avgafter` adds its average line, `shade` covers only the treatment area, and `pvalues`/`pnote` report the post-treatment average and separate joint tests. Example: `did2s_plot, lead(F#_treat) lag(L#_treat) after(P#_treat) pre(5) avg avgafter shade`.
+With dummy variables, `after(P#_treat)` adds a block of post-treatment dummies (`P1_treat` is the first period after the end of treatment) directly to the right of the treatment periods, labeled +1, +2, ...; `nafter()` limits it, `avgafter` adds its average line, `shade` covers only the treatment area, and `pvalues`/`pnote` report the post-treatment average and separate joint tests. Example: `did2s_plot, lead(F#_treat) lag(L#_treat) after(P#_treat) pre(5) avg avgafter shade`.
 
 `sdof(sample)`, `sdof(untreated)` and `sdof(nyt)` express the estimates in standard deviations of the `did2s` outcome: in the whole `did2s` sample, among untreated observations, or among never- and not-yet-treated observations (the latter requires `id()` and `time()`). The outcome and treatment variable are read from `e(cmdline)`; the command prints the standard deviation used. With `within` (and `id()`, `time()`), the standard deviation is taken after removing unit and time means in the chosen sample. Not available if `did2s` was run with `unit()`.
 
@@ -218,7 +218,7 @@ With dummy variables, `after(P#_treat)` adds a block of post-treatment dummies (
 
 Version 0.2.0 (beta). Package folder: [`lpdid_plot/`](lpdid_plot/).
 
-Event-study plot after `lpdid` (Busch and Girardi). Counterpart of `dcdh_plot` with the same layout, axis positions, defaults and options, so that figures from `lpdid` and `did_multiplegt_dyn` are directly comparable. Baseline at -1, `pre n` at -n, `tau k` at k (labelled k+1).
+Event-study plot after `lpdid` (Busch and Girardi). Counterpart of `dcdh_plot` with the same layout, axis positions, defaults and options, so that figures from `lpdid` and `did_multiplegt_dyn` are directly comparable. Baseline at -1, `pre n` at -n, `tau k` at k (labeled k+1).
 
 **This is a beta version and has not been extensively tested. Please check results against the `lpdid` output and report problems via GitHub issues.**
 
@@ -242,6 +242,6 @@ lpdid_plot, pre(5) post(10) avg avgpre pvalues shade export("event_study.png")
 
 With `pre(U)` and `post(T-1)` in `lpdid`, the plot corresponds to `placebo(U-1)` and `effects(T)` in `dcdh_plot`. The average lines and p-values (`avg`, `avgpre`, `pvalues`, `pnote`) come from `e(pooled_results)`, which `lpdid` stores only with its option `pooled`. Confidence intervals and p-values are those stored by `lpdid` (t-based); `normalci` or `level()` switches to normal-based ones, identical to `dcdh_plot`. All other options are identical to `dcdh_plot` (see [`dcdh_plot`](#dcdh_plot)), except `pre()`/`post()` and `showpre()`/`showpost()` instead of `effects()`/`placebo()` and `showeffects()`/`showplacebo()`. The joint placebo test is the pre-trend test of `lpdid` (option `pretrend_test`). A console note states whenever the intervals are not those of `lpdid`. Details: `help lpdid_plot`.
 
-## Licence
+## License
 
-MIT, see [`LICENSE`](LICENSE). The licence applies to all packages in this repository unless a folder states otherwise. Each help file refers to it as well.
+MIT, see [`LICENSE`](LICENSE). The license applies to all packages in this repository unless a folder states otherwise. Each help file refers to it as well.

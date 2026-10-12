@@ -44,11 +44,11 @@
 
 {syntab:Appearance}
 {synopt:{opt shade}}shade the post-treatment area{p_end}
-{synopt:{opt shadec:olor(colorstyle)}}colour of the shading; default is {cmd:gs12}{p_end}
+{synopt:{opt shadec:olor(colorstyle)}}color of the shading; default is {cmd:gs12}{p_end}
 {synopt:{opt vline}}vertical line between baseline and first effect{p_end}
-{synopt:{opt col:or(string)}}colour of the series; default is {cmd:0 114 178}{p_end}
-{synopt:{opt avgc:olor(string)}}colour of the post-treatment average line{p_end}
-{synopt:{opt precol:or(string)}}colour of the pre-treatment average line{p_end}
+{synopt:{opt col:or(string)}}color of the series; default is {cmd:0 114 178}{p_end}
+{synopt:{opt avgc:olor(string)}}color of the post-treatment average line{p_end}
+{synopt:{opt precol:or(string)}}color of the pre-treatment average line{p_end}
 {synopt:{opt ms:ymbol(symbolstyle)}}marker symbol; default is {cmd:o}{p_end}
 {synopt:{opt lpa:ttern(patternstyle)}}line pattern of the series{p_end}
 {synopt:{opt lw:idth(linewidthstyle)}}line width of the series{p_end}
@@ -92,9 +92,9 @@ so that figures from different estimators can be compared directly.{p_end}
 {pstd}{cmd:estat event} reports the event-study effects in columns named {cmd:Tm}{it:k} ({it:k} periods before treatment) and {cmd:Tp}{it:k} ({it:k} periods after),
 plus the averages {cmd:Pre_avg} and {cmd:Post_avg}.
 {cmd:csdid_event_plot} reads the table {cmd:r(table)} of {cmd:estat event}.
-Event time -{it:k} is plotted at -{it:k}, and event time {it:k} {ul:>} 0 at {it:k}, labelled {it:k}+1, as in the other commands.
+Event time -{it:k} is plotted at -{it:k}, and event time {it:k} {ul:>} 0 at {it:k}, labeled {it:k}+1, as in the other commands.
 Event time -1 ({cmd:Tm1}) is the baseline.
-If {cmd:Tm1} is not in the table, the baseline is set to zero; see {help csdid_event_plot##norm:Normalisation at t-1}.
+If {cmd:Tm1} is not in the table, the baseline is set to zero; see {help csdid_event_plot##norm:Normalization at t-1}.
 Event times without a column appear as gaps.{p_end}
 
 {pstd}By default, the plot uses the standard errors, confidence intervals and p-values that {cmd:estat event} reports.
@@ -102,10 +102,10 @@ These are asymptotic and pointwise, also if {cmd:csdid} was run with {opt wboot}
 The average lines are {cmd:Pre_avg} and {cmd:Post_avg} of {cmd:csdid}.{p_end}
 
 {marker norm}{...}
-{pstd}{bf:Normalisation at t-1.}
+{pstd}{bf:Normalization at t-1.}
 By default, {cmd:csdid} estimates pre-treatment effects with short gaps:
 each pre-treatment effect compares period {it:t} with period {it:t}-1, so event time -1 is estimated and is not zero by construction.
-In that case {cmd:csdid_event_plot} plots the estimate and prints a warning, because the coefficients are not normalised to zero at t-1.
+In that case {cmd:csdid_event_plot} plots the estimate and prints a warning, because the coefficients are not normalized to zero at t-1.
 The graph is still drawn, but the specification should be reconsidered.
 With option {opt long2} in {cmd:csdid}, all pre-treatment effects use period -1 as the base; {cmd:Tm1} is then not estimated and the baseline is plotted as zero.{p_end}
 
@@ -173,16 +173,16 @@ The default is {cmd:%5.3f}.{p_end}
 {dlgtab:Appearance}
 
 {phang}{opt shade} shades the post-treatment area.
-{opt shadecolor()} changes the colour; the default is {cmd:gs12}.
+{opt shadecolor()} changes the color; the default is {cmd:gs12}.
 The shading and {opt vline} follow the automatically chosen y-axis,
 so neither can be combined with {opt ylab()}.{p_end}
 
 {phang}{opt vline} draws a vertical dashed line between the baseline and the first effect.{p_end}
 
-{phang}{opt color(string)} sets the colour of the series and of the confidence intervals.
+{phang}{opt color(string)} sets the color of the series and of the confidence intervals.
 Give an RGB triple in quotes, as in {cmd:color("0 114 178")}, which is the default.
-{opt avgcolor()} sets the colour of the post-treatment average line; the default is {opt color()}.
-{opt precolor()} sets the colour of the pre-treatment average line; the default is {opt avgcolor()}.{p_end}
+{opt avgcolor()} sets the color of the post-treatment average line; the default is {opt color()}.
+{opt precolor()} sets the color of the pre-treatment average line; the default is {opt avgcolor()}.{p_end}
 
 {phang}{opt msymbol()}, {opt lpattern()} and {opt lwidth()}
 set the marker symbol, line pattern and line width of the series.
@@ -215,7 +215,7 @@ It covers the estimates, the intervals, the average lines and zero.{p_end}
 {dlgtab:Output}
 
 {phang}{opt savedata(filename)} saves the plotted data as a Stata dataset.
-It contains the variables {cmd:x} (position in the plot), {cmd:eventtime} (as labelled on the x-axis),
+It contains the variables {cmd:x} (position in the plot), {cmd:eventtime} (as labeled on the x-axis),
 {cmd:type} ({cmd:placebo}, {cmd:baseline} or {cmd:effect}),
 {cmd:coefname} (column of {cmd:r(table)}), {cmd:b}, {cmd:se}, {cmd:lb}, {cmd:ub} and {cmd:p}.
 With two levels, {cmd:lb} and {cmd:ub} belong to the larger level, and {cmd:lb_in} and {cmd:ub_in} to the smaller.
@@ -246,7 +246,7 @@ for example {cmd:name()}, {cmd:scheme()} or {cmd:title()}.{p_end}
 {pstd}The same, letting {cmd:csdid_event_plot} call {cmd:estat event}, with the average lines and their values{p_end}
 {phang2}{stata "csdid_event_plot, avg avgpre avgvalues name(c2, replace)":. csdid_event_plot, avg avgpre avgvalues name(c2, replace)}{p_end}
 
-{pstd}Normalise at t-1 with a universal base period (option {opt long2}); the baseline is then zero{p_end}
+{pstd}Normalize at t-1 with a universal base period (option {opt long2}); the baseline is then zero{p_end}
 {phang2}{stata "csdid lemp lpop, ivar(countyreal) time(year) gvar(first_treat) method(dripw) long2":. csdid lemp lpop, ivar(countyreal) time(year) gvar(first_treat) method(dripw) long2}{p_end}
 {phang2}{stata "csdid_event_plot, avg avgpre name(c3, replace)":. csdid_event_plot, avg avgpre name(c3, replace)}{p_end}
 
@@ -286,7 +286,7 @@ The plot does not re-estimate anything.{p_end}
 {pstd}Jerg Gutmann{break}
 {browse "https://github.com/jerggutmann/stata-tools"}{p_end}
 
-{pstd}Licence: MIT, see {browse "https://github.com/jerggutmann/stata-tools/blob/main/LICENSE":LICENSE} in the repository.{p_end}
+{pstd}License: MIT, see {browse "https://github.com/jerggutmann/stata-tools/blob/main/LICENSE":LICENSE} in the repository.{p_end}
 
 {title:Support and updates}
 
