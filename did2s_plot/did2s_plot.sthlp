@@ -181,7 +181,9 @@ It requires {opt after()} and at least one estimated coefficient in it.{p_end}
 
 {phang}{opt avgvalues} prints the value of each average line next to its end.
 It requires {opt avg}, {opt avgpre} or {opt avgafter}.
-It sets {cmd:xscale(range())}, so do not also pass {cmd:xscale()}.{p_end}
+It sets {cmd:xscale(range())}, so do not also pass {cmd:xscale()}.
+With {opt after()}, the values are appended to the legend labels instead,
+and {opt avgvalues} cannot be combined with {opt nolegend}.{p_end}
 
 {phang}{opt noci} suppresses the confidence intervals.{p_end}
 
