@@ -89,7 +89,7 @@
 {p2colreset}{...}
 
 {pstd}{cmd:did2s_plot} must be run directly after {helpb did2s}.
-The command needs to know which coefficients of {cmd:second_stage()} are event-study coefficients; see {help did2s_plot##naming:Naming the coefficients}.{p_end}
+The command needs to know which coefficients of {cmd:second_stage()} are event-study coefficients; see {help did2s_plot##specifying:Specifying the coefficients}.{p_end}
 
 
 {marker description}{...}
@@ -118,9 +118,10 @@ Lines and confidence bands are not connected across the empty position, and the 
 The three blocks are captioned "pre-treatment", "treatment" and "post-treatment".
 Without {opt after()}, the plot has two blocks and the captions "pre-treatment" and "post-treatment".{p_end}
 
-{marker naming}{...}
-{pstd}{bf:Naming the coefficients.}
+{marker specifying}{...}
+{pstd}{bf:Specifying the coefficients.}
 There are two ways to tell {cmd:did2s_plot} which coefficients to use.
+They cannot be combined, and {opt after()} is available only with the second one.
 In both, a table of the coefficients and their event times is shown in the Results window.{p_end}
 
 {phang2}1. {opt eventvar(varname)}: {cmd:second_stage()} contains one factor variable, for example {cmd:ib100.rel_year_shift}.
@@ -136,8 +137,7 @@ With {cmd:lead(F#_treat) lag(L#_treat)}, the variable {cmd:F3_treat} is event ti
 {cmd:L0_treat} is event time 0.
 Either option can be used alone, but at least one is required.
 {opt after(template)} adds the post-treatment dummies in the same way; {cmd:P2_treat} is the second post-treatment period.
-The templates may contain letters, digits, underscores and periods.
-Neither form can be combined with the other, and {opt after()} requires the dummy form.{p_end}
+The templates may contain letters, digits, underscores and periods.{p_end}
 
 
 {marker options}{...}
@@ -145,7 +145,7 @@ Neither form can be combined with the other, and {opt after()} requires the dumm
 
 {dlgtab:Event-time variables}
 
-{phang}{opt eventvar(varname)} and {opt shift(#)} specify the factor variable as described under {help did2s_plot##naming:Naming the coefficients}.
+{phang}{opt eventvar(varname)} and {opt shift(#)} specify the factor variable as described under {help did2s_plot##specifying:Specifying the coefficients}.
 Only coefficients named {it:level}{cmd:.}{it:varname} (with the usual {cmd:b}, {cmd:o} or {cmd:n} suffix after the level) are used.
 Example: if you generated {cmd:rel_year_shift = rel_year + 20}, specify {cmd:shift(20)}.{p_end}
 
