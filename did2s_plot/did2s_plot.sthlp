@@ -222,11 +222,10 @@ The first period with {cmd:treatment()} equal to 1 of each unit marks the start 
 With a treatment that does not end, {cmd:nyt} and {cmd:untreated} give the same result.{p_end}
 
 {pmore}{opt within} uses the within standard deviation instead.
-In the chosen sample, the outcome is regressed on unit and time effects given by {opt id()} and {opt time()},
-and the standard deviation of the residuals (denominator N - 1, without adjusting for the absorbed effects) is used.
-This is also exact in unbalanced panels, as the untreated samples are.
-{opt time()} must be numeric.
-The within standard deviation is smaller than the raw one, so standardised effects are not comparable between the two.{p_end}
+In the chosen sample, the means by {opt id()} and by {opt time()} are removed from the outcome alternately until they vanish,
+which gives the same result as a regression on unit and time effects, also in the unbalanced panels of the untreated samples.
+The standard deviation of the remaining values is used (denominator N - 1, without adjusting for the removed effects).
+The within standard deviation is smaller than the raw one, so standardized effects are not comparable between the two.{p_end}
 
 {pmore}The command prints the standard deviation and the number of observations used.
 It is unweighted, also if {cmd:did2s} used weights.
