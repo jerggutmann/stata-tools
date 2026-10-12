@@ -1,4 +1,4 @@
-*! cname_std 0.2.2  10oct2026  Jerg Gutmann
+*! cname_std 0.2.3  12oct2026  Jerg Gutmann
 *! Standardizes spellings of country names using the dictionary cname_std_dict.csv
 program define cname_std, rclass
     version 16.0
