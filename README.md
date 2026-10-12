@@ -212,7 +212,7 @@ Event time -1 is the baseline and plotted as zero if it is the omitted reference
 
 With dummy variables, `after(P#_treat)` adds a block of post-treatment dummies (`P1_treat` is the first period after the end of treatment) directly to the right of the treatment periods, labelled +1, +2, ...; `nafter()` limits it, `avgafter` adds its average line, `shade` covers only the treatment area, and `pvalues`/`pnote` report the post-treatment average and separate joint tests. Example: `did2s_plot, lead(F#_treat) lag(L#_treat) after(P#_treat) pre(5) avg avgafter shade`.
 
-`sdof(sample)`, `sdof(untreated)` and `sdof(nyt)` express the estimates in standard deviations of the `did2s` outcome: in the whole `did2s` sample, among untreated observations, or among never- and not-yet-treated observations (the latter requires `id()` and `time()`). The outcome and treatment variable are read from `e(cmdline)`; the command prints the standard deviation used. Not available if `did2s` was run with `unit()`.
+`sdof(sample)`, `sdof(untreated)` and `sdof(nyt)` express the estimates in standard deviations of the `did2s` outcome: in the whole `did2s` sample, among untreated observations, or among never- and not-yet-treated observations (the latter requires `id()` and `time()`). The outcome and treatment variable are read from `e(cmdline)`; the command prints the standard deviation used. With `within` (and `id()`, `time()`), the standard deviation is taken after removing unit and time means in the chosen sample. Not available if `did2s` was run with `unit()`.
 
 ## lpdid_plot
 

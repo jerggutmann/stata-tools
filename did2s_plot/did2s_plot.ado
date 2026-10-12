@@ -7,7 +7,7 @@ program define did2s_plot
 		AVG AVGPre AVGAfter AVGValues PVAlues PNOte ///
 		NOCI CIBars NORMalci LEvel(string) CIOpacity(integer 20) ///
 		SHADE SHADEColor(string) VLINE ///
-		SCale(real 1) PCTof(real 0) SDOF(string) ID(varname) TIME(varname) ///
+		SCale(real 1) PCTof(real 0) SDOF(string) WIThin ID(varname) TIME(varname) ///
 		COLor(string) AVGColor(string) PRECOLor(string) AFTERCOLor(string) MSymbol(string) ///
 		LPAttern(string) LWidth(string) AVGLPattern(string) PRELPattern(string) AFTERLPattern(string) ///
 		NOZero NOCAPtions PRECAPtion(string) POSTCAPtion(string) AFTERCAPtion(string) NOLEGend ///
@@ -81,19 +81,23 @@ program define did2s_plot
 			di as error "sdof() cannot be combined with scale() or pctof()"
 			exit 198
 		}
-		if "`sdof'" == "nyt" & ("`id'" == "" | "`time'" == "") {
-			di as error "sdof(nyt) requires id() and time()"
+		if ("`sdof'" == "nyt" | "`within'" != "") & ("`id'" == "" | "`time'" == "") {
+			di as error "sdof(nyt) and within require id() and time()"
 			exit 198
 		}
 	}
-	else if "`id'" != "" | "`time'" != "" {
-		di as error "id() and time() are only used with sdof(nyt)"
+	else if "`within'" != "" {
+		di as error "within requires sdof()"
+		exit 198
+	}
+	if "`sdof'" == "" & ("`id'" != "" | "`time'" != "") {
+		di as error "id() and time() are only used with sdof()"
 		exit 198
 	}
 	local sc = `scale'
 	if `pctof' != 0 local sc = 100/`pctof'
 	if "`sdof'" != "" {
-		_did2s_plot_sd `sdof' "`id'" "`time'"
+		_did2s_plot_sd `sdof' "`id'" "`time'" "`within'"
 		local sdv = r(sd)
 		local sdn = r(N)
 		local sdy "`r(yvar)'"
@@ -103,6 +107,7 @@ program define did2s_plot
 			cond("`sdof'" == "untreated", "untreated observations (treatment = 0) of the did2s sample", ///
 			"never- and not-yet-treated observations of the did2s sample"))
 		di as text "note: estimates are divided by the standard deviation of `sdy' in the `sdtxt'"
+		if "`within'" != "" di as text "      after removing unit and time means (within standard deviation)"
 		di as text "      standard deviation = " as result %9.4g `sdv' as text ", N = " as result `sdn'
 		if `sdw' == 1 di as text "      did2s used weights; the standard deviation is unweighted"
 	}
@@ -760,7 +765,7 @@ end
 
 * standard deviation of the did2s outcome in the selected sample (data in memory are not changed)
 program define _did2s_plot_sd, rclass
-	args mode id time
+	args mode id time within
 	local cl `"`e(cmdline)'"'
 	gettoken yv : cl, parse(" ,")
 	capture confirm numeric variable `yv'
@@ -772,6 +777,7 @@ program define _did2s_plot_sd, rclass
 		di as error "sdof() cannot be used if did2s was run with unit(): did2s then replaces the outcome in memory"
 		exit 198
 	}
+	local yname "`yv'"
 	local wt = regexm(`"`cl'"', "[[][aipf]w[a-z]* *=")
 	if "`mode'" != "sample" {
 		if !regexm(`"`cl'"', "(^|[ ,])[Tt][Rr][Ee][Aa][Tt][A-Za-z]*[(]([^)]+)[)]") {
@@ -795,13 +801,28 @@ program define _did2s_plot_sd, rclass
 		qui bysort `id': egen double `first' = min(cond(`tv' == 1, `time', .))
 		qui keep if `tv' == 0 & (`time' < `first' | missing(`first'))
 	}
+	if "`within'" != "" {
+		* residual of the outcome on unit and time effects in the selected sample (exact for unbalanced panels)
+		capture confirm numeric variable `time'
+		if _rc {
+			di as error "time() must be numeric"
+			exit 109
+		}
+		tempname hold
+		_estimates hold `hold', copy restore
+		tempvar idn res
+		qui egen long `idn' = group(`id')
+		qui areg `yv' i.`time', absorb(`idn')
+		qui predict double `res', residuals
+		local yv `res'
+	}
 	qui summarize `yv'
 	if r(N) < 2 | missing(r(sd)) | r(sd) <= 0 {
-		di as error "the standard deviation of `yv' in the selected sample is zero or cannot be computed"
+		di as error "the standard deviation of `yname' in the selected sample is zero or cannot be computed"
 		exit 498
 	}
 	return scalar sd = r(sd)
 	return scalar N = r(N)
 	return scalar weighted = `wt'
-	return local yvar "`yv'"
+	return local yvar "`yname'"
 end
