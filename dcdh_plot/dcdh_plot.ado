@@ -108,9 +108,9 @@ program define dcdh_plot
 		local sdn = r(N)
 		local sc = 1/`sdv'
 		local sdtxt = cond("`sdof'" == "sample", "all observations in memory", ///
-			cond("`sdof'" == "untreated", "untreated observations (treatment = 0)", ///
-			"observations of groups that have not yet changed their treatment"))
-		di as text "note: estimates are divided by the standard deviation of `y' in the `sdtxt'"
+			cond("`sdof'" == "untreated", "the untreated observations (treatment = 0)", ///
+			"the observations of groups that have not yet changed their treatment"))
+		di as text "note: estimates are divided by the standard deviation of `y' in `sdtxt'"
 		if `"`sdif'"' != "" di as text `"      restricted by sdif(): `sdif'"'
 		if "`within'" != "" di as text "      after removing group and time means (within standard deviation)"
 		di as text "      standard deviation = " as result %9.4g `sdv' as text ", N = " as result `sdn'

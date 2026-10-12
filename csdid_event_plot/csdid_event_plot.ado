@@ -1,4 +1,4 @@
-*! csdid_event_plot 0.2.0  12oct2026  Jerg Gutmann
+*! csdid_event_plot 0.2.1  12oct2026  Jerg Gutmann
 *! Event-study plot after csdid (estat event); same layout as dcdh_plot, lpdid_plot and did2s_plot
 program define csdid_event_plot, rclass
 	version 16
@@ -109,9 +109,9 @@ program define csdid_event_plot, rclass
 		local sdw = r(weighted)
 		local sc = 1/`sdv'
 		local sdtxt = cond("`sdof'" == "sample", "all observations of the csdid sample", ///
-			cond("`sdof'" == "untreated", "untreated observations of the csdid sample", ///
-			"never- and not-yet-treated observations of the csdid sample"))
-		di as text "note: estimates are divided by the standard deviation of `sdy' in the `sdtxt'"
+			cond("`sdof'" == "untreated", "the untreated observations of the csdid sample", ///
+			"the never- and not-yet-treated observations of the csdid sample"))
+		di as text "note: estimates are divided by the standard deviation of `sdy' in `sdtxt'"
 		if `"`sdif'"' != "" di as text `"      restricted by sdif(): `sdif'"'
 		if "`within'" != "" di as text "      after removing unit and time means (within standard deviation)"
 		di as text "      standard deviation = " as result %9.4g `sdv' as text ", N = " as result `sdn'
