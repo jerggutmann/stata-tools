@@ -1,4 +1,4 @@
-*! dcdh_plot 0.4.0  12oct2026  Jerg Gutmann
+*! dcdh_plot 0.4.1  12oct2026  Jerg Gutmann
 *! Event-study plot after did_multiplegt_dyn (single event)
 program define dcdh_plot
 	version 16
