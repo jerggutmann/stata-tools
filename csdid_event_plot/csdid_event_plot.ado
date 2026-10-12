@@ -1,4 +1,4 @@
-*! csdid_event_plot 0.1.0  11oct2026  Jerg Gutmann
+*! csdid_event_plot 0.2.0  12oct2026  Jerg Gutmann
 *! Event-study plot after csdid (estat event); same layout as dcdh_plot, lpdid_plot and did2s_plot
 program define csdid_event_plot, rclass
 	version 16
@@ -6,7 +6,7 @@ program define csdid_event_plot, rclass
 		AVG AVGPre AVGValues PVAlues PNOte ///
 		NOCI CIBars NORMalci LEvel(string) CIOpacity(integer 20) ///
 		SHADE SHADEColor(string) VLINE ///
-		SCale(real 1) PCTof(real 0) ///
+		SCale(real 1) PCTof(real 0) SDOF(string) WIThin Y(varname) TREATment(varname) ID(varname) TIME(varname) SDIF(string asis) ///
 		COLor(string) AVGColor(string) PRECOLor(string) MSymbol(string) ///
 		LPAttern(string) LWidth(string) AVGLPattern(string) PRELPattern(string) ///
 		NOZero NOCAPtions PRECAPtion(string) POSTCAPtion(string) NOLEGend ///
@@ -79,8 +79,44 @@ program define csdid_event_plot, rclass
 		di as error "specify either scale() or pctof(), not both"
 		exit 198
 	}
+	if "`sdof'" != "" {
+		if !inlist("`sdof'", "sample", "untreated", "nyt") {
+			di as error "sdof() must be sample, untreated or nyt"
+			exit 198
+		}
+		if `pctof' != 0 | `scale' != 1 {
+			di as error "sdof() cannot be combined with scale() or pctof()"
+			exit 198
+		}
+	}
+	else if "`within'`y'`treatment'`id'`time'" != "" | `"`sdif'"' != "" {
+		di as error "within, y(), treatment(), id(), time() and sdif() are only used with sdof()"
+		exit 198
+	}
 	local sc = `scale'
 	if `pctof' != 0 local sc = 100/`pctof'
+	if "`sdof'" != "" {
+		local sdopts mode(`sdof') `within'
+		if "`y'" != "" local sdopts `sdopts' y(`y')
+		if "`treatment'" != "" local sdopts `sdopts' treat(`treatment')
+		if "`id'" != "" local sdopts `sdopts' id(`id')
+		if "`time'" != "" local sdopts `sdopts' time(`time')
+		if `"`sdif'"' != "" local sdopts `sdopts' sdif(`sdif')
+		_csdid_event_plot_sd, `sdopts'
+		local sdv = r(sd)
+		local sdn = r(N)
+		local sdy "`r(yvar)'"
+		local sdw = r(weighted)
+		local sc = 1/`sdv'
+		local sdtxt = cond("`sdof'" == "sample", "all observations of the csdid sample", ///
+			cond("`sdof'" == "untreated", "untreated observations of the csdid sample", ///
+			"never- and not-yet-treated observations of the csdid sample"))
+		di as text "note: estimates are divided by the standard deviation of `sdy' in the `sdtxt'"
+		if `"`sdif'"' != "" di as text `"      restricted by sdif(): `sdif'"'
+		if "`within'" != "" di as text "      after removing unit and time means (within standard deviation)"
+		di as text "      standard deviation = " as result %9.4g `sdv' as text ", N = " as result `sdn'
+		if `sdw' == 1 di as text "      csdid used weights; the standard deviation is unweighted"
+	}
 
 	* confidence intervals: those of csdid (estat event) unless normalci or level() is given
 	local usel 1
@@ -272,7 +308,8 @@ program define csdid_event_plot, rclass
 		local ps : display string(`sepre', "`fmt'")
 		local pp : display string(`ppre', "`fmt'")
 		di as text _n "csdid_event_plot: summary of the plotted model"
-		if `sc' != 1 di as text "(estimates multiplied by " as result `sc' as text ")"
+		if "`sdof'" != "" di as text "(estimates in standard deviations of the outcome)"
+		else if `sc' != 1 di as text "(estimates multiplied by " as result `sc' as text ")"
 		di as text "{hline 62}"
 		di as text %-30s "" %10s "estimate" %10s "s.e." %10s "p-value"
 		di as text "{hline 62}"
@@ -541,4 +578,119 @@ program define _csdid_event_plot_wald, rclass
 	return scalar df   = `df'
 	if `df' > 0 return scalar p = chi2tail(`df', `q'[1,1])
 	else return scalar p = .
+end
+
+* standard deviation of the csdid outcome in the selected sample (data in memory are not changed)
+program define _csdid_event_plot_sd, rclass
+	syntax , MODE(string) [ Y(string) TREAT(string) ID(string) TIME(string) WITHIN SDIF(string asis) ]
+	if "`e(cmd)'" != "csdid" {
+		di as error "sdof() needs the results of csdid in e(); run csdid again"
+		exit 301
+	}
+	local cl `"`e(cmdline)'"'
+	local yv "`y'"
+	if "`yv'" == "" {
+		gettoken junk rest : cl
+		gettoken yv : rest, parse(" ,")
+	}
+	capture confirm numeric variable `yv'
+	if _rc {
+		di as error "outcome variable `yv' of csdid not found; sdof() needs the data used by csdid (or specify y())"
+		exit 111
+	}
+	local yname "`yv'"
+	local wt = regexm(`"`cl'"', "[[][aipf]w[a-z]* *=")
+	if "`id'" == "" local id "`e(id)'"
+	if "`time'" == "" & regexm(`"`cl'"', "(^|[ ,])[Tt]([Ii]([Mm]([Ee])?)?)?[(]([^)]+)[)]") {
+		local time = strtrim(regexs(5))
+	}
+	local usegvar = ("`mode'" != "sample" & "`treat'" == "")
+	local usefirst = ("`mode'" == "nyt" & "`treat'" != "")
+	if `usegvar' | `usefirst' | "`within'" != "" {
+		capture confirm numeric variable `time'
+		if _rc {
+			di as error "time variable not found in e(cmdline); specify time()"
+			exit 111
+		}
+	}
+	if `usefirst' | "`within'" != "" {
+		capture confirm numeric variable `id'
+		if _rc {
+			di as error "unit variable not found in e(id) (csdid without ivar()); specify id()"
+			exit 111
+		}
+	}
+	local tv "`treat'"
+	if `usegvar' {
+		local gv "`e(ggroup)'"
+		capture confirm numeric variable `gv'
+		if _rc {
+			di as error "group variable `gv' of csdid not found; specify treatment()"
+			exit 111
+		}
+	}
+	else if "`mode'" != "sample" {
+		capture confirm numeric variable `tv'
+		if _rc {
+			di as error "treatment variable `tv' not found"
+			exit 111
+		}
+	}
+	preserve
+	qui keep if e(sample)
+	if `"`sdif'"' != "" {
+		capture qui keep if (`sdif')
+		if _rc {
+			di as error `"sdif() is not a valid condition: `sdif'"'
+			exit 198
+		}
+	}
+	if `usegvar' {
+		* csdid: a unit is treated from period gvar on (gvar = 0: never treated)
+		tempvar tv
+		qui gen byte `tv' = (`gv' > 0 & `time' >= `gv')
+	}
+	if `usefirst' {
+		tempvar first
+		qui bysort `id': egen double `first' = min(cond(`tv' == 1, `time', .))
+		qui keep if `tv' == 0 & (`time' < `first' | missing(`first'))
+	}
+	else if "`mode'" != "sample" {
+		qui keep if `tv' == 0
+	}
+	if "`within'" != "" {
+		* remove unit and time means alternately until they vanish (exact also in unbalanced panels);
+		* no estimation command is used, so the results of csdid in e() stay untouched
+		tempvar res m1 m2
+		qui gen double `res' = `yv'
+		local diff = 1
+		local it = 0
+		while `diff' > 1e-10 & `it' < 5000 {
+			local ++it
+			qui bysort `id': egen double `m1' = mean(`res')
+			qui replace `res' = `res' - `m1'
+			qui bysort `time': egen double `m2' = mean(`res')
+			qui replace `res' = `res' - `m2'
+			qui summarize `m1', meanonly
+			local diff = max(abs(r(min)), abs(r(max)))
+			qui summarize `m2', meanonly
+			local diff = max(`diff', abs(r(min)), abs(r(max)))
+			if missing(`diff') local diff = 0
+			drop `m1' `m2'
+		}
+		if `diff' > 1e-10 {
+			di as error "within: unit and time means did not converge"
+			exit 430
+		}
+		local yv `res'
+	}
+	qui summarize `yv'
+	if r(N) < 2 | missing(r(sd)) | r(sd) <= 0 {
+		di as error "the standard deviation of `yname' in the selected sample is zero or cannot be computed"
+		exit 498
+	}
+	return scalar sd = r(sd)
+	return scalar N = r(N)
+	return scalar weighted = `wt'
+	return local yvar "`yname'"
 end

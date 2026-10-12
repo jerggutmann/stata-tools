@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.3.1  12oct2026  Jerg Gutmann}{...}
+{* *! version 0.3.2  12oct2026  Jerg Gutmann}{...}
 {vieweralsosee "did2s" "help did2s"}{...}
 {vieweralsosee "dcdh_plot" "help dcdh_plot"}{...}
 {vieweralsosee "lpdid_plot" "help lpdid_plot"}{...}
@@ -47,8 +47,11 @@
 {synopt:{opt pct:of(#)}}express estimates in percent of {it:#}{p_end}
 {synopt:{opt sdof(sample|untreated|nyt)}}express estimates in standard deviations of the outcome in the chosen sample{p_end}
 {synopt:{opt wit:hin}}with {opt sdof()}, use the standard deviation after removing unit and time means{p_end}
+{synopt:{opt y(varname)}}outcome for {opt sdof()}; default is the outcome in {cmd:e(cmdline)}{p_end}
+{synopt:{opt treat:ment(varname)}}treatment for {opt sdof()}; default is {cmd:treatment()} in {cmd:e(cmdline)}{p_end}
 {synopt:{opt id(varname)}}unit identifier; required for {cmd:sdof(nyt)} and {opt within}{p_end}
 {synopt:{opt time(varname)}}time variable; required for {cmd:sdof(nyt)} and {opt within}{p_end}
+{synopt:{opt sdif(exp)}}additional condition for the observations used by {opt sdof()}{p_end}
 
 {syntab:Statistics}
 {synopt:{opt pva:lues}}display a table of averages, p-values and joint tests{p_end}
@@ -210,7 +213,8 @@ It is equivalent to {cmd:scale(100/}{it:#}{cmd:)}.
 Neither changes the p-values.{p_end}
 
 {phang}{opt sdof(sample|untreated|nyt)} expresses all estimates in standard deviations of the outcome of {cmd:did2s}.
-The outcome and the treatment variable are taken from {cmd:e(cmdline)}, the observations from {cmd:e(sample)}.
+The outcome and the treatment variable are taken from {cmd:e(cmdline)}, unless you specify {opt y()} or {opt treatment()}.
+The observations are those of {cmd:e(sample)}, further restricted by {opt sdif()} if specified.
 The data in memory must be those used for {cmd:did2s}.
 The standard deviation is computed over the observations with a non-missing outcome in the chosen sample:{p_end}
 {phang2}{cmd:sample}: all observations of the {cmd:did2s} sample.{p_end}
@@ -226,6 +230,10 @@ In the chosen sample, the means by {opt id()} and by {opt time()} are removed fr
 which gives the same result as a regression on unit and time effects, also in the unbalanced panels of the untreated samples.
 The standard deviation of the remaining values is used (denominator N - 1, without adjusting for the removed effects).
 The within standard deviation is smaller than the raw one, so standardized effects are not comparable between the two.{p_end}
+
+{pmore}{opt sdif(exp)} restricts the observations used for the standard deviation by an additional condition, for example {cmd:sdif(year >= 1990)}.
+It is applied after {cmd:e(sample)} and before the choice of the sample in {opt sdof()}.
+{opt y(varname)}, {opt treatment(varname)}, {opt id(varname)}, {opt time(varname)} and {opt sdif()} have the same meaning in {helpb dcdh_plot} and {helpb csdid_event_plot}.{p_end}
 
 {pmore}The command prints the standard deviation and the number of observations used.
 It is unweighted, also if {cmd:did2s} used weights.

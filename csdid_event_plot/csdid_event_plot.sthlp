@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.1.0  11oct2026  Jerg Gutmann}{...}
+{* *! version 0.2.0  12oct2026  Jerg Gutmann}{...}
 {vieweralsosee "csdid" "help csdid"}{...}
 {vieweralsosee "dcdh_plot" "help dcdh_plot"}{...}
 {vieweralsosee "lpdid_plot" "help lpdid_plot"}{...}
@@ -36,6 +36,13 @@
 {synopt:{opt le:vel(# [#])}}one or two confidence levels; implies {opt normalci}{p_end}
 {synopt:{opt sc:ale(#)}}multiply all estimates by {it:#}{p_end}
 {synopt:{opt pct:of(#)}}express estimates in percent of {it:#}{p_end}
+{synopt:{opt sdof(sample|untreated|nyt)}}express estimates in standard deviations of the outcome in the chosen sample{p_end}
+{synopt:{opt wit:hin}}with {opt sdof()}, use the standard deviation after removing unit and time means{p_end}
+{synopt:{opt y(varname)}}outcome for {opt sdof()}; default is the outcome in {cmd:e(cmdline)}{p_end}
+{synopt:{opt treat:ment(varname)}}0/1 treatment for {opt sdof()}; default is derived from {cmd:gvar()}{p_end}
+{synopt:{opt id(varname)}}unit identifier for {opt within}; default is {cmd:ivar()} of {cmd:csdid}{p_end}
+{synopt:{opt time(varname)}}time variable for {opt sdof()}; default is {cmd:time()} of {cmd:csdid}{p_end}
+{synopt:{opt sdif(exp)}}additional condition for the observations used by {opt sdof()}{p_end}
 
 {syntab:Statistics}
 {synopt:{opt pva:lues}}display a table of averages, p-values and joint tests{p_end}
@@ -155,6 +162,33 @@ It is equivalent to {cmd:scale(100/}{it:#}{cmd:)}.
 {opt scale()} and {opt pctof()} cannot be combined.
 Neither changes the p-values.{p_end}
 
+{phang}{opt sdof(sample|untreated|nyt)} expresses all estimates in standard deviations of the outcome of {cmd:csdid}.
+It needs the results of {cmd:csdid} in {cmd:e()} and the data used for {cmd:csdid} in memory.
+The outcome is the first variable in {cmd:e(cmdline)}, the observations are those of {cmd:e(sample)}.
+The standard deviation is computed over the observations with a non-missing outcome in the chosen sample:{p_end}
+{phang2}{cmd:sample}: all observations of the {cmd:csdid} sample.{p_end}
+{phang2}{cmd:untreated} and {cmd:nyt}: observations of the sample that are never treated or not yet treated.
+A unit is treated from the period {cmd:gvar()} on; {cmd:gvar()} equal to 0 means never treated.
+Because {cmd:csdid} assumes that treatment does not end, both give the same result.
+If you specify {opt treatment()}, observations with {opt treatment()} equal to 0 are used instead;
+{cmd:nyt} then also drops the observations after the end of a treatment and requires {opt id()}.{p_end}
+
+{pmore}{opt within} uses the within standard deviation instead.
+In the chosen sample, the means by {opt id()} and by {opt time()} are removed from the outcome alternately until they vanish,
+which gives the same result as a regression on unit and time effects, also in unbalanced panels.
+The standard deviation of the remaining values is used (denominator N - 1, without adjusting for the removed effects).
+The within standard deviation is smaller than the raw one, so standardized effects are not comparable between the two.
+If {cmd:csdid} was run without {opt ivar()}, specify {opt id()}.{p_end}
+
+{pmore}{opt sdif(exp)} restricts the observations used for the standard deviation by an additional condition, for example {cmd:sdif(year <= 2006)}.
+It is applied after {cmd:e(sample)} and before the choice of the sample in {opt sdof()}.
+{opt y(varname)}, {opt treatment(varname)}, {opt id(varname)}, {opt time(varname)} and {opt sdif()} have the same meaning in {helpb dcdh_plot} and {helpb did2s_plot}.{p_end}
+
+{pmore}The command prints the standard deviation and the number of observations used.
+It is unweighted, also if {cmd:csdid} used weights.
+It is treated as a constant, so the standard errors do not account for its estimation.
+{opt sdof()} cannot be combined with {opt scale()} or {opt pctof()}.{p_end}
+
 {dlgtab:Statistics}
 
 {phang}{opt pvalues} displays a table in the Results window.
@@ -263,6 +297,12 @@ for example {cmd:name()}, {cmd:scheme()} or {cmd:title()}.{p_end}
 
 {pstd}Express the estimates in percent of a baseline mean of 12.5 and save the graph{p_end}
 {phang2}{stata `"csdid_event_plot, pctof(12.5) avg export("event_study.png") name(c7, replace)"':. csdid_event_plot, pctof(12.5) avg export("event_study.png") name(c7, replace)}{p_end}
+
+{pstd}Express the estimates in standard deviations of the outcome among never- and not-yet-treated observations{p_end}
+{phang2}{stata "csdid_event_plot, sdof(nyt) avg name(c8, replace)":. csdid_event_plot, sdof(nyt) avg name(c8, replace)}{p_end}
+
+{pstd}The same with the within standard deviation, restricted to the years up to 2006{p_end}
+{phang2}{stata "csdid_event_plot, sdof(nyt) within sdif(year <= 2006) avg name(c9, replace)":. csdid_event_plot, sdof(nyt) within sdif(year <= 2006) avg name(c9, replace)}{p_end}
 
 
 {marker remarks}{...}
