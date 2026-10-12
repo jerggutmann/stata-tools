@@ -316,7 +316,7 @@ Here event time -1 is estimated, so {cmd:did2s_plot} prints a warning (see Remar
 {phang2}{stata "did2s_plot, eventvar(rel_year_shift) shift(20) pre(5) post(10) pctof(12.5) name(d5, replace)":. did2s_plot, eventvar(rel_year_shift) shift(20) pre(5) post(10) pctof(12.5) name(d5, replace)}{p_end}
 
 {pstd}Save the graph{p_end}
-{phang2}{stata `"did2s_plot, eventvar(rel_year_shift) shift(20) pre(5) post(10) avg export("event_study.png") name(d6, replace)"':. did2s_plot, eventvar(rel_year_shift) shift(20) pre(5) post(10) avg export("event_study.png") name(d6, replace)}{p_end}
+{phang2}{stata "did2s_plot, eventvar(rel_year_shift) shift(20) avg export(event_study.png) name(d6, replace)":. did2s_plot, eventvar(rel_year_shift) shift(20) avg export(event_study.png) name(d6, replace)}{p_end}
 
 {pstd}The same model with dummy variables instead of the factor variable.
 Leave out the dummy for event time -1 ({cmd:F1_treat}), so that t-1 is the reference period and no warning appears.
@@ -336,9 +336,9 @@ Run the loop in the Command window or a do-file{p_end}
 {phang2}{cmd:. forvalues k = 1/10 {c -(}}{p_end}
 {phang3}{cmd:. gen P`k'_treat = (rel_year_shift == 27 + `k')}{p_end}
 {phang2}{cmd:. {c )-}}{p_end}
-{phang2}{stata "did2s dep_var, first_stage(i.state i.year) second_stage(F*_treat L*_treat P*_treat) treatment(treat) cluster(state)":. did2s dep_var, first_stage(i.state i.year) second_stage(F*_treat L*_treat P*_treat) treatment(treat) cluster(state)}{p_end}
-{phang2}{stata "did2s_plot, lead(F#_treat) lag(L#_treat) after(P#_treat) pre(5) avg avgafter shade vline name(d8, replace)":. did2s_plot, lead(F#_treat) lag(L#_treat) after(P#_treat) pre(5) avg avgafter shade vline name(d8, replace)}{p_end}
-{phang2}{stata "did2s_plot, lead(F#_treat) lag(L#_treat) after(P#_treat) pre(5) nafter(5) avg avgafter pvalues pnote name(d9, replace)":. did2s_plot, lead(F#_treat) lag(L#_treat) after(P#_treat) pre(5) nafter(5) avg avgafter pvalues pnote name(d9, replace)}{p_end}
+{phang2}{cmd:. did2s dep_var, first_stage(i.state i.year) second_stage(F*_treat L*_treat P*_treat) treatment(treat) cluster(state)}{p_end}
+{phang2}{stata "did2s_plot, lead(F#_treat) lag(L#_treat) after(P#_treat) avg avgafter shade vline name(d8, replace)":. did2s_plot, lead(F#_treat) lag(L#_treat) after(P#_treat) avg avgafter shade vline name(d8, replace)}{p_end}
+{phang2}{stata "did2s_plot, lead(F#_treat) lag(L#_treat) after(P#_treat) nafter(5) avgafter pnote name(d9, replace)":. did2s_plot, lead(F#_treat) lag(L#_treat) after(P#_treat) nafter(5) avgafter pnote name(d9, replace)}{p_end}
 
 
 {marker remarks}{...}
