@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.2.2  10oct2026  Jerg Gutmann}{...}
+{* *! version 0.2.3  12oct2026  Jerg Gutmann}{...}
 {vieweralsosee "cname_std_add" "help cname_std_add"}{...}
 {vieweralsosee "kountry" "help kountry"}{...}
 {viewerjumpto "Syntax" "cname_std##syntax"}{...}
@@ -120,30 +120,31 @@ The values are:{p_end}
 {marker examples}{...}
 {title:Examples}
 
-{pstd}A small dataset with three spellings{p_end}
-{phang2}{cmd:. set obs 3}{p_end}
-{phang2}{cmd:. generate cname = "Deutschland" in 1}{p_end}
-{phang2}{cmd:. replace cname = "Korea, Rep." in 2}{p_end}
-{phang2}{cmd:. replace cname = "Atlantis" in 3}{p_end}
+{pstd}A small dataset with three spellings (the first line clears the data in memory){p_end}
+{phang2}{stata "clear":. clear}{p_end}
+{phang2}{stata "set obs 3":. set obs 3}{p_end}
+{phang2}{stata `"generate cname = "Deutschland" in 1"':. generate cname = "Deutschland" in 1}{p_end}
+{phang2}{stata `"replace cname = "Korea, Rep." in 2"':. replace cname = "Korea, Rep." in 2}{p_end}
+{phang2}{stata `"replace cname = "Atlantis" in 3"':. replace cname = "Atlantis" in 3}{p_end}
 
 {pstd}Standardize {cmd:cname} in place{p_end}
-{phang2}{cmd:. cname_std}{p_end}
+{phang2}{stata "cname_std":. cname_std}{p_end}
 
 {pstd}Keep the original, write the result to {cmd:cname_new} and flag every entry{p_end}
-{phang2}{cmd:. cname_std, new marker}{p_end}
+{phang2}{stata "cname_std, new marker":. cname_std, new marker}{p_end}
 
 {pstd}List the spellings that are not yet in the dictionary{p_end}
-{phang2}{cmd:. list cname if cname_new_marker == 2}{p_end}
+{phang2}{stata "list cname if cname_new_marker == 2":. list cname if cname_new_marker == 2}{p_end}
 
-{pstd}Standardize the variable {cmd:country} into a new variable {cmd:country_std}{p_end}
+{pstd}Standardize the variable {cmd:country} into a new variable {cmd:country_std}; this needs a variable of that name{p_end}
 {phang2}{cmd:. cname_std, varname(country) new(country_std)}{p_end}
 
 {pstd}Keep West Germany and the USSR as separate entries{p_end}
-{phang2}{cmd:. cname_std, alt(germany ussr)}{p_end}
+{phang2}{stata "cname_std, alt(germany ussr)":. cname_std, alt(germany ussr)}{p_end}
 
-{pstd}Teach the command a new spelling, then run it again{p_end}
+{pstd}Teach the command a new spelling, then run it again; {cmd:cname_std_add} changes a file in your PERSONAL directory, so this line is not clickable{p_end}
 {phang2}{cmd:. cname_std_add "Netherlands, The" "Netherlands"}{p_end}
-{phang2}{cmd:. cname_std}{p_end}
+{phang2}{stata "cname_std":. cname_std}{p_end}
 
 
 {marker remarks}{...}
@@ -168,7 +169,7 @@ You can teach the command new spellings in three ways.{p_end}
 
 {phang}1. {bf:Your own dictionary.}
 {cmd:cname_std_add "Netherlands, The" "Netherlands"} appends one line to the file {cmd:cname_std_extra.csv}
-in your PERSONAL directory ({cmd:. sysdir} shows where it is).
+in your PERSONAL directory ({stata sysdir} shows where it is).
 {cmd:cname_std} reads this file automatically, and it is not overwritten when you update the package.
 The standard name must already exist in the dictionary, otherwise the command stops (option {opt force} overrides this).
 {opt file()} writes to another file instead.{p_end}

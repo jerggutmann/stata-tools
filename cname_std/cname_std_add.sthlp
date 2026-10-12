@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.2.2  10oct2026  Jerg Gutmann}{...}
+{* *! version 0.2.3  12oct2026  Jerg Gutmann}{...}
 {vieweralsosee "cname_std" "help cname_std"}{...}
 {viewerjumpto "Syntax" "cname_std_add##syntax"}{...}
 {viewerjumpto "Description" "cname_std_add##description"}{...}
@@ -31,7 +31,7 @@
 {title:Description}
 
 {pstd}{cmd:cname_std_add} appends one line to the file {cmd:cname_std_extra.csv} in your PERSONAL directory
-({cmd:. sysdir} shows where it is). The file is created if it does not exist.
+({stata sysdir} shows where it is). The file is created if it does not exist.
 {helpb cname_std} reads it automatically, so the spelling is standardized from the next run on.
 The file is not touched when the package is updated.{p_end}
 
@@ -53,6 +53,7 @@ The file is created with a header line if it does not exist.{p_end}
 {marker examples}{...}
 {title:Examples}
 
+{pstd}These commands change the dictionary file in your PERSONAL directory or write a new file, so they are not clickable.{p_end}
 {phang2}{cmd:. cname_std_add "Netherlands, The" "Netherlands"}{p_end}
 {phang2}{cmd:. cname_std_add "Kongo" "[keep]"}{p_end}
 {phang2}{cmd:. cname_std_add "Atlantis" "Greece", file("my_dictionary.csv")}{p_end}

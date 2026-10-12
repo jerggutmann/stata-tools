@@ -17,7 +17,7 @@ All commands require Stata 16 or newer. The plot commands also require the estim
 
 ## cname_std
 
-Version 0.2.2 (beta). Package folder: [`cname_std/`](cname_std/).
+Version 0.2.3 (beta). Package folder: [`cname_std/`](cname_std/).
 
 Standardizes the spelling of country names in a string variable (`cname` by default). A dictionary of about 2,000 spellings (English, German, French, Spanish, plus the spellings known from `kountry` and an own list) is matched ignoring case, accents, punctuation and spaces. Names that are not found are only trimmed and capitalized and are reported, so the dictionary can be extended step by step.
 
