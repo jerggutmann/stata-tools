@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.3.2  12oct2026  Jerg Gutmann}{...}
+{* *! version 0.3.3  12oct2026  Jerg Gutmann}{...}
 {vieweralsosee "did2s" "help did2s"}{...}
 {vieweralsosee "dcdh_plot" "help dcdh_plot"}{...}
 {vieweralsosee "lpdid_plot" "help lpdid_plot"}{...}
@@ -379,7 +379,7 @@ Run the loop in the Command window or a do-file{p_end}
 {phang2}{cmd:. forvalues k = 1/10 {c -(}}{p_end}
 {phang3}{cmd:. gen P`k'_treat = (rel_year_shift == 27 + `k')}{p_end}
 {phang2}{cmd:. {c )-}}{p_end}
-{phang2}{cmd:. did2s dep_var, first_stage(i.state i.year) second_stage(F*_treat L*_treat P*_treat) treatment(treat) cluster(state)}{p_end}
+{phang2}{stata "did2s dep_var, first_stage(i.state i.year) second_stage(F*_treat L*_treat P*_treat) treatment(treat) cluster(state)":. did2s dep_var, first_stage(i.state i.year) second_stage(F*_treat L*_treat P*_treat) ...}{p_end}
 {phang2}{stata "did2s_plot, lead(F#_treat) lag(L#_treat) after(P#_treat) avg avgafter shade vline name(d8, replace)":. did2s_plot, lead(F#_treat) lag(L#_treat) after(P#_treat) avg avgafter shade vline name(d8, replace)}{p_end}
 {phang2}{stata "did2s_plot, lead(F#_treat) lag(L#_treat) after(P#_treat) nafter(5) avgafter pnote name(d9, replace)":. did2s_plot, lead(F#_treat) lag(L#_treat) after(P#_treat) nafter(5) avgafter pnote name(d9, replace)}{p_end}
 
