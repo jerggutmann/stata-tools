@@ -1,4 +1,4 @@
-*! cname_std_add 0.2.0  09oct2026  Jerg Gutmann
+*! cname_std_add 0.2.3  12oct2026  Jerg Gutmann
 * Adds a new spelling to the personal dictionary cname_std_extra.csv (read automatically by cname_std)
 program define cname_std_add
     version 16.0
