@@ -1,7 +1,7 @@
 v 3
 d did2s_plot - Event-study plot after did2s
 d Jerg Gutmann
-d Version 0.3.0 (beta). Plots did2s event-study coefficients with confidence intervals in the same layout as dcdh_plot and lpdid_plot; optionally a post-treatment block, standard-deviation units, averages, joint tests and p-values. Requires Stata 16 or newer and did2s.
-d Distribution-Date: 20261027
+d Version 0.3.1 (beta). Plots did2s event-study coefficients with confidence intervals in the same layout as dcdh_plot and lpdid_plot; optionally a post-treatment block, standard-deviation units, averages, joint tests and p-values. Requires Stata 16 or newer and did2s.
+d Distribution-Date: 20261028
 f did2s_plot.ado
 f did2s_plot.sthlp
