@@ -46,8 +46,9 @@
 {synopt:{opt sc:ale(#)}}multiply all estimates by {it:#}{p_end}
 {synopt:{opt pct:of(#)}}express estimates in percent of {it:#}{p_end}
 {synopt:{opt sdof(sample|untreated|nyt)}}express estimates in standard deviations of the outcome in the chosen sample{p_end}
-{synopt:{opt id(varname)}}unit identifier; required for {cmd:sdof(nyt)}{p_end}
-{synopt:{opt time(varname)}}time variable; required for {cmd:sdof(nyt)}{p_end}
+{synopt:{opt wit:hin}}with {opt sdof()}, use the standard deviation after removing unit and time means{p_end}
+{synopt:{opt id(varname)}}unit identifier; required for {cmd:sdof(nyt)} and {opt within}{p_end}
+{synopt:{opt time(varname)}}time variable; required for {cmd:sdof(nyt)} and {opt within}{p_end}
 
 {syntab:Statistics}
 {synopt:{opt pva:lues}}display a table of averages, p-values and joint tests{p_end}
@@ -220,6 +221,13 @@ Observations after the end of a treatment are excluded.
 The first period with {cmd:treatment()} equal to 1 of each unit marks the start of its treatment.
 With a treatment that does not end, {cmd:nyt} and {cmd:untreated} give the same result.{p_end}
 
+{pmore}{opt within} uses the within standard deviation instead.
+In the chosen sample, the outcome is regressed on unit and time effects given by {opt id()} and {opt time()},
+and the standard deviation of the residuals (denominator N - 1, without adjusting for the absorbed effects) is used.
+This is also exact in unbalanced panels, as the untreated samples are.
+{opt time()} must be numeric.
+The within standard deviation is smaller than the raw one, so standardised effects are not comparable between the two.{p_end}
+
 {pmore}The command prints the standard deviation and the number of observations used.
 It is unweighted, also if {cmd:did2s} used weights.
 It is treated as a constant, so the standard errors do not account for its estimation.
@@ -341,6 +349,7 @@ Here event time -1 is estimated, so {cmd:did2s_plot} prints a warning (see Remar
 {pstd}Express the estimates in standard deviations of the outcome among untreated observations{p_end}
 {phang2}{stata "did2s_plot, eventvar(rel_year_shift) shift(20) pre(5) post(10) sdof(untreated) name(d6s, replace)":. did2s_plot, eventvar(rel_year_shift) shift(20) pre(5) post(10) sdof(untreated) name(d6s, replace)}{p_end}
 {phang2}{stata "did2s_plot, eventvar(rel_year_shift) shift(20) sdof(nyt) id(unit) time(year) name(d6t, replace)":. did2s_plot, eventvar(rel_year_shift) shift(20) sdof(nyt) id(unit) time(year) name(d6t, replace)}{p_end}
+{phang2}{stata "did2s_plot, eventvar(rel_year_shift) shift(20) sdof(untreated) within id(unit) time(year) name(dw, replace)":. did2s_plot, eventvar(rel_year_shift) shift(20) sdof(untreated) within id(unit) time(year) name(dw, replace)}{p_end}
 
 {pstd}Save the graph{p_end}
 {phang2}{stata "did2s_plot, eventvar(rel_year_shift) shift(20) avg export(event_study.png) name(d6, replace)":. did2s_plot, eventvar(rel_year_shift) shift(20) avg export(event_study.png) name(d6, replace)}{p_end}
