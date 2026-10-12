@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.3.8  11oct2026  Jerg Gutmann}{...}
+{* *! version 0.4.0  12oct2026  Jerg Gutmann}{...}
 {vieweralsosee "did_multiplegt_dyn" "help did_multiplegt_dyn"}{...}
 {vieweralsosee "[G-2] graph twoway" "help twoway"}{...}
 {vieweralsosee "[G-2] graph export" "help graph_export"}{...}
@@ -35,6 +35,13 @@
 {synopt:{opt le:vel(# [#])}}one or two confidence levels{p_end}
 {synopt:{opt sc:ale(#)}}multiply all estimates by {it:#}{p_end}
 {synopt:{opt pct:of(#)}}express estimates in percent of {it:#}{p_end}
+{synopt:{opt sdof(sample|untreated|nyt)}}express estimates in standard deviations of the outcome in the chosen sample{p_end}
+{synopt:{opt wit:hin}}with {opt sdof()}, use the standard deviation after removing group and time means{p_end}
+{synopt:{opt y(varname)}}outcome {cmd:Y} of {cmd:did_multiplegt_dyn}; required with {opt sdof()}{p_end}
+{synopt:{opt treat:ment(varname)}}treatment {cmd:D}; required for {cmd:sdof(untreated)} and {cmd:sdof(nyt)}{p_end}
+{synopt:{opt id(varname)}}group variable {cmd:G}; required for {cmd:sdof(nyt)} and {opt within}{p_end}
+{synopt:{opt time(varname)}}time variable {cmd:T}; required for {cmd:sdof(nyt)} and {opt within}{p_end}
+{synopt:{opt sdif(exp)}}additional condition for the observations used by {opt sdof()}{p_end}
 
 {syntab:Statistics}
 {synopt:{opt pva:lues}}display a table of estimates and p-values{p_end}
@@ -145,6 +152,36 @@ It is equivalent to {cmd:scale(100/}{it:#}{cmd:)}.
 {opt scale()} and {opt pctof()} cannot be combined.
 Neither changes the p-values.{p_end}
 
+{phang}{opt sdof(sample|untreated|nyt)} expresses all estimates in standard deviations of the outcome.
+{cmd:did_multiplegt_dyn} stores neither its variables nor its estimation sample,
+so you specify the variables of your {cmd:did_multiplegt_dyn Y G T D} call with {opt y()}, {opt id()}, {opt time()} and {opt treatment()},
+and the data in memory must be those used for the estimation.
+The standard deviation is computed over the observations with a non-missing outcome in the chosen sample:{p_end}
+{phang2}{cmd:sample}: all observations in memory that satisfy {opt sdif()}. Requires {opt y()}.{p_end}
+{phang2}{cmd:untreated}: observations with {opt treatment()} equal to 0, which presupposes a treatment with 0 as the untreated value. Requires {opt treatment()}.{p_end}
+{phang2}{cmd:nyt}: observations of groups that have not yet changed their treatment, including groups that never do.
+A group has changed its treatment in the first period in which {opt treatment()} differs from its first observed value.
+This is the set of observations from which {cmd:did_multiplegt_dyn} takes its control groups, and it also works for non-binary and non-absorbing treatments.
+Requires {opt treatment()}, {opt id()} and {opt time()}; the treatment must not vary within {opt id()} and {opt time()}.{p_end}
+
+{pmore}{opt within} uses the within standard deviation instead.
+In the chosen sample, the means by {opt id()} and by {opt time()} are removed from the outcome alternately until they vanish,
+which gives the same result as a regression on group and time effects, also in unbalanced panels.
+The standard deviation of the remaining values is used (denominator N - 1, without adjusting for the removed effects).
+The within standard deviation is smaller than the raw one, so standardized effects are not comparable between the two.{p_end}
+
+{pmore}{opt sdif(exp)} restricts the observations used for the standard deviation by an additional condition.
+Use it to mirror the sample of the estimation, which {cmd:did_multiplegt_dyn} does not store.
+If you ran {cmd:did_multiplegt_dyn} with {cmd:if year <= 2000}, specify {cmd:sdif(year <= 2000)}.
+If you ran it with {opt save_sample}, specify {cmd:sdif(!missing(_did_sample))} to use the groups that entered the estimation.
+Observations that {cmd:did_multiplegt_dyn} drops for other reasons, for example cells with larger and lower treatment than in period one, remain in the sample.
+{opt y()}, {opt treatment()}, {opt id()}, {opt time()} and {opt sdif()} have the same meaning in {helpb did2s_plot} and {helpb csdid_event_plot}.{p_end}
+
+{pmore}The command prints the standard deviation and the number of observations used.
+It is unweighted, also if {cmd:did_multiplegt_dyn} used {opt weight()}.
+It is treated as a constant, so the standard errors do not account for its estimation.
+{opt sdof()} cannot be combined with {opt scale()} or {opt pctof()}.{p_end}
+
 {dlgtab:Statistics}
 
 {phang}{opt pvalues} displays a table in the Results window.
@@ -247,6 +284,13 @@ for example {cmd:name()}, {cmd:scheme()} or {cmd:title()}.{p_end}
 
 {pstd}Express the estimates in percent of a baseline mean of 12.5{p_end}
 {phang2}{stata "dcdh_plot, effects(8) placebo(3) pctof(12.5) name(f6, replace)":. dcdh_plot, effects(8) placebo(3) pctof(12.5) name(f6, replace)}{p_end}
+
+{pstd}Express the estimates in standard deviations of the outcome among groups that have not yet changed their treatment{p_end}
+{phang2}{cmd:. dcdh_plot, effects(8) placebo(3) sdof(nyt) y(Dl_vloans_b) id(county) time(year) treatment(inter_bra) name(f8, replace)}{p_end}
+
+{pstd}The same with the within standard deviation, using the groups of the estimation sample (this needs {opt save_sample} in the estimation){p_end}
+{phang2}{cmd:. did_multiplegt_dyn Dl_vloans_b county year inter_bra, effects(8) placebo(3) cluster(state_n) save_sample graph_off}{p_end}
+{phang2}{cmd:. dcdh_plot, effects(8) placebo(3) sdof(nyt) within y(Dl_vloans_b) id(county) time(year) treatment(inter_bra) sdif(!missing(_did_sample)) name(f9, replace)}{p_end}
 
 {pstd}Change a caption and a legend label{p_end}
 {phang2}{stata `"dcdh_plot, effects(8) placebo(3) avg postcaption("after the reform") lblavg("mean effect") name(f7, replace)"':. dcdh_plot, effects(8) placebo(3) avg postcaption("after the reform") lblavg("mean effect") name(f7, replace)}{p_end}

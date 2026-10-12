@@ -1,4 +1,4 @@
-*! dcdh_plot 0.3.8  11oct2026  Jerg Gutmann
+*! dcdh_plot 0.4.0  12oct2026  Jerg Gutmann
 *! Event-study plot after did_multiplegt_dyn (single event)
 program define dcdh_plot
 	version 16
@@ -7,7 +7,7 @@ program define dcdh_plot
 		AVG AVGPre AVGValues PVAlues PNOte ///
 		NOCI CIBars NORMalci LEvel(string) CIOpacity(integer 20) ///
 		SHADE SHADEColor(string) VLINE ///
-		SCale(real 1) PCTof(real 0) ///
+		SCale(real 1) PCTof(real 0) SDOF(string) WIThin Y(varname) TREATment(varname) ID(varname) TIME(varname) SDIF(string asis) ///
 		COLor(string) AVGColor(string) PRECOLor(string) MSymbol(string) ///
 		LPAttern(string) LWidth(string) AVGLPattern(string) PRELPattern(string) ///
 		NOZero NOCAPtions PRECAPtion(string) POSTCAPtion(string) NOLEGend ///
@@ -69,8 +69,53 @@ program define dcdh_plot
 		di as error "specify either scale() or pctof(), not both"
 		exit 198
 	}
+	if "`sdof'" != "" {
+		if !inlist("`sdof'", "sample", "untreated", "nyt") {
+			di as error "sdof() must be sample, untreated or nyt"
+			exit 198
+		}
+		if `pctof' != 0 | `scale' != 1 {
+			di as error "sdof() cannot be combined with scale() or pctof()"
+			exit 198
+		}
+		if "`y'" == "" {
+			di as error "sdof() requires y(): did_multiplegt_dyn does not store the outcome"
+			exit 198
+		}
+		if inlist("`sdof'", "untreated", "nyt") & "`treatment'" == "" {
+			di as error "sdof(`sdof') requires treatment()"
+			exit 198
+		}
+		if ("`sdof'" == "nyt" | "`within'" != "") & ("`id'" == "" | "`time'" == "") {
+			di as error "sdof(nyt) and within require id() and time()"
+			exit 198
+		}
+	}
+	else if "`within'`y'`treatment'`id'`time'" != "" | `"`sdif'"' != "" {
+		di as error "within, y(), treatment(), id(), time() and sdif() are only used with sdof()"
+		exit 198
+	}
 	local sc = `scale'
 	if `pctof' != 0 local sc = 100/`pctof'
+	if "`sdof'" != "" {
+		local sdopts mode(`sdof') `within' y(`y')
+		if "`treatment'" != "" local sdopts `sdopts' treat(`treatment')
+		if "`id'" != "" local sdopts `sdopts' id(`id')
+		if "`time'" != "" local sdopts `sdopts' time(`time')
+		if `"`sdif'"' != "" local sdopts `sdopts' sdif(`sdif')
+		_dcdh_plot_sd, `sdopts'
+		local sdv = r(sd)
+		local sdn = r(N)
+		local sc = 1/`sdv'
+		local sdtxt = cond("`sdof'" == "sample", "all observations in memory", ///
+			cond("`sdof'" == "untreated", "untreated observations (treatment = 0)", ///
+			"observations of groups that have not yet changed their treatment"))
+		di as text "note: estimates are divided by the standard deviation of `y' in the `sdtxt'"
+		if `"`sdif'"' != "" di as text `"      restricted by sdif(): `sdif'"'
+		if "`within'" != "" di as text "      after removing group and time means (within standard deviation)"
+		di as text "      standard deviation = " as result %9.4g `sdv' as text ", N = " as result `sdn'
+		di as text "      the standard deviation is unweighted; the sample of did_multiplegt_dyn may differ (see help)"
+	}
 
 	* did_multiplegt_dyn does not store its confidence intervals; its default is the 95% normal interval
 	if "`level'" == "" {
@@ -153,7 +198,8 @@ program define dcdh_plot
 		local ps : display string(`sepre', "`fmt'")
 		local pp : display string(`ppre', "`fmt'")
 		di as text _n "dcdh_plot: summary of the plotted model"
-		if `sc' != 1 di as text "(estimates multiplied by " as result `sc' as text ")"
+		if "`sdof'" != "" di as text "(estimates in standard deviations of the outcome)"
+		else if `sc' != 1 di as text "(estimates multiplied by " as result `sc' as text ")"
 		di as text "{hline 62}"
 		di as text %-30s "" %10s "estimate" %10s "s.e." %10s "p-value"
 		di as text "{hline 62}"
@@ -420,4 +466,75 @@ program define _dcdh_plot_pp, rclass
 	return scalar b  = `bpl'[1,1]
 	return scalar se = sqrt(`vpl'[1,1])
 	return scalar n  = `npl'
+end
+
+* standard deviation of the outcome in the selected sample (data in memory are not changed)
+program define _dcdh_plot_sd, rclass
+	syntax , MODE(string) Y(string) [ TREAT(string) ID(string) TIME(string) WITHIN SDIF(string asis) ]
+	foreach v in `y' `treat' `id' `time' {
+		capture confirm numeric variable `v'
+		if _rc {
+			di as error "numeric variable `v' not found"
+			exit 111
+		}
+	}
+	local yv "`y'"
+	local yname "`y'"
+	preserve
+	if `"`sdif'"' != "" {
+		capture qui keep if (`sdif')
+		if _rc {
+			di as error `"sdif() is not a valid condition: `sdif'"'
+			exit 198
+		}
+	}
+	qui drop if missing(`y')
+	foreach v in `treat' `id' `time' {
+		qui drop if missing(`v')
+	}
+	if "`mode'" == "untreated" {
+		qui keep if `treat' == 0
+	}
+	if "`mode'" == "nyt" {
+		* not yet switched: before the first period in which a group's treatment differs from its first observed value
+		tempvar tmin base first
+		qui bysort `id': egen double `tmin' = min(`time')
+		qui bysort `id': egen double `base' = max(cond(`time' == `tmin', `treat', .))
+		qui bysort `id': egen double `first' = min(cond(`treat' != `base', `time', .))
+		qui keep if `time' < `first' | missing(`first')
+	}
+	if "`within'" != "" {
+		* remove group and time means alternately until they vanish (exact also in unbalanced panels);
+		* no estimation command is used, so the results of did_multiplegt_dyn in e() stay untouched
+		tempvar res m1 m2
+		qui gen double `res' = `yv'
+		local diff = 1
+		local it = 0
+		while `diff' > 1e-10 & `it' < 5000 {
+			local ++it
+			qui bysort `id': egen double `m1' = mean(`res')
+			qui replace `res' = `res' - `m1'
+			qui bysort `time': egen double `m2' = mean(`res')
+			qui replace `res' = `res' - `m2'
+			qui summarize `m1', meanonly
+			local diff = max(abs(r(min)), abs(r(max)))
+			qui summarize `m2', meanonly
+			local diff = max(`diff', abs(r(min)), abs(r(max)))
+			if missing(`diff') local diff = 0
+			drop `m1' `m2'
+		}
+		if `diff' > 1e-10 {
+			di as error "within: unit and time means did not converge"
+			exit 430
+		}
+		local yv `res'
+	}
+	qui summarize `yv'
+	if r(N) < 2 | missing(r(sd)) | r(sd) <= 0 {
+		di as error "the standard deviation of `yname' in the selected sample is zero or cannot be computed"
+		exit 498
+	}
+	return scalar sd = r(sd)
+	return scalar N = r(N)
+	return local yvar "`yname'"
 end

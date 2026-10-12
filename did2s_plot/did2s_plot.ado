@@ -1,4 +1,4 @@
-*! did2s_plot 0.3.1  12oct2026  Jerg Gutmann
+*! did2s_plot 0.3.2  12oct2026  Jerg Gutmann
 *! Event-study plot after did2s; same layout as dcdh_plot and lpdid_plot; optional post-treatment block and standard-deviation units
 program define did2s_plot
 	version 16
@@ -7,7 +7,7 @@ program define did2s_plot
 		AVG AVGPre AVGAfter AVGValues PVAlues PNOte ///
 		NOCI CIBars NORMalci LEvel(string) CIOpacity(integer 20) ///
 		SHADE SHADEColor(string) VLINE ///
-		SCale(real 1) PCTof(real 0) SDOF(string) WIThin ID(varname) TIME(varname) ///
+		SCale(real 1) PCTof(real 0) SDOF(string) WIThin Y(varname) TREATment(varname) ID(varname) TIME(varname) SDIF(string asis) ///
 		COLor(string) AVGColor(string) PRECOLor(string) AFTERCOLor(string) MSymbol(string) ///
 		LPAttern(string) LWidth(string) AVGLPattern(string) PRELPattern(string) AFTERLPattern(string) ///
 		NOZero NOCAPtions PRECAPtion(string) POSTCAPtion(string) AFTERCAPtion(string) NOLEGend ///
@@ -90,14 +90,20 @@ program define did2s_plot
 		di as error "within requires sdof()"
 		exit 198
 	}
-	if "`sdof'" == "" & ("`id'" != "" | "`time'" != "") {
-		di as error "id() and time() are only used with sdof()"
+	if "`sdof'" == "" & ("`y'`treatment'`id'`time'" != "" | `"`sdif'"' != "") {
+		di as error "y(), treatment(), id(), time() and sdif() are only used with sdof()"
 		exit 198
 	}
 	local sc = `scale'
 	if `pctof' != 0 local sc = 100/`pctof'
 	if "`sdof'" != "" {
-		_did2s_plot_sd `sdof' "`id'" "`time'" "`within'"
+		local sdopts mode(`sdof') `within'
+		if "`y'" != "" local sdopts `sdopts' y(`y')
+		if "`treatment'" != "" local sdopts `sdopts' treat(`treatment')
+		if "`id'" != "" local sdopts `sdopts' id(`id')
+		if "`time'" != "" local sdopts `sdopts' time(`time')
+		if `"`sdif'"' != "" local sdopts `sdopts' sdif(`sdif')
+		_did2s_plot_sd, `sdopts'
 		local sdv = r(sd)
 		local sdn = r(N)
 		local sdy "`r(yvar)'"
@@ -107,6 +113,7 @@ program define did2s_plot
 			cond("`sdof'" == "untreated", "untreated observations (treatment = 0) of the did2s sample", ///
 			"never- and not-yet-treated observations of the did2s sample"))
 		di as text "note: estimates are divided by the standard deviation of `sdy' in the `sdtxt'"
+		if `"`sdif'"' != "" di as text `"      restricted by sdif(): `sdif'"'
 		if "`within'" != "" di as text "      after removing unit and time means (within standard deviation)"
 		di as text "      standard deviation = " as result %9.4g `sdv' as text ", N = " as result `sdn'
 		if `sdw' == 1 di as text "      did2s used weights; the standard deviation is unweighted"
@@ -765,12 +772,13 @@ end
 
 * standard deviation of the did2s outcome in the selected sample (data in memory are not changed)
 program define _did2s_plot_sd, rclass
-	args mode id time within
+	syntax , MODE(string) [ Y(string) TREAT(string) ID(string) TIME(string) WITHIN SDIF(string asis) ]
 	local cl `"`e(cmdline)'"'
-	gettoken yv : cl, parse(" ,")
+	local yv "`y'"
+	if "`yv'" == "" gettoken yv : cl, parse(" ,")
 	capture confirm numeric variable `yv'
 	if _rc {
-		di as error "outcome variable `yv' of did2s not found; sdof() needs the data used by did2s"
+		di as error "outcome variable `yv' of did2s not found; sdof() needs the data used by did2s (or specify y())"
 		exit 111
 	}
 	if regexm(`"`cl'"', "(^|[ ,])unit[(]") {
@@ -780,11 +788,14 @@ program define _did2s_plot_sd, rclass
 	local yname "`yv'"
 	local wt = regexm(`"`cl'"', "[[][aipf]w[a-z]* *=")
 	if "`mode'" != "sample" {
-		if !regexm(`"`cl'"', "(^|[ ,])[Tt][Rr][Ee][Aa][Tt][A-Za-z]*[(]([^)]+)[)]") {
-			di as error "treatment() not found in e(cmdline)"
-			exit 111
+		local tv "`treat'"
+		if "`tv'" == "" {
+			if !regexm(`"`cl'"', "(^|[ ,])[Tt][Rr][Ee][Aa][Tt][A-Za-z]*[(]([^)]+)[)]") {
+				di as error "treatment() not found in e(cmdline); specify treatment()"
+				exit 111
+			}
+			local tv = strtrim(regexs(2))
 		}
-		local tv = strtrim(regexs(2))
 		capture confirm numeric variable `tv'
 		if _rc {
 			di as error "treatment variable `tv' of did2s not found"
@@ -793,6 +804,13 @@ program define _did2s_plot_sd, rclass
 	}
 	preserve
 	qui keep if e(sample)
+	if `"`sdif'"' != "" {
+		capture qui keep if (`sdif')
+		if _rc {
+			di as error `"sdif() is not a valid condition: `sdif'"'
+			exit 198
+		}
+	}
 	if "`mode'" == "untreated" {
 		qui keep if `tv' == 0
 	}

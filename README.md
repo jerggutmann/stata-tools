@@ -53,9 +53,11 @@ Spellings that are not recognized (marker 2) can be added to a personal dictiona
 
 ## csdid_event_plot
 
-Version 0.1.0 (beta). Package folder: [`csdid_event_plot/`](csdid_event_plot/).
+Version 0.2.0 (beta). Package folder: [`csdid_event_plot/`](csdid_event_plot/).
 
 Event-study plot after `csdid` (Callaway and Sant'Anna; Stata implementation by Rios-Avila, Sant'Anna and Callaway, written for version 1.81). Counterpart of `dcdh_plot`, `lpdid_plot` and `did2s_plot` with the same layout, axis positions, defaults and options. It plots the table of `estat event` (`Tm#`, `Tp#`, `Pre_avg`, `Post_avg`). The name differs from `csdid_plot`, which belongs to the `csdid` package itself and is not touched by this package.
+
+`sdof(sample)`, `sdof(untreated)` and `sdof(nyt)` express the estimates in standard deviations of the `csdid` outcome (whole `csdid` sample, or never- and not-yet-treated observations; the two latter coincide because `csdid` treatment does not end). `within` uses the standard deviation after removing unit and time means, and `sdif()` adds a condition on the observations used. Outcome, group and time variable are read from the results of `csdid`; `y()`, `treatment()`, `id()` and `time()` override them. The command prints the standard deviation used.
 
 **This is a beta version. Please check results against the `estat event` output and report problems via GitHub issues.**
 
@@ -107,9 +109,11 @@ The plot covers the longer of the two event-time ranges. Confidence intervals ar
 
 ## dcdh_plot
 
-Version 0.3.8 (beta). Package folder: [`dcdh_plot/`](dcdh_plot/).
+Version 0.4.0 (beta). Package folder: [`dcdh_plot/`](dcdh_plot/).
 
 Event-study plot after `did_multiplegt_dyn` (one event). Shows the effects and placebos with confidence intervals, and optionally the average total effect, the average placebo, p-values and more.
+
+`sdof(sample)`, `sdof(untreated)` and `sdof(nyt)` express the estimates in standard deviations of the outcome (all observations, untreated observations, or observations of groups that have not yet changed their treatment). Because `did_multiplegt_dyn` stores neither its variables nor its sample, the variables are given with `y()`, `treatment()`, `id()` and `time()`, and `sdif()` restricts the observations (for example to the groups marked by `save_sample`). `within` uses the standard deviation after removing group and time means. The command prints the standard deviation used.
 
 **This is a beta version and has not been extensively tested. Please check results against the `did_multiplegt_dyn` output and report problems via GitHub issues.**
 
@@ -180,7 +184,7 @@ Periods that could not be estimated appear as gaps. `shade` and `vline` cannot b
 
 ## did2s_plot
 
-Version 0.3.1 (beta). Package folder: [`did2s_plot/`](did2s_plot/).
+Version 0.3.2 (beta). Package folder: [`did2s_plot/`](did2s_plot/).
 
 Event-study plot after `did2s` (Butts and Gardner; two-stage difference-in-differences). Counterpart of `dcdh_plot` and `lpdid_plot` with the same layout, axis positions, defaults and options. Because `did2s` leaves the definition of the treatment variables to the user, `did2s_plot` identifies the event-study coefficients by name (see below).
 
@@ -212,7 +216,7 @@ Event time -1 is the baseline and plotted as zero if it is the omitted reference
 
 With dummy variables, `after(P#_treat)` adds a block of post-treatment dummies (`P1_treat` is the first period after the end of treatment) directly to the right of the treatment periods, labeled +1, +2, ...; `nafter()` limits it, `avgafter` adds its average line, `shade` covers only the treatment area, and `pvalues`/`pnote` report the post-treatment average and separate joint tests. Example: `did2s_plot, lead(F#_treat) lag(L#_treat) after(P#_treat) pre(5) avg avgafter shade`.
 
-`sdof(sample)`, `sdof(untreated)` and `sdof(nyt)` express the estimates in standard deviations of the `did2s` outcome: in the whole `did2s` sample, among untreated observations, or among never- and not-yet-treated observations (the latter requires `id()` and `time()`). The outcome and treatment variable are read from `e(cmdline)`; the command prints the standard deviation used. With `within` (and `id()`, `time()`), the standard deviation is taken after removing unit and time means in the chosen sample. Not available if `did2s` was run with `unit()`.
+`sdof(sample)`, `sdof(untreated)` and `sdof(nyt)` express the estimates in standard deviations of the `did2s` outcome: in the whole `did2s` sample, among untreated observations, or among never- and not-yet-treated observations (the latter requires `id()` and `time()`). The outcome and treatment variable are read from `e(cmdline)` unless `y()` or `treatment()` is given, and `sdif()` adds a condition on the observations used; the command prints the standard deviation used. With `within` (and `id()`, `time()`), the standard deviation is taken after removing unit and time means in the chosen sample. Not available if `did2s` was run with `unit()`.
 
 ## lpdid_plot
 
