@@ -1,5 +1,5 @@
-*! did2s_plot 0.2.0  12oct2026  Jerg Gutmann
-*! Event-study plot after did2s; same layout as dcdh_plot and lpdid_plot; optional post-treatment block
+*! did2s_plot 0.3.0  12oct2026  Jerg Gutmann
+*! Event-study plot after did2s; same layout as dcdh_plot and lpdid_plot; optional post-treatment block and standard-deviation units
 program define did2s_plot
 	version 16
 	syntax , [ EVENTVAR(string) SHIFT(integer 0) LEAD(string) LAG(string) AFTER(string) NAFter(integer -999) ///
@@ -7,7 +7,7 @@ program define did2s_plot
 		AVG AVGPre AVGAfter AVGValues PVAlues PNOte ///
 		NOCI CIBars NORMalci LEvel(string) CIOpacity(integer 20) ///
 		SHADE SHADEColor(string) VLINE ///
-		SCale(real 1) PCTof(real 0) ///
+		SCale(real 1) PCTof(real 0) SDOF(string) ID(varname) TIME(varname) ///
 		COLor(string) AVGColor(string) PRECOLor(string) AFTERCOLor(string) MSymbol(string) ///
 		LPAttern(string) LWidth(string) AVGLPattern(string) PRELPattern(string) AFTERLPattern(string) ///
 		NOZero NOCAPtions PRECAPtion(string) POSTCAPtion(string) AFTERCAPtion(string) NOLEGend ///
@@ -72,8 +72,40 @@ program define did2s_plot
 		di as error "specify either scale() or pctof(), not both"
 		exit 198
 	}
+	if "`sdof'" != "" {
+		if !inlist("`sdof'", "sample", "untreated", "nyt") {
+			di as error "sdof() must be sample, untreated or nyt"
+			exit 198
+		}
+		if `pctof' != 0 | `scale' != 1 {
+			di as error "sdof() cannot be combined with scale() or pctof()"
+			exit 198
+		}
+		if "`sdof'" == "nyt" & ("`id'" == "" | "`time'" == "") {
+			di as error "sdof(nyt) requires id() and time()"
+			exit 198
+		}
+	}
+	else if "`id'" != "" | "`time'" != "" {
+		di as error "id() and time() are only used with sdof(nyt)"
+		exit 198
+	}
 	local sc = `scale'
 	if `pctof' != 0 local sc = 100/`pctof'
+	if "`sdof'" != "" {
+		_did2s_plot_sd `sdof' "`id'" "`time'"
+		local sdv = r(sd)
+		local sdn = r(N)
+		local sdy "`r(yvar)'"
+		local sdw = r(weighted)
+		local sc = 1/`sdv'
+		local sdtxt = cond("`sdof'" == "sample", "all observations of the did2s sample", ///
+			cond("`sdof'" == "untreated", "untreated observations (treatment = 0) of the did2s sample", ///
+			"never- and not-yet-treated observations of the did2s sample"))
+		di as text "note: estimates are divided by the standard deviation of `sdy' in the `sdtxt'"
+		di as text "      standard deviation = " as result %9.4g `sdv' as text ", N = " as result `sdn'
+		if `sdw' == 1 di as text "      did2s used weights; the standard deviation is unweighted"
+	}
 
 	* confidence intervals are normal-based (did2s displays z-based intervals but does not store them)
 	if "`level'" == "" {
@@ -389,7 +421,8 @@ program define did2s_plot
 
 	if "`pvalues'" != "" {
 		di as text _n "did2s_plot: summary of the plotted model"
-		if `sc' != 1 di as text "(estimates multiplied by " as result `sc' as text ")"
+		if "`sdof'" != "" di as text "(estimates in standard deviations of the outcome)"
+		else if `sc' != 1 di as text "(estimates multiplied by " as result `sc' as text ")"
 		di as text "{hline 62}"
 		di as text %-30s "" %10s "estimate" %10s "s.e." %10s "p-value"
 		di as text "{hline 62}"
@@ -723,4 +756,52 @@ program define _did2s_plot_wald, rclass
 	return scalar df   = `df'
 	if `df' > 0 return scalar p = chi2tail(`df', `q'[1,1])
 	else return scalar p = .
+end
+
+* standard deviation of the did2s outcome in the selected sample (data in memory are not changed)
+program define _did2s_plot_sd, rclass
+	args mode id time
+	local cl `"`e(cmdline)'"'
+	gettoken yv : cl, parse(" ,")
+	capture confirm numeric variable `yv'
+	if _rc {
+		di as error "outcome variable `yv' of did2s not found; sdof() needs the data used by did2s"
+		exit 111
+	}
+	if regexm(`"`cl'"', "(^|[ ,])unit[(]") {
+		di as error "sdof() cannot be used if did2s was run with unit(): did2s then replaces the outcome in memory"
+		exit 198
+	}
+	local wt = regexm(`"`cl'"', "[[][aipf]w[a-z]* *=")
+	if "`mode'" != "sample" {
+		if !regexm(`"`cl'"', "(^|[ ,])[Tt][Rr][Ee][Aa][Tt][A-Za-z]*[(]([^)]+)[)]") {
+			di as error "treatment() not found in e(cmdline)"
+			exit 111
+		}
+		local tv = strtrim(regexs(2))
+		capture confirm numeric variable `tv'
+		if _rc {
+			di as error "treatment variable `tv' of did2s not found"
+			exit 111
+		}
+	}
+	preserve
+	qui keep if e(sample)
+	if "`mode'" == "untreated" {
+		qui keep if `tv' == 0
+	}
+	if "`mode'" == "nyt" {
+		tempvar first
+		qui bysort `id': egen double `first' = min(cond(`tv' == 1, `time', .))
+		qui keep if `tv' == 0 & (`time' < `first' | missing(`first'))
+	}
+	qui summarize `yv'
+	if r(N) < 2 | missing(r(sd)) | r(sd) <= 0 {
+		di as error "the standard deviation of `yv' in the selected sample is zero or cannot be computed"
+		exit 498
+	}
+	return scalar sd = r(sd)
+	return scalar N = r(N)
+	return scalar weighted = `wt'
+	return local yvar "`yv'"
 end

@@ -180,7 +180,7 @@ Periods that could not be estimated appear as gaps. `shade` and `vline` cannot b
 
 ## did2s_plot
 
-Version 0.2.0 (beta). Package folder: [`did2s_plot/`](did2s_plot/).
+Version 0.3.0 (beta). Package folder: [`did2s_plot/`](did2s_plot/).
 
 Event-study plot after `did2s` (Butts and Gardner; two-stage difference-in-differences). Counterpart of `dcdh_plot` and `lpdid_plot` with the same layout, axis positions, defaults and options. Because `did2s` leaves the definition of the treatment variables to the user, `did2s_plot` identifies the event-study coefficients by name (see below).
 
@@ -211,6 +211,8 @@ did2s_plot, eventvar(rel_year_shift) shift(20) pre(5) post(10) avg avgpre pvalue
 Event time -1 is the baseline and plotted as zero if it is the omitted reference period. If the regression estimates it, the estimate is plotted and a warning says that the coefficients are not normalized at t-1 (as in the `did2s` help example); leaving out the dummy for t-1 avoids this. Factor variable and dummies cannot be combined. `avg` and `avgpre` are unweighted means of the plotted coefficients (not the `did2s` average treatment effect); `pvalues` and `pnote` also report joint Wald tests from `e(V)`. Confidence intervals are normal-based, as displayed by `did2s` (`level()` defaults to the current `c(level)`; `level(90 95)` draws two bands; `normalci` is accepted for consistency). `pre()`/`post()` limit the plotted event times. All other options are identical to `dcdh_plot` (see [`dcdh_plot`](#dcdh_plot)), except that `eventvar()`, `shift()`, `lead()` and `lag()` identify the coefficients. Details: `help did2s_plot`.
 
 With dummy variables, `after(P#_treat)` adds a block of post-treatment dummies (`P1_treat` is the first period after the end of treatment) directly to the right of the treatment periods, labelled +1, +2, ...; `nafter()` limits it, `avgafter` adds its average line, `shade` covers only the treatment area, and `pvalues`/`pnote` report the post-treatment average and separate joint tests. Example: `did2s_plot, lead(F#_treat) lag(L#_treat) after(P#_treat) pre(5) avg avgafter shade`.
+
+`sdof(sample)`, `sdof(untreated)` and `sdof(nyt)` express the estimates in standard deviations of the `did2s` outcome: in the whole `did2s` sample, among untreated observations, or among never- and not-yet-treated observations (the latter requires `id()` and `time()`). The outcome and treatment variable are read from `e(cmdline)`; the command prints the standard deviation used. Not available if `did2s` was run with `unit()`.
 
 ## lpdid_plot
 

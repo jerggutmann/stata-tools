@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.2.0  12oct2026  Jerg Gutmann}{...}
+{* *! version 0.3.0  12oct2026  Jerg Gutmann}{...}
 {vieweralsosee "did2s" "help did2s"}{...}
 {vieweralsosee "dcdh_plot" "help dcdh_plot"}{...}
 {vieweralsosee "lpdid_plot" "help lpdid_plot"}{...}
@@ -45,6 +45,9 @@
 {synopt:{opt le:vel(# [#])}}one or two confidence levels{p_end}
 {synopt:{opt sc:ale(#)}}multiply all estimates by {it:#}{p_end}
 {synopt:{opt pct:of(#)}}express estimates in percent of {it:#}{p_end}
+{synopt:{opt sdof(sample|untreated|nyt)}}express estimates in standard deviations of the outcome in the chosen sample{p_end}
+{synopt:{opt id(varname)}}unit identifier; required for {cmd:sdof(nyt)}{p_end}
+{synopt:{opt time(varname)}}time variable; required for {cmd:sdof(nyt)}{p_end}
 
 {syntab:Statistics}
 {synopt:{opt pva:lues}}display a table of averages, p-values and joint tests{p_end}
@@ -205,6 +208,24 @@ It is equivalent to {cmd:scale(100/}{it:#}{cmd:)}.
 {opt scale()} and {opt pctof()} cannot be combined.
 Neither changes the p-values.{p_end}
 
+{phang}{opt sdof(sample|untreated|nyt)} expresses all estimates in standard deviations of the outcome of {cmd:did2s}.
+The outcome and the treatment variable are taken from {cmd:e(cmdline)}, the observations from {cmd:e(sample)}.
+The data in memory must be those used for {cmd:did2s}.
+The standard deviation is computed over the observations with a non-missing outcome in the chosen sample:{p_end}
+{phang2}{cmd:sample}: all observations of the {cmd:did2s} sample.{p_end}
+{phang2}{cmd:untreated}: observations of the sample with {cmd:treatment()} equal to 0, which are the observations of the first stage.{p_end}
+{phang2}{cmd:nyt}: untreated observations of units that are never treated or not yet treated.
+Observations after the end of a treatment are excluded.
+{opt id(varname)} and {opt time(varname)} are required.
+The first period with {cmd:treatment()} equal to 1 of each unit marks the start of its treatment.
+With a treatment that does not end, {cmd:nyt} and {cmd:untreated} give the same result.{p_end}
+
+{pmore}The command prints the standard deviation and the number of observations used.
+It is unweighted, also if {cmd:did2s} used weights.
+It is treated as a constant, so the standard errors do not account for its estimation.
+{opt sdof()} cannot be combined with {opt scale()} or {opt pctof()}.
+It cannot be used if {cmd:did2s} was run with {opt unit()}, because {cmd:did2s} then replaces the outcome in memory.{p_end}
+
 {dlgtab:Statistics}
 
 {phang}{opt pvalues} displays a table in the Results window.
@@ -316,6 +337,10 @@ Here event time -1 is estimated, so {cmd:did2s_plot} prints a warning (see Remar
 
 {pstd}Express the estimates in percent of a baseline mean of 12.5{p_end}
 {phang2}{stata "did2s_plot, eventvar(rel_year_shift) shift(20) pre(5) post(10) pctof(12.5) name(d5, replace)":. did2s_plot, eventvar(rel_year_shift) shift(20) pre(5) post(10) pctof(12.5) name(d5, replace)}{p_end}
+
+{pstd}Express the estimates in standard deviations of the outcome among untreated observations{p_end}
+{phang2}{stata "did2s_plot, eventvar(rel_year_shift) shift(20) pre(5) post(10) sdof(untreated) name(d6s, replace)":. did2s_plot, eventvar(rel_year_shift) shift(20) pre(5) post(10) sdof(untreated) name(d6s, replace)}{p_end}
+{phang2}{stata "did2s_plot, eventvar(rel_year_shift) shift(20) sdof(nyt) id(unit) time(year) name(d6t, replace)":. did2s_plot, eventvar(rel_year_shift) shift(20) sdof(nyt) id(unit) time(year) name(d6t, replace)}{p_end}
 
 {pstd}Save the graph{p_end}
 {phang2}{stata "did2s_plot, eventvar(rel_year_shift) shift(20) avg export(event_study.png) name(d6, replace)":. did2s_plot, eventvar(rel_year_shift) shift(20) avg export(event_study.png) name(d6, replace)}{p_end}
