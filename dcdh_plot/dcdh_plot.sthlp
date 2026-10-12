@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.4.0  12oct2026  Jerg Gutmann}{...}
+{* *! version 0.4.1  12oct2026  Jerg Gutmann}{...}
 {vieweralsosee "did_multiplegt_dyn" "help did_multiplegt_dyn"}{...}
 {vieweralsosee "[G-2] graph twoway" "help twoway"}{...}
 {vieweralsosee "[G-2] graph export" "help graph_export"}{...}
@@ -286,11 +286,11 @@ for example {cmd:name()}, {cmd:scheme()} or {cmd:title()}.{p_end}
 {phang2}{stata "dcdh_plot, effects(8) placebo(3) pctof(12.5) name(f6, replace)":. dcdh_plot, effects(8) placebo(3) pctof(12.5) name(f6, replace)}{p_end}
 
 {pstd}Express the estimates in standard deviations of the outcome among groups that have not yet changed their treatment{p_end}
-{phang2}{cmd:. dcdh_plot, effects(8) placebo(3) sdof(nyt) y(Dl_vloans_b) id(county) time(year) treatment(inter_bra) name(f8, replace)}{p_end}
+{phang2}{stata "dcdh_plot, sdof(nyt) y(Dl_vloans_b) id(county) time(year) treatment(inter_bra) name(f8, replace)":. dcdh_plot, sdof(nyt) y(Dl_vloans_b) id(county) time(year) treatment(inter_bra) name(f8, replace)}{p_end}
 
 {pstd}The same with the within standard deviation, using the groups of the estimation sample (this needs {opt save_sample} in the estimation){p_end}
-{phang2}{cmd:. did_multiplegt_dyn Dl_vloans_b county year inter_bra, effects(8) placebo(3) cluster(state_n) save_sample graph_off}{p_end}
-{phang2}{cmd:. dcdh_plot, effects(8) placebo(3) sdof(nyt) within y(Dl_vloans_b) id(county) time(year) treatment(inter_bra) sdif(!missing(_did_sample)) name(f9, replace)}{p_end}
+{phang2}{stata "did_multiplegt_dyn Dl_vloans_b county year inter_bra, effects(8) placebo(3) cluster(state_n) save_sample":. did_multiplegt_dyn Dl_vloans_b county year inter_bra, effects(8) placebo(3) cluster(state_n) save_sample}{p_end}
+{phang2}{stata "dcdh_plot, sdof(nyt) within y(Dl_vloans_b) id(county) time(year) treat(inter_bra) sdif(!missing(_did_sample))":. dcdh_plot, sdof(nyt) within y(Dl_vloans_b) id(county) time(year) treat(inter_bra) sdif(!missing(_did_sample))}{p_end}
 
 {pstd}Change a caption and a legend label{p_end}
 {phang2}{stata `"dcdh_plot, effects(8) placebo(3) avg postcaption("after the reform") lblavg("mean effect") name(f7, replace)"':. dcdh_plot, effects(8) placebo(3) avg postcaption("after the reform") lblavg("mean effect") name(f7, replace)}{p_end}

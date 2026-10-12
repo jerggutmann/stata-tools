@@ -109,7 +109,7 @@ The plot covers the longer of the two event-time ranges. Confidence intervals ar
 
 ## dcdh_plot
 
-Version 0.4.0 (beta). Package folder: [`dcdh_plot/`](dcdh_plot/).
+Version 0.4.1 (beta). Package folder: [`dcdh_plot/`](dcdh_plot/).
 
 Event-study plot after `did_multiplegt_dyn` (one event). Shows the effects and placebos with confidence intervals, and optionally the average total effect, the average placebo, p-values and more.
 
