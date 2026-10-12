@@ -802,18 +802,29 @@ program define _did2s_plot_sd, rclass
 		qui keep if `tv' == 0 & (`time' < `first' | missing(`first'))
 	}
 	if "`within'" != "" {
-		* residual of the outcome on unit and time effects in the selected sample (exact for unbalanced panels)
-		capture confirm numeric variable `time'
-		if _rc {
-			di as error "time() must be numeric"
-			exit 109
+		* remove unit and time means alternately until they vanish (exact also in unbalanced panels);
+		* no estimation command is used, so the results of did2s in e() stay untouched
+		tempvar res m1 m2
+		qui gen double `res' = `yv'
+		local diff = 1
+		local it = 0
+		while `diff' > 1e-10 & `it' < 5000 {
+			local ++it
+			qui bysort `id': egen double `m1' = mean(`res')
+			qui replace `res' = `res' - `m1'
+			qui bysort `time': egen double `m2' = mean(`res')
+			qui replace `res' = `res' - `m2'
+			qui summarize `m1', meanonly
+			local diff = max(abs(r(min)), abs(r(max)))
+			qui summarize `m2', meanonly
+			local diff = max(`diff', abs(r(min)), abs(r(max)))
+			if missing(`diff') local diff = 0
+			drop `m1' `m2'
 		}
-		tempname hold
-		_estimates hold `hold', copy restore
-		tempvar idn res
-		qui egen long `idn' = group(`id')
-		qui areg `yv' i.`time', absorb(`idn')
-		qui predict double `res', residuals
+		if `diff' > 1e-10 {
+			di as error "within: unit and time means did not converge"
+			exit 430
+		}
 		local yv `res'
 	}
 	qui summarize `yv'
