@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.1.1  11oct2026  Jerg Gutmann}{...}
+{* *! version 0.2.0  12oct2026  Jerg Gutmann}{...}
 {vieweralsosee "did2s" "help did2s"}{...}
 {vieweralsosee "dcdh_plot" "help dcdh_plot"}{...}
 {vieweralsosee "lpdid_plot" "help lpdid_plot"}{...}
@@ -19,7 +19,7 @@
 {title:Syntax}
 
 {p 8 17 2}{cmd:did2s_plot,} {opt eventvar(varname)} [{opt shift(#)} {it:options}]{p_end}
-{p 8 17 2}{cmd:did2s_plot,} {opt lead(template)} {opt lag(template)} [{it:options}]{p_end}
+{p 8 17 2}{cmd:did2s_plot,} {opt lead(template)} {opt lag(template)} [{opt after(template)} {it:options}]{p_end}
 
 {synoptset 26 tabbed}{...}
 {synopthdr}
@@ -29,12 +29,15 @@
 {synopt:{opt shift(#)}}value of {it:varname} that corresponds to event time 0; default is {cmd:0}{p_end}
 {synopt:{opt lead(template)}}name pattern of lead dummies, for example {cmd:F#_treat}{p_end}
 {synopt:{opt lag(template)}}name pattern of lag dummies, for example {cmd:L#_treat}{p_end}
+{synopt:{opt after(template)}}name pattern of post-treatment dummies, for example {cmd:P#_treat}; only with {opt lead()} and/or {opt lag()}{p_end}
 
 {syntab:Contents}
 {synopt:{opt pre(#)}}earliest event time shown is {it:-#}; default is all{p_end}
 {synopt:{opt post(#)}}latest event time shown is {it:#}; default is all{p_end}
+{synopt:{opt naf:ter(#)}}number of post-treatment periods shown; default is all{p_end}
 {synopt:{opt avg}}add the average of the plotted post-treatment coefficients{p_end}
 {synopt:{opt avgp:re}}add the average of the plotted pre-treatment coefficients{p_end}
+{synopt:{opt avga:fter}}add the average of the plotted coefficients of {opt after()}{p_end}
 {synopt:{opt avgv:alues}}print the values of the average lines{p_end}
 {synopt:{opt noci}}no confidence intervals{p_end}
 {synopt:{opt cib:ars}}confidence intervals as bars{p_end}
@@ -49,26 +52,30 @@
 {synopt:{opt fmt(%fmt)}}number format; default is {cmd:%5.3f}{p_end}
 
 {syntab:Appearance}
-{synopt:{opt shade}}shade the post-treatment area{p_end}
+{synopt:{opt shade}}shade the post-treatment area; with {opt after()}, the treatment area{p_end}
 {synopt:{opt shadec:olor(colorstyle)}}colour of the shading; default is {cmd:gs12}{p_end}
 {synopt:{opt vline}}vertical line between baseline and first effect{p_end}
 {synopt:{opt col:or(string)}}colour of the series; default is {cmd:0 114 178}{p_end}
 {synopt:{opt avgc:olor(string)}}colour of the post-treatment average line{p_end}
 {synopt:{opt precol:or(string)}}colour of the pre-treatment average line{p_end}
+{synopt:{opt aftercol:or(string)}}colour of the average line of {opt after()}{p_end}
 {synopt:{opt ms:ymbol(symbolstyle)}}marker symbol; default is {cmd:o}{p_end}
 {synopt:{opt lpa:ttern(patternstyle)}}line pattern of the series{p_end}
 {synopt:{opt lw:idth(linewidthstyle)}}line width of the series{p_end}
 {synopt:{opt avgl:pattern(patternstyle)}}line pattern of the post-treatment average line{p_end}
 {synopt:{opt prelp:attern(patternstyle)}}line pattern of the pre-treatment average line{p_end}
+{synopt:{opt afterlp:attern(patternstyle)}}line pattern of the average line of {opt after()}{p_end}
 {synopt:{opt cio:pacity(#)}}opacity of the confidence bands in percent; default is {cmd:20}{p_end}
 {synopt:{opt noz:ero}}no zero line{p_end}
-{synopt:{opt nocap:tions}}no pre-/post-treatment captions{p_end}
+{synopt:{opt nocap:tions}}no captions{p_end}
 {synopt:{opt precap:tion(string)}}text of the pre-treatment caption{p_end}
-{synopt:{opt postcap:tion(string)}}text of the post-treatment caption{p_end}
+{synopt:{opt postcap:tion(string)}}text of the post-treatment caption; with {opt after()}, of the treatment caption{p_end}
+{synopt:{opt aftercap:tion(string)}}text of the post-treatment caption with {opt after()}{p_end}
 {synopt:{opt noleg:end}}no legend{p_end}
 {synopt:{opt lbld:yn(string)}}legend label of the event-study series{p_end}
 {synopt:{opt lbla:vg(string)}}legend label of the average effect{p_end}
 {synopt:{opt lblp:re(string)}}legend label of the average placebo{p_end}
+{synopt:{opt lblaf:ter(string)}}legend label of the average of {opt after()}{p_end}
 {synopt:{opt yti:tle(string)}}title left of the y-axis; default is none{p_end}
 {synopt:{opt xti:tle(string)}}title of the x-axis; default is none{p_end}
 {synopt:{opt ylab(rule)}}y-axis labels; requires {opt tpos()}{p_end}
@@ -104,6 +111,13 @@ If your regression estimates a coefficient for event time -1, it is plotted as e
 If event time -1 is the omitted base category (or has no coefficient), the baseline is set to zero.
 Event times without a coefficient appear as gaps.{p_end}
 
+{pstd}With {opt after()}, a second block of dummy variables is plotted to the right of the treatment periods, separated by an empty position.
+The user defines these dummies:
+{cmd:P1_treat} is the first period after the end of treatment, {cmd:P2_treat} the second, and so on.
+Lines and confidence bands are not connected across the empty position, and the x-axis of the second block is labelled +1, +2, ....
+The three blocks are captioned "pre-treatment", "treatment" and "post-treatment".
+Without {opt after()}, the plot has two blocks and the captions "pre-treatment" and "post-treatment".{p_end}
+
 {marker naming}{...}
 {pstd}{bf:Naming the coefficients.}
 There are two ways to tell {cmd:did2s_plot} which coefficients to use.
@@ -121,8 +135,9 @@ The templates describe their names, with {cmd:#} for the number.
 With {cmd:lead(F#_treat) lag(L#_treat)}, the variable {cmd:F3_treat} is event time -3 and {cmd:L2_treat} is event time 2;
 {cmd:L0_treat} is event time 0.
 Either option can be used alone, but at least one is required.
+{opt after(template)} adds the post-treatment dummies in the same way; {cmd:P2_treat} is the second post-treatment period.
 The templates may contain letters, digits, underscores and periods.
-Neither form can be combined with the other.{p_end}
+Neither form can be combined with the other, and {opt after()} requires the dummy form.{p_end}
 
 
 {marker options}{...}
@@ -136,6 +151,10 @@ Example: if you generated {cmd:rel_year_shift = rel_year + 20}, specify {cmd:shi
 
 {phang}{opt lead(template)} and {opt lag(template)} specify the names of lead and lag dummies, see above.{p_end}
 
+{phang}{opt after(template)} specifies the names of the post-treatment dummies, see above.
+Their number is taken from the matched coefficients.
+It cannot be combined with {opt eventvar()}.{p_end}
+
 {dlgtab:Contents}
 
 {phang}{opt pre(#)} and {opt post(#)} restrict the plot to the event times -{it:#}, ..., -1 and 0, ..., {it:#}.
@@ -144,16 +163,24 @@ By default, all matched coefficients are plotted.
 {cmd:pre(}{it:U}{cmd:)} corresponds to {cmd:placebo(}{it:U}-1{cmd:)} and {cmd:post(}{it:T}{cmd:)} to {cmd:effects(}{it:T}+1{cmd:)} in {helpb dcdh_plot}.
 If you ask for more periods than were estimated, the missing ones appear as gaps.{p_end}
 
+{phang}{opt nafter(#)} restricts the second block to the post-treatment periods 1, ..., {it:#}.
+By default, all matched coefficients are plotted.
+It requires {opt after()}.{p_end}
+
 {phang}{opt avg} adds the average of the plotted post-treatment coefficients as a dashed horizontal line over the post-treatment periods.
 The average is unweighted; its standard error is computed from {cmd:e(V)}.
-It is {it:not} the average treatment effect of {cmd:did2s} (for example from a static model), which weights the treated observations.{p_end}
+It is {it:not} the average treatment effect of {cmd:did2s} (for example from a static model), which weights the treated observations.
+With {opt after()}, {opt avg} covers the treatment periods only.{p_end}
 
 {phang}{opt avgpre} adds the unweighted average of the plotted pre-treatment coefficients as a dashed horizontal line.
 It spans the periods from the earliest plotted period to -1 if event time -1 is estimated, otherwise to -2.
 At least one estimated pre-treatment coefficient must be plotted.{p_end}
 
+{phang}{opt avgafter} adds the unweighted average of the plotted coefficients of {opt after()} as a horizontal line over the second block.
+It requires {opt after()} and at least one estimated coefficient in it.{p_end}
+
 {phang}{opt avgvalues} prints the value of each average line next to its end.
-It requires {opt avg} or {opt avgpre}.
+It requires {opt avg}, {opt avgpre} or {opt avgafter}.
 It sets {cmd:xscale(range())}, so do not also pass {cmd:xscale()}.{p_end}
 
 {phang}{opt noci} suppresses the confidence intervals.{p_end}
@@ -181,13 +208,16 @@ Neither changes the p-values.{p_end}
 {phang}{opt pvalues} displays a table in the Results window.
 It contains the estimate, standard error and p-value of the average of the post-treatment coefficients and of the pre-treatment coefficients
 (the latter if at least two are plotted).
-In addition, it reports joint Wald tests that all plotted pre-treatment coefficients, and all plotted post-treatment coefficients, are zero.
+With {opt after()}, it also reports the average of the post-treatment coefficients of {opt after()}.
+In addition, it reports joint Wald tests that all plotted pre-treatment coefficients, and all plotted post-treatment coefficients, are zero;
+with {opt after()}, there are separate tests for the treatment and the post-treatment coefficients.
 They use the full covariance matrix {cmd:e(V)} of the coefficients and are shown as p-values only.
 Omitted, base and zero-baseline periods are not part of the tests.
 The p-values are two-sided; the averages use the normal distribution.{p_end}
 
 {phang}{opt pnote} adds the p-value of the average post-treatment effect and the p-value of the joint test of the pre-treatment coefficients
 (pre-trend test, if at least two are plotted) as a note below the plot.
+With {opt after()}, it also shows the average of the post-treatment coefficients of {opt after()} and its p-value.
 It uses the {cmd:note()} option of the graph, so do not also pass {cmd:note()}.{p_end}
 
 {phang}{opt fmt(%fmt)} sets the number format of the values and p-values.
@@ -196,21 +226,24 @@ The default is {cmd:%5.3f}.{p_end}
 {dlgtab:Appearance}
 
 {phang}{opt shade} shades the post-treatment area.
+With {opt after()}, only the treatment area is shaded.
 {opt shadecolor()} changes the colour; the default is {cmd:gs12}.
 The shading and {opt vline} follow the automatically chosen y-axis,
 so neither can be combined with {opt ylab()}.{p_end}
 
-{phang}{opt vline} draws a vertical dashed line between the baseline and the first effect.{p_end}
+{phang}{opt vline} draws a vertical dashed line between the baseline and the first effect.
+With {opt after()}, a second line is drawn in the empty position before the second block.{p_end}
 
 {phang}{opt color(string)} sets the colour of the series and of the confidence intervals.
 Give an RGB triple in quotes, as in {cmd:color("0 114 178")}, which is the default.
 {opt avgcolor()} sets the colour of the post-treatment average line; the default is {opt color()}.
-{opt precolor()} sets the colour of the pre-treatment average line; the default is {opt avgcolor()}.{p_end}
+{opt precolor()} sets the colour of the pre-treatment average line; the default is {opt avgcolor()}.
+{opt aftercolor()} sets the colour of the average line of {opt after()}; the default is {opt avgcolor()}.{p_end}
 
 {phang}{opt msymbol()}, {opt lpattern()} and {opt lwidth()}
 set the marker symbol, line pattern and line width of the series.
-{opt avglpattern()} and {opt prelpattern()} set the line patterns of the two average lines;
-the defaults are {cmd:dash} and {cmd:shortdash}.{p_end}
+{opt avglpattern()}, {opt prelpattern()} and {opt afterlpattern()} set the line patterns of the average lines;
+the defaults are {cmd:dash}, {cmd:shortdash} and {cmd:longdash_dot}.{p_end}
 
 {phang}{opt ciopacity(#)} sets the opacity of the confidence band in percent.
 The default is 20.
@@ -218,14 +251,16 @@ With two levels, the inner band is drawn with twice this opacity, up to 100.{p_e
 
 {phang}{opt nozero} suppresses the horizontal line at zero.{p_end}
 
-{phang}{opt nocaptions} suppresses the captions "pre-treatment" and "post-treatment".
-{opt precaption()} and {opt postcaption()} change their text.
+{phang}{opt nocaptions} suppresses the captions "pre-treatment" and "post-treatment"
+(with {opt after()}: "pre-treatment", "treatment" and "post-treatment").
+{opt precaption()} and {opt postcaption()} change the text of the first and second caption;
+{opt aftercaption()} changes the text of the third caption with {opt after()}.
 Unless you set {opt tpos()}, the captions are placed just above the top y-axis label.{p_end}
 
 {phang}{opt nolegend} suppresses the legend.
-A legend is only drawn if {opt avg} or {opt avgpre} is specified.
-{opt lbldyn()}, {opt lblavg()} and {opt lblpre()} change the legend labels of the event-study series,
-the average effect and the average placebo.{p_end}
+A legend is only drawn if {opt avg}, {opt avgpre} or {opt avgafter} is specified.
+{opt lbldyn()}, {opt lblavg()}, {opt lblpre()} and {opt lblafter()} change the legend labels of the event-study series,
+the average effect, the average placebo and the average post-treatment effect.{p_end}
 
 {phang}{opt ytitle(string)} and {opt xtitle(string)} add titles to the axes.
 By default, neither axis has a title.{p_end}
@@ -238,8 +273,8 @@ It covers the estimates, the intervals, the average lines and zero.{p_end}
 {dlgtab:Output}
 
 {phang}{opt savedata(filename)} saves the plotted data as a Stata dataset.
-It contains the variables {cmd:x} (position in the plot), {cmd:eventtime} (as labelled on the x-axis),
-{cmd:type} ({cmd:placebo}, {cmd:baseline} or {cmd:effect}),
+It contains the variables {cmd:x} (position in the plot), {cmd:eventtime} (as labelled on the x-axis; for {cmd:after}, the period since the end of treatment),
+{cmd:type} ({cmd:placebo}, {cmd:baseline}, {cmd:effect} or {cmd:after}),
 {cmd:coefname} (name of the coefficient in {cmd:e(b)}), {cmd:b}, {cmd:se}, {cmd:lb}, {cmd:ub} and {cmd:p}.
 With two levels, {cmd:lb} and {cmd:ub} belong to the larger level, and {cmd:lb_in} and {cmd:ub_in} to the smaller.
 The data in memory are not changed.{p_end}
@@ -294,6 +329,16 @@ The two loops cannot be run by clicking; copy them into the Command window or a 
 {phang2}{cmd:. {c )-}}{p_end}
 {phang2}{stata "did2s dep_var, first_stage(i.state i.year) second_stage(F*_treat L*_treat) treatment(treat) cluster(state)":. did2s dep_var, first_stage(i.state i.year) second_stage(F*_treat L*_treat) treatment(treat) cluster(state)}{p_end}
 {phang2}{stata "did2s_plot, lead(F#_treat) lag(L#_treat) pre(5) post(10) avg avgpre name(d7, replace)":. did2s_plot, lead(F#_treat) lag(L#_treat) pre(5) post(10) avg avgpre name(d7, replace)}{p_end}
+
+{pstd}Post-treatment block: treat the eight years with event times 0 to 7 as the treatment period and add dummies {cmd:P1_treat}, {cmd:P2_treat}, ... for the years after it.
+Run the loop in the Command window or a do-file{p_end}
+{phang2}{stata "drop L8_treat-L20_treat":. drop L8_treat-L20_treat}{p_end}
+{phang2}{cmd:. forvalues k = 1/10 {c -(}}{p_end}
+{phang3}{cmd:. gen P`k'_treat = (rel_year_shift == 27 + `k')}{p_end}
+{phang2}{cmd:. {c )-}}{p_end}
+{phang2}{stata "did2s dep_var, first_stage(i.state i.year) second_stage(F*_treat L*_treat P*_treat) treatment(treat) cluster(state)":. did2s dep_var, first_stage(i.state i.year) second_stage(F*_treat L*_treat P*_treat) treatment(treat) cluster(state)}{p_end}
+{phang2}{stata "did2s_plot, lead(F#_treat) lag(L#_treat) after(P#_treat) pre(5) avg avgafter shade vline name(d8, replace)":. did2s_plot, lead(F#_treat) lag(L#_treat) after(P#_treat) pre(5) avg avgafter shade vline name(d8, replace)}{p_end}
+{phang2}{stata "did2s_plot, lead(F#_treat) lag(L#_treat) after(P#_treat) pre(5) nafter(5) avg avgafter pvalues pnote name(d9, replace)":. did2s_plot, lead(F#_treat) lag(L#_treat) after(P#_treat) pre(5) nafter(5) avg avgafter pvalues pnote name(d9, replace)}{p_end}
 
 
 {marker remarks}{...}

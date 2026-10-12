@@ -1,17 +1,17 @@
-*! did2s_plot 0.1.1  11oct2026  Jerg Gutmann
-*! Event-study plot after did2s; same layout as dcdh_plot and lpdid_plot
+*! did2s_plot 0.2.0  12oct2026  Jerg Gutmann
+*! Event-study plot after did2s; same layout as dcdh_plot and lpdid_plot; optional post-treatment block
 program define did2s_plot
 	version 16
-	syntax , [ EVENTVAR(string) SHIFT(integer 0) LEAD(string) LAG(string) ///
+	syntax , [ EVENTVAR(string) SHIFT(integer 0) LEAD(string) LAG(string) AFTER(string) NAFter(integer -999) ///
 		PRE(integer -999) POST(integer -999) ///
-		AVG AVGPre AVGValues PVAlues PNOte ///
+		AVG AVGPre AVGAfter AVGValues PVAlues PNOte ///
 		NOCI CIBars NORMalci LEvel(string) CIOpacity(integer 20) ///
 		SHADE SHADEColor(string) VLINE ///
 		SCale(real 1) PCTof(real 0) ///
-		COLor(string) AVGColor(string) PRECOLor(string) MSymbol(string) ///
-		LPAttern(string) LWidth(string) AVGLPattern(string) PRELPattern(string) ///
-		NOZero NOCAPtions PRECAPtion(string) POSTCAPtion(string) NOLEGend ///
-		LBLDyn(string) LBLAvg(string) LBLPre(string) ///
+		COLor(string) AVGColor(string) PRECOLor(string) AFTERCOLor(string) MSymbol(string) ///
+		LPAttern(string) LWidth(string) AVGLPattern(string) PRELPattern(string) AFTERLPattern(string) ///
+		NOZero NOCAPtions PRECAPtion(string) POSTCAPtion(string) AFTERCAPtion(string) NOLEGend ///
+		LBLDyn(string) LBLAvg(string) LBLPre(string) LBLAfter(string) ///
 		YTItle(string) XTItle(string) ylab(string) tpos(real -99999) ///
 		FMT(string) SAVEData(string) EXPort(string) * ]
 
@@ -28,6 +28,22 @@ program define did2s_plot
 		di as error "eventvar() cannot be combined with lead() or lag()"
 		exit 198
 	}
+	if "`after'" != "" & "`eventvar'" != "" {
+		di as error "after() cannot be combined with eventvar(); it requires the dummy-variable templates lead() and/or lag()"
+		exit 198
+	}
+	if "`after'" != "" & "`lead'" == "" & "`lag'" == "" {
+		di as error "after() requires lead() and/or lag()"
+		exit 198
+	}
+	if "`after'" == "" & (`nafter' != -999 | "`avgafter'" != "") {
+		di as error "nafter() and avgafter require after()"
+		exit 198
+	}
+	if `nafter' != -999 & `nafter' < 1 {
+		di as error "nafter() must be at least 1"
+		exit 198
+	}
 	if `pre' != -999 & `pre' < 1 {
 		di as error "pre() must be at least 1"
 		exit 198
@@ -40,8 +56,8 @@ program define did2s_plot
 		di as error "if you set ylab() you must also set tpos()"
 		exit 198
 	}
-	if "`avgvalues'" != "" & "`avg'" == "" & "`avgpre'" == "" {
-		di as error "avgvalues requires avg and/or avgpre"
+	if "`avgvalues'" != "" & "`avg'" == "" & "`avgpre'" == "" & "`avgafter'" == "" {
+		di as error "avgvalues requires avg, avgpre and/or avgafter"
 		exit 198
 	}
 	if ("`shade'" != "" | "`vline'" != "") & "`ylab'" != "" {
@@ -85,11 +101,15 @@ program define did2s_plot
 	if "`msymbol'" == "" local msymbol o
 	if "`avglpattern'" == "" local avglpattern dash
 	if "`prelpattern'" == "" local prelpattern shortdash
+	if "`aftercolor'" == "" local aftercolor "`avgcolor'"
+	if "`afterlpattern'" == "" local afterlpattern longdash_dot
 	if "`lbldyn'" == "" local lbldyn "dynamic effect"
 	if "`lblavg'" == "" local lblavg "average effect"
 	if "`lblpre'" == "" local lblpre "average placebo"
+	if "`lblafter'" == "" local lblafter "average post-treatment effect"
 	if "`precaption'" == "" local precaption "pre-treatment"
-	if "`postcaption'" == "" local postcaption "post-treatment"
+	if "`postcaption'" == "" local postcaption = cond("`after'" != "", "treatment", "post-treatment")
+	if "`aftercaption'" == "" local aftercaption "post-treatment"
 	if "`fmt'" == "" local fmt "%5.3f"
 
 	* ---- map the coefficients of e(b) to event time ----
@@ -100,7 +120,7 @@ program define did2s_plot
 	local cn : colnames `B'
 
 	* templates for lead()/lag(): split at "#"
-	foreach w in lead lag {
+	foreach w in lead lag after {
 		if "``w''" != "" {
 			local p = strpos("``w''", "#")
 			local rest = substr("``w''", `p' + 1, .)
@@ -119,6 +139,7 @@ program define did2s_plot
 	foreach nm of local cn {
 		local ++j
 		local omit 0
+		local kd 0
 		local t = .
 		if "`eventvar'" != "" {
 			* factor-variable coefficients: <level>[b|o|bn|...].<eventvar>
@@ -139,23 +160,27 @@ program define did2s_plot
 				local nm2 = substr("`nm'", 3, .)
 				local om 1
 			}
-			foreach w in lead lag {
+			foreach w in lead lag after {
 				if "``w''" != "" & missing(`t') {
 					if regexm("`nm2'", "^``w'_re'([0-9]+)") {
 						local lev = regexs(1)
 						if "`nm2'" == "``w'_a'`lev'``w'_b'" {
 							local t = cond("`w'" == "lead", -`lev', `lev')
 							local omit `om'
+							if "`w'" == "after" local kd 1
 						}
 					}
 				}
 			}
+			* after(): P0 is not a post-treatment period
+			if `kd' == 1 & `t' < 1 local t = .
 		}
 		if !missing(`t') {
 			local ++M
 			local et_`M' = `t'
 			local ec_`M' = `j'
 			local eo_`M' = `omit'
+			local ek_`M' = `kd'
 			local en_`M' "`nm'"
 		}
 	}
@@ -167,25 +192,36 @@ program define did2s_plot
 	* span of the estimated coefficients; omitted/base categories outside it are dropped
 	local tmin = .
 	local tmax = .
+	local amax = .
 	forvalues m = 1/`M' {
 		if `eo_`m'' == 0 {
-			local tmin = min(`tmin', `et_`m'')
-			local tmax = max(`tmax', `et_`m'')
+			if `ek_`m'' == 0 {
+				local tmin = min(`tmin', `et_`m'')
+				local tmax = max(`tmax', `et_`m'')
+			}
+			else {
+				local amax = max(`amax', `et_`m'')
+			}
 		}
 	}
 	if missing(`tmin') {
 		di as error "no estimated (non-omitted) coefficient matches the specification"
 		exit 111
 	}
+	if "`after'" != "" & missing(`amax') {
+		di as error "no estimated (non-omitted) coefficient matches after()"
+		exit 111
+	}
 	forvalues m = 1/`M' {
 		local tt = `et_`m''
 		forvalues n = `=`m'+1'/`M' {
-			if `et_`n'' == `tt' {
+			if `et_`n'' == `tt' & `ek_`n'' == `ek_`m'' {
 				di as error "event time `tt' is matched by more than one coefficient (`en_`m'', `en_`n'')"
 				exit 198
 			}
 		}
-		if `eo_`m'' == 1 & (`tt' < `tmin' | `tt' > `tmax') local eo_`m' 2
+		if `eo_`m'' == 1 & `ek_`m'' == 0 & (`tt' < `tmin' | `tt' > `tmax') local eo_`m' 2
+		if `eo_`m'' == 1 & `ek_`m'' == 1 & `tt' > `amax' local eo_`m' 2
 	}
 
 	* window: pre(U) = earliest event time -U; post(T) = event times 0..T
@@ -200,25 +236,48 @@ program define did2s_plot
 	* same bookkeeping as dcdh_plot and lpdid_plot
 	local showplacebo = `pre' - 1
 	local showeffects = `post' + 1
+	* after(): post-treatment periods 1..nA (default: all matched)
+	local nA 0
+	if "`after'" != "" {
+		local nA = `amax'
+		if `nafter' != -999 local nA = `nafter'
+	}
 
 	* mapping table
 	di as text _n "did2s_plot: coefficients used"
-	di as text "{hline 62}"
-	di as text %-30s "coefficient" %12s "event time" %-20s "  status"
-	di as text "{hline 62}"
+	di as text "{hline 78}"
+	di as text %-30s "coefficient" %12s "event time" %-16s "  block" %-20s "  status"
+	di as text "{hline 78}"
+	local blpost = cond("`after'" != "", "treatment", "post-treatment")
 	local precols
 	local postcols
+	local aftercols
 	local npre 0
 	local npost 0
+	local nafe 0
 	forvalues m = 1/`M' {
 		local tt = `et_`m''
 		local stat "estimated"
 		if `eo_`m'' == 1 local stat "base (zero)"
 		if `eo_`m'' == 2 local stat "base (not used)"
-		if `tt' < -`pre' | `tt' > `post' local stat "not shown"
-		di as text %-30s "`en_`m''" as result %12.0f `tt' as text %-20s "  `stat'"
+		if `ek_`m'' == 0 & (`tt' < -`pre' | `tt' > `post') local stat "not shown"
+		if `ek_`m'' == 1 & `tt' > `nA' local stat "not shown"
+		local ts "`tt'"
+		local bl "pre-treatment"
+		if `ek_`m'' == 1 {
+			local ts "+`tt'"
+			local bl "post-treatment"
+		}
+		else if `tt' >= 0 {
+			local bl "`blpost'"
+		}
+		di as text %-30s "`en_`m''" as result %12s "`ts'" as text %-16s "  `bl'" %-20s "  `stat'"
 		if "`stat'" == "estimated" {
-			if `tt' <= -1 {
+			if `ek_`m'' == 1 {
+				local aftercols `aftercols' `ec_`m''
+				local ++nafe
+			}
+			else if `tt' <= -1 {
 				local precols `precols' `ec_`m''
 				local ++npre
 			}
@@ -228,10 +287,10 @@ program define did2s_plot
 			}
 		}
 	}
-	di as text "{hline 62}"
+	di as text "{hline 78}"
 	local base_est = 0
 	forvalues m = 1/`M' {
-		if `et_`m'' == -1 & `eo_`m'' == 0 local base_est = 1
+		if `et_`m'' == -1 & `eo_`m'' == 0 & `ek_`m'' == 0 local base_est = 1
 	}
 	if `base_est' == 0 {
 		di as text "note: event time -1 is not estimated; plotted as zero baseline"
@@ -243,7 +302,11 @@ program define did2s_plot
 	local xend = cond(`base_est', -1, -2)
 
 	if "`avg'" != "" & `npost' == 0 {
-		di as error "avg requires at least one estimated post-treatment coefficient in the window"
+		di as error "avg requires at least one estimated `blpost' coefficient in the window"
+		exit 198
+	}
+	if "`avgafter'" != "" & `nafe' == 0 {
+		di as error "avgafter requires at least one estimated post-treatment coefficient in the window"
 		exit 198
 	}
 	if "`avgpre'" != "" & `npre' == 0 {
@@ -260,7 +323,26 @@ program define did2s_plot
 	local ppre  = .
 	local jpre  = .
 	local jpost = .
+	local bafter  = .
+	local seafter = .
+	local pafter  = .
+	local jafter  = .
 	tempname W mm vv
+	if `nafe' > 0 {
+		matrix `W' = J(1, `K', 0)
+		foreach c of local aftercols {
+			matrix `W'[1, `c'] = 1/`nafe'
+		}
+		matrix `mm' = `W'*`B''
+		matrix `vv' = `W'*`V'*`W''
+		local bafter  = `mm'[1,1]
+		local seafter = sqrt(`vv'[1,1])
+		if `seafter' > 0 local pafter = 2*normal(-abs(`bafter'/`seafter'))
+		local bafter  = `bafter'*`sc'
+		local seafter = `seafter'*`sc'
+		_did2s_plot_wald `B' `V' "`aftercols'"
+		local jafter = r(p)
+	}
 	if `npost' > 0 {
 		matrix `W' = J(1, `K', 0)
 		foreach c of local postcols {
@@ -297,7 +379,7 @@ program define did2s_plot
 			local dpre = r(df)
 		}
 	}
-	if "`avg'" != "" | "`avgpre'" != "" | "`pvalues'" != "" {
+	if "`avg'" != "" | "`avgpre'" != "" | "`avgafter'" != "" | "`pvalues'" != "" {
 		di as text "note: averages are equal-weighted means of the plotted coefficients, not the did2s average treatment effect"
 	}
 
@@ -307,11 +389,23 @@ program define did2s_plot
 		di as text "{hline 62}"
 		di as text %-30s "" %10s "estimate" %10s "s.e." %10s "p-value"
 		di as text "{hline 62}"
+		local lavg  "Average effect"
+		local ljoint "Joint test: all effects = 0"
+		if `nA' > 0 {
+			local lavg  "Average effect: treatment"
+			local ljoint "Joint test: treatment = 0"
+		}
 		if `npost' > 0 {
 			local s1 : display string(`bavg', "`fmt'")
 			local s2 : display string(`seavg', "`fmt'")
 			local s3 : display string(`pavg', "`fmt'")
-			di as text %-30s "Average effect" as result %10s "`s1'" %10s "`s2'" %10s "`s3'"
+			di as text %-30s "`lavg'" as result %10s "`s1'" %10s "`s2'" %10s "`s3'"
+		}
+		if `nafe' > 0 {
+			local s1 : display string(`bafter', "`fmt'")
+			local s2 : display string(`seafter', "`fmt'")
+			local s3 : display string(`pafter', "`fmt'")
+			di as text %-30s "Average effect: post-treatment" as result %10s "`s1'" %10s "`s2'" %10s "`s3'"
 		}
 		if `npre' >= 2 {
 			local s1 : display string(`bpre', "`fmt'")
@@ -319,7 +413,8 @@ program define did2s_plot
 			local s3 : display string(`ppre', "`fmt'")
 			di as text %-30s "Average placebo" as result %10s "`s1'" %10s "`s2'" %10s "`s3'"
 		}
-		if !missing(`jpost') di as text %-30s "Joint test: all effects = 0" as result %30s string(`jpost', "`fmt'")
+		if !missing(`jpost') di as text %-30s "`ljoint'" as result %30s string(`jpost', "`fmt'")
+		if !missing(`jafter') di as text %-30s "Joint test: post-treatment = 0" as result %30s string(`jafter', "`fmt'")
 		if !missing(`jpre') di as text %-30s "Joint test: all placebos = 0" as result %30s string(`jpre', "`fmt'")
 		di as text "{hline 62}"
 	}
@@ -328,18 +423,26 @@ program define did2s_plot
 	preserve
 	qui {
 		clear
-		set obs `=`pre' + 1 + `post''
+		set obs `=`pre' + 1 + `post' + `nA''
 		gen x = _n - `pre' - 1
+		* with after(): one empty position (x = post+1) separates the two blocks
+		if `nA' > 0 replace x = x + 1 if x > `post'
 		gen eventtime = cond(x >= 0, x + 1, x)
 		gen str8 type = cond(x <= -1, "placebo", "effect")
+		if `nA' > 0 {
+			replace eventtime = x - `post' - 1 if x > `post'
+			replace type = "after" if x > `post'
+		}
 		gen str60 coefname = ""
 		gen b  = .
 		gen se = .
 		gen byte est = 0
 		forvalues m = 1/`M' {
 			local tt = `et_`m''
-			if `tt' >= -`pre' & `tt' <= `post' & `eo_`m'' < 2 {
-				local i = `tt' + `pre' + 1
+			local i = .
+			if `ek_`m'' == 0 & `tt' >= -`pre' & `tt' <= `post' local i = `tt' + `pre' + 1
+			if `ek_`m'' == 1 & `tt' >= 1 & `tt' <= `nA' local i = `pre' + 1 + `post' + `tt'
+			if !missing(`i') & `eo_`m'' < 2 {
 				replace coefname = "`en_`m''" in `i'
 				if `eo_`m'' == 0 {
 					replace b   = `sc'*`B'[1, `ec_`m''] in `i'
@@ -372,10 +475,23 @@ program define did2s_plot
 		qui save "`savedata'", replace
 		di as text "plotted data saved to `savedata'"
 	}
+	* empty row at x = post+1 breaks lines and bands between the two blocks
+	if `nA' > 0 {
+		qui set obs `=_N + 1'
+		qui replace x = `post' + 1 in `=_N'
+		qui sort x
+	}
 
 	* ---- axis geometry ----
 	local x0   = 0
 	local x1   = `showeffects' - 1
+	local xmax = `x1'
+	local xa0  = `x1' + 2
+	local tx3  = .
+	if `nA' > 0 {
+		local xmax = `x1' + 1 + `nA'
+		local tx3  = (`xa0' + `xmax')/2
+	}
 	local xmin = -(`showplacebo' + 1)
 	local tx1  = -(`showplacebo' + 2)/2
 	local tx2  = (`showeffects' - 1)/2
@@ -386,6 +502,9 @@ program define did2s_plot
 	}
 	forvalues k = 1/`showeffects' {
 		local xlab `xlab' `=`k'-1' "`k'"
+	}
+	forvalues k = 1/`nA' {
+		local xlab `xlab' `=`x1'+1+`k'' "+`k'"
 	}
 
 	* tidy y-range from the plotted data; also used for shading and the vertical line
@@ -402,6 +521,7 @@ program define did2s_plot
 	local yv
 	if "`avg'" != "" local yv `yv' `bavg'
 	if "`avgpre'" != "" local yv `yv' `bpre'
+	if "`avgafter'" != "" local yv `yv' `bafter'
 	foreach v of local yv {
 		if !missing(`v') {
 			local lo = min(`lo', `v')
@@ -448,6 +568,10 @@ program define did2s_plot
 	if "`vline'" != "" {
 		local plots `plots' (pci `lo2' -0.5 `hi2' -0.5, lcolor(gs8) lpattern(dash))
 		local ++k
+		if `nA' > 0 {
+			local plots `plots' (pci `lo2' `=`x1'+1' `hi2' `=`x1'+1', lcolor(gs8) lpattern(dash))
+			local ++k
+		}
 	}
 	if "`noci'" == "" {
 		if "`cibars'" != "" {
@@ -475,7 +599,7 @@ program define did2s_plot
 	local ++k
 	local order `k' "`lbldyn'"
 	if "`nozero'" == "" {
-		local plots `plots' (pci 0 `xmin' 0 `x1', lcolor(gs8) lpattern(solid))
+		local plots `plots' (pci 0 `xmin' 0 `xmax', lcolor(gs8) lpattern(solid))
 		local ++k
 	}
 	local texts
@@ -489,8 +613,20 @@ program define did2s_plot
 		local k = `k' + 2
 		if "`avgvalues'" != "" {
 			local s : display string(`bavg', "`fmt'")
-			local texts `texts' text(`bavg' `=`x1'+0.2' "`s'", place(e) size(small) color("`avgcolor'"))
-			local xsc xscale(range(`=`xmin'-0.5' `=`x1'+1.5'))
+			if `nA' > 0 local texts `texts' text(`bavg' `x1' "`s'", place(n) size(small) color("`avgcolor'"))
+			else local texts `texts' text(`bavg' `=`x1'+0.2' "`s'", place(e) size(small) color("`avgcolor'"))
+		}
+	}
+	if "`avgafter'" != "" {
+		local plots `plots' (pci `bafter' `xa0' `bafter' `xmax', lcolor("`aftercolor'") lpattern(`afterlpattern') lwidth(medthick))
+		local ++k
+		local order `order' `k' "`lblafter'"
+		local plots `plots' (scatteri `bafter' `xa0', msymbol(circle_hollow) mcolor("`aftercolor'"))
+		local plots `plots' (scatteri `bafter' `xmax', msymbol(circle_hollow) mcolor("`aftercolor'"))
+		local k = `k' + 2
+		if "`avgvalues'" != "" {
+			local s : display string(`bafter', "`fmt'")
+			local texts `texts' text(`bafter' `=`xmax'+0.2' "`s'", place(e) size(small) color("`aftercolor'"))
 		}
 	}
 	if "`avgpre'" != "" {
@@ -503,17 +639,22 @@ program define did2s_plot
 		if "`avgvalues'" != "" {
 			local s : display string(`bpre', "`fmt'")
 			local texts `texts' text(`bpre' `=`xmin'-0.2' "`s'", place(w) size(small) color("`precolor'"))
-			local xsc xscale(range(`=`xmin'-1.5' `=`x1'+1.5'))
 		}
+	}
+	if "`avgvalues'" != "" {
+		local xl = `xmin' - 0.5
+		if "`avgpre'" != "" local xl = `xmin' - 1.5
+		local xsc xscale(range(`xl' `=`xmax'+1.5'))
 	}
 
 	local legend legend(off)
-	if ("`avg'" != "" | "`avgpre'" != "") & "`nolegend'" == "" {
+	if ("`avg'" != "" | "`avgpre'" != "" | "`avgafter'" != "") & "`nolegend'" == "" {
 		local legend legend(order(`order') rows(1) position(6))
 	}
 	local captions
 	if "`nocaptions'" == "" {
 		local captions text(`tpos' `tx1' "`precaption'", size(small)) text(`tpos' `tx2' "`postcaption'", size(small))
+		if `nA' > 0 local captions `captions' text(`tpos' `tx3' "`aftercaption'", size(small))
 	}
 	local ytitlecmd
 	if "`ytitle'" != "" local ytitlecmd title("`ytitle'", position(9) size(medium))
@@ -527,6 +668,12 @@ program define did2s_plot
 			local s1 : display string(`bavg', "`fmt'")
 			local s2 : display string(`pavg', "`fmt'")
 			local nt "Average effect: `s1' (p = `s2')"
+		}
+		if !missing(`pafter') {
+			local s1 : display string(`bafter', "`fmt'")
+			local s2 : display string(`pafter', "`fmt'")
+			if "`nt'" != "" local nt "`nt'; average post-treatment effect: `s1' (p = `s2')"
+			else local nt "Average post-treatment effect: `s1' (p = `s2')"
 		}
 		if !missing(`jpre') {
 			local s3 : display string(`jpre', "`fmt'")
