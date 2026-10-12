@@ -299,7 +299,7 @@ With {opt normalci} or {opt level()}, they are calculated from the estimate and 
 
 {pstd}Please report problems and suggestions at
 {browse "https://github.com/jerggutmann/stata-tools/issues"}.
-Re-run {cmd:net install lpdid_plot, replace} to get the latest version.{p_end}
+Run {cmd:ado update lpdid_plot, update} to get the latest version.{p_end}
 
 
 {title:Also see}

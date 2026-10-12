@@ -312,7 +312,7 @@ program define did2s_plot
 		else if `tt' >= 0 {
 			local bl "`blpost'"
 		}
-		di as text %-30s "`en_`m''" as result %12s "`ts'" as text %-16s "  `bl'" %-20s "  `stat'"
+		if `eo_`m'' != 2 di as text %-30s "`en_`m''" as result %12s "`ts'" as text %-16s "  `bl'" %-20s "  `stat'"
 		if "`stat'" == "estimated" {
 			if `ek_`m'' == 1 {
 				local aftercols `aftercols' `ec_`m''

@@ -279,7 +279,7 @@ Regions and aggregates ("Africa", "OECD Members") are not part of the dictionary
 
 {pstd}This is a beta version. Please report problems and missing spellings at
 {browse "https://github.com/jerggutmann/stata-tools/issues"}.
-Re-run {cmd:net install cname_std, replace} to get the latest dictionary.{p_end}
+Run {cmd:ado update cname_std, update} to get the latest dictionary.{p_end}
 
 
 {title:Also see}

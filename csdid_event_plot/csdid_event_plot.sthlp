@@ -292,7 +292,7 @@ The plot does not re-estimate anything.{p_end}
 
 {pstd}Please report problems and suggestions at
 {browse "https://github.com/jerggutmann/stata-tools/issues"}.
-Re-run {cmd:net install csdid_event_plot, replace} to get the latest version.{p_end}
+Run {cmd:ado update csdid_event_plot, update} to get the latest version.{p_end}
 
 
 {title:Also see}

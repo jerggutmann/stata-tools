@@ -415,7 +415,7 @@ In the example data, {cmd:rel_year} is 0 in the first treated year.{p_end}
 
 {pstd}Please report problems and suggestions at
 {browse "https://github.com/jerggutmann/stata-tools/issues"}.
-Re-run {cmd:net install did2s_plot, replace} to get the latest version.{p_end}
+Run {cmd:ado update did2s_plot, update} to get the latest version.{p_end}
 
 
 {title:Also see}
