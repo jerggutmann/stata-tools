@@ -29,7 +29,7 @@ Standardizes the spelling of country names in a string variable (`cname` by defa
 net install cname_std, from("https://raw.githubusercontent.com/jerggutmann/stata-tools/main/cname_std/") replace
 ```
 
-Re-run the same line to update the dictionary. Remove with `ado uninstall cname_std`.
+Run `ado update cname_std, update` to update the dictionary. Remove with `ado uninstall cname_std`.
 
 ### Usage
 
@@ -65,7 +65,7 @@ Event-study plot after `csdid` (Callaway and Sant'Anna; Stata implementation by 
 net install csdid_event_plot, from("https://raw.githubusercontent.com/jerggutmann/stata-tools/main/csdid_event_plot/") replace
 ```
 
-Re-run the same line to update. Remove with `ado uninstall csdid_event_plot`.
+Run `ado update csdid_event_plot, update` to update. Remove with `ado uninstall csdid_event_plot`.
 
 ### Usage
 
@@ -94,7 +94,7 @@ Runs two `did_multiplegt_dyn` estimations and draws both event studies in one pl
 net install dcdh_compare, from("https://raw.githubusercontent.com/jerggutmann/stata-tools/main/dcdh_compare/") replace
 ```
 
-Re-run the same line to update. Remove with `ado uninstall dcdh_compare`.
+Run `ado update dcdh_compare, update` to update. Remove with `ado uninstall dcdh_compare`.
 
 ### Usage
 
@@ -119,7 +119,7 @@ Event-study plot after `did_multiplegt_dyn` (one event). Shows the effects and p
 net install dcdh_plot, from("https://raw.githubusercontent.com/jerggutmann/stata-tools/main/dcdh_plot/") replace
 ```
 
-Re-run the same line to update. Remove with `ado uninstall dcdh_plot`.
+Run `ado update dcdh_plot, update` to update. Remove with `ado uninstall dcdh_plot`.
 
 ### Usage
 
@@ -192,7 +192,7 @@ Event-study plot after `did2s` (Butts and Gardner; two-stage difference-in-diffe
 net install did2s_plot, from("https://raw.githubusercontent.com/jerggutmann/stata-tools/main/did2s_plot/") replace
 ```
 
-Re-run the same line to update. Remove with `ado uninstall did2s_plot`.
+Run `ado update did2s_plot, update` to update. Remove with `ado uninstall did2s_plot`.
 
 ### Usage
 
@@ -228,7 +228,7 @@ Event-study plot after `lpdid` (Busch and Girardi). Counterpart of `dcdh_plot` w
 net install lpdid_plot, from("https://raw.githubusercontent.com/jerggutmann/stata-tools/main/lpdid_plot/") replace
 ```
 
-Re-run the same line to update. Remove with `ado uninstall lpdid_plot`.
+Run `ado update lpdid_plot, update` to update. Remove with `ado uninstall lpdid_plot`.
 
 ### Usage
 

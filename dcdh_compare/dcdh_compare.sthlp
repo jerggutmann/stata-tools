@@ -322,7 +322,7 @@ the joint p-values are those stored by {cmd:did_multiplegt_dyn}.{p_end}
 
 {pstd}Please report problems and suggestions at
 {browse "https://github.com/jerggutmann/stata-tools/issues"}.
-Re-run {cmd:net install dcdh_compare, replace} to get the latest version.{p_end}
+Run {cmd:ado update dcdh_compare, update} to get the latest version.{p_end}
 
 {title:Also see}
 
