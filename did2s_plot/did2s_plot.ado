@@ -110,9 +110,9 @@ program define did2s_plot
 		local sdw = r(weighted)
 		local sc = 1/`sdv'
 		local sdtxt = cond("`sdof'" == "sample", "all observations of the did2s sample", ///
-			cond("`sdof'" == "untreated", "untreated observations (treatment = 0) of the did2s sample", ///
-			"never- and not-yet-treated observations of the did2s sample"))
-		di as text "note: estimates are divided by the standard deviation of `sdy' in the `sdtxt'"
+			cond("`sdof'" == "untreated", "the untreated observations (treatment = 0) of the did2s sample", ///
+			"the never- and not-yet-treated observations of the did2s sample"))
+		di as text "note: estimates are divided by the standard deviation of `sdy' in `sdtxt'"
 		if `"`sdif'"' != "" di as text `"      restricted by sdif(): `sdif'"'
 		if "`within'" != "" di as text "      after removing unit and time means (within standard deviation)"
 		di as text "      standard deviation = " as result %9.4g `sdv' as text ", N = " as result `sdn'

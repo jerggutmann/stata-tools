@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.2.0  12oct2026  Jerg Gutmann}{...}
+{* *! version 0.2.1  12oct2026  Jerg Gutmann}{...}
 {vieweralsosee "csdid" "help csdid"}{...}
 {vieweralsosee "dcdh_plot" "help dcdh_plot"}{...}
 {vieweralsosee "lpdid_plot" "help lpdid_plot"}{...}

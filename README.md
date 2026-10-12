@@ -53,7 +53,7 @@ Spellings that are not recognized (marker 2) can be added to a personal dictiona
 
 ## csdid_event_plot
 
-Version 0.2.0 (beta). Package folder: [`csdid_event_plot/`](csdid_event_plot/).
+Version 0.2.1 (beta). Package folder: [`csdid_event_plot/`](csdid_event_plot/).
 
 Event-study plot after `csdid` (Callaway and Sant'Anna; Stata implementation by Rios-Avila, Sant'Anna and Callaway, written for version 1.81). Counterpart of `dcdh_plot`, `lpdid_plot` and `did2s_plot` with the same layout, axis positions, defaults and options. It plots the table of `estat event` (`Tm#`, `Tp#`, `Pre_avg`, `Post_avg`). The name differs from `csdid_plot`, which belongs to the `csdid` package itself and is not touched by this package.
 
