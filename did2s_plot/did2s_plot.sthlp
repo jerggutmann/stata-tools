@@ -111,10 +111,10 @@ If your regression estimates a coefficient for event time -1, it is plotted as e
 If event time -1 is the omitted base category (or has no coefficient), the baseline is set to zero.
 Event times without a coefficient appear as gaps.{p_end}
 
-{pstd}With {opt after()}, a second block of dummy variables is plotted to the right of the treatment periods, separated by an empty position.
+{pstd}With {opt after()}, a second block of dummy variables is plotted directly to the right of the treatment periods.
 The user defines these dummies:
 {cmd:P1_treat} is the first period after the end of treatment, {cmd:P2_treat} the second, and so on.
-Lines and confidence bands are not connected across the empty position, and the x-axis of the second block is labelled +1, +2, ....
+Lines and confidence bands are not connected between the two blocks, and the x-axis of the second block is labelled +1, +2, ....
 The three blocks are captioned "pre-treatment", "treatment" and "post-treatment".
 Without {opt after()}, the plot has two blocks and the captions "pre-treatment" and "post-treatment".{p_end}
 
@@ -232,7 +232,7 @@ The shading and {opt vline} follow the automatically chosen y-axis,
 so neither can be combined with {opt ylab()}.{p_end}
 
 {phang}{opt vline} draws a vertical dashed line between the baseline and the first effect.
-With {opt after()}, a second line is drawn in the empty position before the second block.{p_end}
+With {opt after()}, a second line is drawn between the treatment and the post-treatment block.{p_end}
 
 {phang}{opt color(string)} sets the colour of the series and of the confidence intervals.
 Give an RGB triple in quotes, as in {cmd:color("0 114 178")}, which is the default.

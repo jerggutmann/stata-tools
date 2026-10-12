@@ -425,12 +425,10 @@ program define did2s_plot
 		clear
 		set obs `=`pre' + 1 + `post' + `nA''
 		gen x = _n - `pre' - 1
-		* with after(): one empty position (x = post+1) separates the two blocks
-		if `nA' > 0 replace x = x + 1 if x > `post'
 		gen eventtime = cond(x >= 0, x + 1, x)
 		gen str8 type = cond(x <= -1, "placebo", "effect")
 		if `nA' > 0 {
-			replace eventtime = x - `post' - 1 if x > `post'
+			replace eventtime = x - `post' if x > `post'
 			replace type = "after" if x > `post'
 		}
 		gen str60 coefname = ""
@@ -475,10 +473,10 @@ program define did2s_plot
 		qui save "`savedata'", replace
 		di as text "plotted data saved to `savedata'"
 	}
-	* empty row at x = post+1 breaks lines and bands between the two blocks
+	* empty row at x = post+0.5 breaks lines and bands between the two blocks
 	if `nA' > 0 {
 		qui set obs `=_N + 1'
-		qui replace x = `post' + 1 in `=_N'
+		qui replace x = `post' + 0.5 in `=_N'
 		qui sort x
 	}
 
@@ -486,10 +484,10 @@ program define did2s_plot
 	local x0   = 0
 	local x1   = `showeffects' - 1
 	local xmax = `x1'
-	local xa0  = `x1' + 2
+	local xa0  = `x1' + 1
 	local tx3  = .
 	if `nA' > 0 {
-		local xmax = `x1' + 1 + `nA'
+		local xmax = `x1' + `nA'
 		local tx3  = (`xa0' + `xmax')/2
 	}
 	local xmin = -(`showplacebo' + 1)
@@ -504,7 +502,7 @@ program define did2s_plot
 		local xlab `xlab' `=`k'-1' "`k'"
 	}
 	forvalues k = 1/`nA' {
-		local xlab `xlab' `=`x1'+1+`k'' "+`k'"
+		local xlab `xlab' `=`x1'+`k'' "+`k'"
 	}
 
 	* tidy y-range from the plotted data; also used for shading and the vertical line
@@ -569,7 +567,7 @@ program define did2s_plot
 		local plots `plots' (pci `lo2' -0.5 `hi2' -0.5, lcolor(gs8) lpattern(dash))
 		local ++k
 		if `nA' > 0 {
-			local plots `plots' (pci `lo2' `=`x1'+1' `hi2' `=`x1'+1', lcolor(gs8) lpattern(dash))
+			local plots `plots' (pci `lo2' `=`x1'+0.5' `hi2' `=`x1'+0.5', lcolor(gs8) lpattern(dash))
 			local ++k
 		}
 	}
