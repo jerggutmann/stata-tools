@@ -184,7 +184,7 @@ Periods that could not be estimated appear as gaps. `shade` and `vline` cannot b
 
 ## did2s_plot
 
-Version 0.3.2 (beta). Package folder: [`did2s_plot/`](did2s_plot/).
+Version 0.3.3 (beta). Package folder: [`did2s_plot/`](did2s_plot/).
 
 Event-study plot after `did2s` (Butts and Gardner; two-stage difference-in-differences). Counterpart of `dcdh_plot` and `lpdid_plot` with the same layout, axis positions, defaults and options. Because `did2s` leaves the definition of the treatment variables to the user, `did2s_plot` identifies the event-study coefficients by name (see below).
 

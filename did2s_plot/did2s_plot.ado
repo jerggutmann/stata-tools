@@ -1,4 +1,4 @@
-*! did2s_plot 0.3.2  12oct2026  Jerg Gutmann
+*! did2s_plot 0.3.3  12oct2026  Jerg Gutmann
 *! Event-study plot after did2s; same layout as dcdh_plot and lpdid_plot; optional post-treatment block and standard-deviation units
 program define did2s_plot
 	version 16
