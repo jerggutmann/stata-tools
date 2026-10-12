@@ -2,6 +2,6 @@ v 3
 d dcdh_plot - Event-study plot after did_multiplegt_dyn
 d Jerg Gutmann
 d Version 0.3.8 (beta). Plots event-study effects and placebos with confidence intervals; optionally the average effect, the average placebo and p-values. Requires Stata 16 or newer and did_multiplegt_dyn.
-d Distribution-Date: 20261017
+d Distribution-Date: 20261026
 f dcdh_plot.ado
 f dcdh_plot.sthlp

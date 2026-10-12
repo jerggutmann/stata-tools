@@ -63,7 +63,7 @@ The file is created with a header line if it does not exist.{p_end}
 {pstd}Jerg Gutmann{break}
 {browse "https://github.com/jerggutmann/stata-tools"}{p_end}
 
-{pstd}Licence: MIT, see {browse "https://github.com/jerggutmann/stata-tools/blob/main/LICENSE":LICENSE} in the repository.{p_end}
+{pstd}License: MIT, see {browse "https://github.com/jerggutmann/stata-tools/blob/main/LICENSE":LICENSE} in the repository.{p_end}
 
 
 {title:Also see}

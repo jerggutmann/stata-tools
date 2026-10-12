@@ -44,11 +44,11 @@
 
 {syntab:Appearance}
 {synopt:{opt shade}}shade the post-treatment area{p_end}
-{synopt:{opt shadec:olor(colorstyle)}}colour of the shading; default is {cmd:gs12}{p_end}
+{synopt:{opt shadec:olor(colorstyle)}}color of the shading; default is {cmd:gs12}{p_end}
 {synopt:{opt vline}}vertical line between baseline and first effect{p_end}
-{synopt:{opt col:or(string)}}colour of the series; default is {cmd:0 114 178}{p_end}
-{synopt:{opt avgc:olor(string)}}colour of the pooled post-treatment line{p_end}
-{synopt:{opt precol:or(string)}}colour of the pooled pre-treatment line{p_end}
+{synopt:{opt col:or(string)}}color of the series; default is {cmd:0 114 178}{p_end}
+{synopt:{opt avgc:olor(string)}}color of the pooled post-treatment line{p_end}
+{synopt:{opt precol:or(string)}}color of the pooled pre-treatment line{p_end}
 {synopt:{opt ms:ymbol(symbolstyle)}}marker symbol; default is {cmd:o}{p_end}
 {synopt:{opt lpa:ttern(patternstyle)}}line pattern of the series{p_end}
 {synopt:{opt lw:idth(linewidthstyle)}}line width of the series{p_end}
@@ -87,7 +87,7 @@ It is the counterpart of {helpb dcdh_plot}, which does the same after {cmd:did_m
 Both commands use the same layout, axis positions, defaults and options,
 so that figures from the two estimators can be compared directly.{p_end}
 
-{pstd}The baseline period is plotted at -1, {cmd:pre}{it:n} at -{it:n} and {cmd:tau}{it:k} at {it:k}, labelled {it:k}+1.
+{pstd}The baseline period is plotted at -1, {cmd:pre}{it:n} at -{it:n} and {cmd:tau}{it:k} at {it:k}, labeled {it:k}+1.
 This is the position of placebo {it:l} at -({it:l}+1) and of effect {it:l} at {it:l}-1 in {helpb dcdh_plot}.
 The baseline is set to zero.
 Periods that are missing in {cmd:e(results)} appear as gaps.{p_end}
@@ -173,16 +173,16 @@ The default is {cmd:%5.3f}.{p_end}
 {dlgtab:Appearance}
 
 {phang}{opt shade} shades the post-treatment area.
-{opt shadecolor()} changes the colour; the default is {cmd:gs12}.
+{opt shadecolor()} changes the color; the default is {cmd:gs12}.
 The shading and {opt vline} follow the automatically chosen y-axis,
 so neither can be combined with {opt ylab()}.{p_end}
 
 {phang}{opt vline} draws a vertical dashed line between the baseline and the first effect.{p_end}
 
-{phang}{opt color(string)} sets the colour of the series and of the confidence intervals.
+{phang}{opt color(string)} sets the color of the series and of the confidence intervals.
 Give an RGB triple in quotes, as in {cmd:color("0 114 178")}, which is the default.
-{opt avgcolor()} sets the colour of the pooled post-treatment line; the default is {opt color()}.
-{opt precolor()} sets the colour of the pooled pre-treatment line; the default is {opt avgcolor()}.{p_end}
+{opt avgcolor()} sets the color of the pooled post-treatment line; the default is {opt color()}.
+{opt precolor()} sets the color of the pooled pre-treatment line; the default is {opt avgcolor()}.{p_end}
 
 {phang}{opt msymbol()}, {opt lpattern()} and {opt lwidth()}
 set the marker symbol, line pattern and line width of the series.
@@ -215,7 +215,7 @@ It covers the estimates, the intervals, the average lines and zero.{p_end}
 {dlgtab:Output}
 
 {phang}{opt savedata(filename)} saves the plotted data as a Stata dataset.
-It contains the variables {cmd:x} (position in the plot), {cmd:eventtime} (as labelled on the x-axis),
+It contains the variables {cmd:x} (position in the plot), {cmd:eventtime} (as labeled on the x-axis),
 {cmd:type} ({cmd:placebo}, {cmd:baseline} or {cmd:effect}),
 {cmd:coefname} (row name in {cmd:e(results)}), {cmd:b}, {cmd:se}, {cmd:lb}, {cmd:ub} and {cmd:p}.
 With two levels, {cmd:lb} and {cmd:ub} belong to the larger level, and {cmd:lb_in} and {cmd:ub_in} to the smaller.
@@ -293,7 +293,7 @@ With {opt normalci} or {opt level()}, they are calculated from the estimate and 
 {pstd}Jerg Gutmann{break}
 {browse "https://github.com/jerggutmann/stata-tools"}{p_end}
 
-{pstd}Licence: MIT, see {browse "https://github.com/jerggutmann/stata-tools/blob/main/LICENSE":LICENSE} in the repository.{p_end}
+{pstd}License: MIT, see {browse "https://github.com/jerggutmann/stata-tools/blob/main/LICENSE":LICENSE} in the repository.{p_end}
 
 {title:Support and updates}
 

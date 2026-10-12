@@ -43,11 +43,11 @@
 
 {syntab:Appearance}
 {synopt:{opt shade}}shade the post-treatment area{p_end}
-{synopt:{opt shadec:olor(colorstyle)}}colour of the shading; default is {cmd:gs12}{p_end}
+{synopt:{opt shadec:olor(colorstyle)}}color of the shading; default is {cmd:gs12}{p_end}
 {synopt:{opt vline}}vertical line between baseline and first effect{p_end}
-{synopt:{opt col:or(string)}}colour of the series; default is {cmd:0 114 178}{p_end}
-{synopt:{opt avgc:olor(string)}}colour of the average effect line{p_end}
-{synopt:{opt precol:or(string)}}colour of the average placebo line{p_end}
+{synopt:{opt col:or(string)}}color of the series; default is {cmd:0 114 178}{p_end}
+{synopt:{opt avgc:olor(string)}}color of the average effect line{p_end}
+{synopt:{opt precol:or(string)}}color of the average placebo line{p_end}
 {synopt:{opt ms:ymbol(symbolstyle)}}marker symbol; default is {cmd:o}{p_end}
 {synopt:{opt lpa:ttern(patternstyle)}}line pattern of the series{p_end}
 {synopt:{opt lw:idth(linewidthstyle)}}line width of the series{p_end}
@@ -82,7 +82,7 @@
 
 {pstd}{cmd:dcdh_plot} draws an event-study plot for a single event from the results of {cmd:did_multiplegt_dyn}.
 It shows the effects and the placebos with confidence intervals.
-The baseline period is plotted at -1, placebo {it:l} at -({it:l}+1) and effect {it:l} at {it:l}-1, labelled {it:l}.
+The baseline period is plotted at -1, placebo {it:l} at -({it:l}+1) and effect {it:l} at {it:l}-1, labeled {it:l}.
 Periods that could not be estimated appear as gaps.{p_end}
 
 {pstd}Optionally, the plot also shows the average total effect and the average placebo as horizontal lines,
@@ -163,16 +163,16 @@ The default is {cmd:%5.3f}.{p_end}
 {dlgtab:Appearance}
 
 {phang}{opt shade} shades the post-treatment area.
-{opt shadecolor()} changes the colour; the default is {cmd:gs12}.
+{opt shadecolor()} changes the color; the default is {cmd:gs12}.
 The shading and {opt vline} follow the automatically chosen y-axis,
 so neither can be combined with {opt ylab()}.{p_end}
 
 {phang}{opt vline} draws a vertical dashed line between the baseline and the first effect.{p_end}
 
-{phang}{opt color(string)} sets the colour of the series and of the confidence intervals.
+{phang}{opt color(string)} sets the color of the series and of the confidence intervals.
 Give an RGB triple in quotes, as in {cmd:color("0 114 178")}, which is the default.
-{opt avgcolor()} sets the colour of the average effect line; the default is {opt color()}.
-{opt precolor()} sets the colour of the average placebo line; the default is {opt avgcolor()}.{p_end}
+{opt avgcolor()} sets the color of the average effect line; the default is {opt color()}.
+{opt precolor()} sets the color of the average placebo line; the default is {opt avgcolor()}.{p_end}
 
 {phang}{opt msymbol()}, {opt lpattern()} and {opt lwidth()}
 set the marker symbol, line pattern and line width of the series.
@@ -205,7 +205,7 @@ It covers the estimates, the intervals, the average lines and zero.{p_end}
 {dlgtab:Output}
 
 {phang}{opt savedata(filename)} saves the plotted data as a Stata dataset.
-It contains the variables {cmd:x} (position in the plot), {cmd:eventtime} (as labelled on the x-axis),
+It contains the variables {cmd:x} (position in the plot), {cmd:eventtime} (as labeled on the x-axis),
 {cmd:type} ({cmd:placebo}, {cmd:baseline} or {cmd:effect}), {cmd:coefname} (name of the coefficient in {cmd:e()}), {cmd:b}, {cmd:se}, {cmd:lb}, {cmd:ub} and {cmd:p}.
 With two levels, {cmd:lb} and {cmd:ub} belong to the larger level, and {cmd:lb_in} and {cmd:ub_in} to the smaller.
 The data in memory are not changed.{p_end}
@@ -279,7 +279,7 @@ The joint p-values are those stored by {cmd:did_multiplegt_dyn}.{p_end}
 {pstd}Jerg Gutmann{break}
 {browse "https://github.com/jerggutmann/stata-tools"}{p_end}
 
-{pstd}Licence: MIT, see {browse "https://github.com/jerggutmann/stata-tools/blob/main/LICENSE":LICENSE} in the repository.{p_end}
+{pstd}License: MIT, see {browse "https://github.com/jerggutmann/stata-tools/blob/main/LICENSE":LICENSE} in the repository.{p_end}
 
 {title:Support and updates}
 

@@ -57,12 +57,12 @@
 
 {syntab:Appearance}
 {synopt:{opt shade}}shade the post-treatment area; with {opt after()}, the treatment area{p_end}
-{synopt:{opt shadec:olor(colorstyle)}}colour of the shading; default is {cmd:gs12}{p_end}
+{synopt:{opt shadec:olor(colorstyle)}}color of the shading; default is {cmd:gs12}{p_end}
 {synopt:{opt vline}}vertical line between baseline and first effect{p_end}
-{synopt:{opt col:or(string)}}colour of the series; default is {cmd:0 114 178}{p_end}
-{synopt:{opt avgc:olor(string)}}colour of the post-treatment average line{p_end}
-{synopt:{opt precol:or(string)}}colour of the pre-treatment average line{p_end}
-{synopt:{opt aftercol:or(string)}}colour of the average line of {opt after()}{p_end}
+{synopt:{opt col:or(string)}}color of the series; default is {cmd:0 114 178}{p_end}
+{synopt:{opt avgc:olor(string)}}color of the post-treatment average line{p_end}
+{synopt:{opt precol:or(string)}}color of the pre-treatment average line{p_end}
+{synopt:{opt aftercol:or(string)}}color of the average line of {opt after()}{p_end}
 {synopt:{opt ms:ymbol(symbolstyle)}}marker symbol; default is {cmd:o}{p_end}
 {synopt:{opt lpa:ttern(patternstyle)}}line pattern of the series{p_end}
 {synopt:{opt lw:idth(linewidthstyle)}}line width of the series{p_end}
@@ -109,7 +109,7 @@ so that figures from the different estimators can be compared directly.{p_end}
 It reads {cmd:e(b)} and {cmd:e(V)} and does not change them.{p_end}
 
 {pstd}Event times -2 and earlier are plotted at their value as placebo coefficients.
-Event time {it:k} {ul:>} 0 is plotted at {it:k} and labelled {it:k}+1, as {cmd:tau}{it:k} in {helpb lpdid_plot}.
+Event time {it:k} {ul:>} 0 is plotted at {it:k} and labeled {it:k}+1, as {cmd:tau}{it:k} in {helpb lpdid_plot}.
 Event time -1 is the baseline, plotted at -1.
 If your regression estimates a coefficient for event time -1, it is plotted as estimated.
 If event time -1 is the omitted base category (or has no coefficient), the baseline is set to zero.
@@ -118,7 +118,7 @@ Event times without a coefficient appear as gaps.{p_end}
 {pstd}With {opt after()}, a second block of dummy variables is plotted directly to the right of the treatment periods.
 The user defines these dummies:
 {cmd:P1_treat} is the first period after the end of treatment, {cmd:P2_treat} the second, and so on.
-Lines and confidence bands are not connected between the two blocks, and the x-axis of the second block is labelled +1, +2, ....
+Lines and confidence bands are not connected between the two blocks, and the x-axis of the second block is labeled +1, +2, ....
 The three blocks are captioned "pre-treatment", "treatment" and "post-treatment".
 Without {opt after()}, the plot has two blocks and the captions "pre-treatment" and "post-treatment".{p_end}
 
@@ -131,7 +131,7 @@ In both, a table of the coefficients and their event times is shown in the Resul
 {phang2}1. {opt eventvar(varname)}: {cmd:second_stage()} contains one factor variable, for example {cmd:ib100.rel_year_shift}.
 Its levels are non-negative integers, so event times that are negative must be shifted.
 Level {it:v} corresponds to event time {it:v} - {opt shift()}.
-Omitted and base levels (for example {cmd:100b.}) are recognised.
+Omitted and base levels (for example {cmd:100b.}) are recognized.
 A base level outside the range of the estimated levels, such as a never-treated group coded 100, is ignored.
 A base level inside that range is plotted as zero.{p_end}
 
@@ -257,18 +257,18 @@ The default is {cmd:%5.3f}.{p_end}
 
 {phang}{opt shade} shades the post-treatment area.
 With {opt after()}, only the treatment area is shaded.
-{opt shadecolor()} changes the colour; the default is {cmd:gs12}.
+{opt shadecolor()} changes the color; the default is {cmd:gs12}.
 The shading and {opt vline} follow the automatically chosen y-axis,
 so neither can be combined with {opt ylab()}.{p_end}
 
 {phang}{opt vline} draws a vertical dashed line between the baseline and the first effect.
 With {opt after()}, a second line is drawn between the treatment and the post-treatment block.{p_end}
 
-{phang}{opt color(string)} sets the colour of the series and of the confidence intervals.
+{phang}{opt color(string)} sets the color of the series and of the confidence intervals.
 Give an RGB triple in quotes, as in {cmd:color("0 114 178")}, which is the default.
-{opt avgcolor()} sets the colour of the post-treatment average line; the default is {opt color()}.
-{opt precolor()} sets the colour of the pre-treatment average line; the default is {opt avgcolor()}.
-{opt aftercolor()} sets the colour of the average line of {opt after()}; the default is {opt avgcolor()}.{p_end}
+{opt avgcolor()} sets the color of the post-treatment average line; the default is {opt color()}.
+{opt precolor()} sets the color of the pre-treatment average line; the default is {opt avgcolor()}.
+{opt aftercolor()} sets the color of the average line of {opt after()}; the default is {opt avgcolor()}.{p_end}
 
 {phang}{opt msymbol()}, {opt lpattern()} and {opt lwidth()}
 set the marker symbol, line pattern and line width of the series.
@@ -303,7 +303,7 @@ It covers the estimates, the intervals, the average lines and zero.{p_end}
 {dlgtab:Output}
 
 {phang}{opt savedata(filename)} saves the plotted data as a Stata dataset.
-It contains the variables {cmd:x} (position in the plot), {cmd:eventtime} (as labelled on the x-axis; for {cmd:after}, the period since the end of treatment),
+It contains the variables {cmd:x} (position in the plot), {cmd:eventtime} (as labeled on the x-axis; for {cmd:after}, the period since the end of treatment),
 {cmd:type} ({cmd:placebo}, {cmd:baseline}, {cmd:effect} or {cmd:after}),
 {cmd:coefname} (name of the coefficient in {cmd:e(b)}), {cmd:b}, {cmd:se}, {cmd:lb}, {cmd:ub} and {cmd:p}.
 With two levels, {cmd:lb} and {cmd:ub} belong to the larger level, and {cmd:lb_in} and {cmd:ub_in} to the smaller.
@@ -386,10 +386,10 @@ Confidence intervals are normal-based, like those of {cmd:did2s}, and p-values a
 They are therefore comparable to {helpb dcdh_plot}.
 Base and omitted categories have a coefficient of zero and a standard error of zero.{p_end}
 
-{pstd}{bf:Normalisation at t-1.}
+{pstd}{bf:Normalization at t-1.}
 Event-study estimates are only comparable to those of {cmd:dcdh_plot} and {cmd:lpdid_plot} if the reference period is event time -1.
 If your regression estimates a coefficient for event time -1, {cmd:did2s_plot} plots it as estimated and prints a warning,
-because the coefficients are then not normalised to zero at t-1.
+because the coefficients are then not normalized to zero at t-1.
 The graph is still drawn, but the specification should be reconsidered.
 With dummy variables, leave out the dummy for event time -1 (for example {cmd:F1_treat}); the baseline is then plotted as zero.
 With a factor variable, make event time -1 the base level, for example with {cmd:ib}{it:#}{cmd:.}, and make sure that never-treated observations are handled as in your model.
@@ -398,7 +398,7 @@ The factor-variable form and the dummy form cannot be combined in one call.{p_en
 {pstd}The averages and joint tests refer only to the coefficients that are plotted.
 Changing {opt pre()} or {opt post()} changes them.{p_end}
 
-{pstd}The first treated period is event time 0 and is labelled 1 on the x-axis, as in {helpb dcdh_plot} and {helpb lpdid_plot}.
+{pstd}The first treated period is event time 0 and is labeled 1 on the x-axis, as in {helpb dcdh_plot} and {helpb lpdid_plot}.
 In the example data, {cmd:rel_year} is 0 in the first treated year.{p_end}
 
 {pstd}This is a beta version. Please check the plotted values against the output of {cmd:did2s}.{p_end}
@@ -409,7 +409,7 @@ In the example data, {cmd:rel_year} is 0 in the first treated year.{p_end}
 {pstd}Jerg Gutmann{break}
 {browse "https://github.com/jerggutmann/stata-tools"}{p_end}
 
-{pstd}Licence: MIT, see {browse "https://github.com/jerggutmann/stata-tools/blob/main/LICENSE":LICENSE} in the repository.{p_end}
+{pstd}License: MIT, see {browse "https://github.com/jerggutmann/stata-tools/blob/main/LICENSE":LICENSE} in the repository.{p_end}
 
 {title:Support and updates}
 
