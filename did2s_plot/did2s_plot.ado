@@ -52,6 +52,10 @@ program define did2s_plot
 		di as error "post() must be 0 or larger"
 		exit 198
 	}
+	if "`avgvalues'" != "" & "`nolegend'" != "" & "`after'" != "" {
+		di as error "avgvalues cannot be combined with nolegend when after() is used; the values are shown in the legend"
+		exit 198
+	}
 	if "`ylab'" != "" & `tpos' == -99999 {
 		di as error "if you set ylab() you must also set tpos()"
 		exit 198
@@ -605,41 +609,51 @@ program define did2s_plot
 	if "`avg'" != "" {
 		local plots `plots' (pci `bavg' `x0' `bavg' `x1', lcolor("`avgcolor'") lpattern(`avglpattern') lwidth(medthick))
 		local ++k
-		local order `order' `k' "`lblavg'"
+		local lab "`lblavg'"
+		if "`avgvalues'" != "" & `nA' > 0 {
+			local s : display string(`bavg', "`fmt'")
+			local lab "`lab' (`s')"
+		}
+		local order `order' `k' "`lab'"
 		local plots `plots' (scatteri `bavg' `x0', msymbol(circle_hollow) mcolor("`avgcolor'"))
 		local plots `plots' (scatteri `bavg' `x1', msymbol(circle_hollow) mcolor("`avgcolor'"))
 		local k = `k' + 2
-		if "`avgvalues'" != "" {
+		if "`avgvalues'" != "" & `nA' == 0 {
 			local s : display string(`bavg', "`fmt'")
-			if `nA' > 0 local texts `texts' text(`bavg' `x1' "`s'", place(n) size(small) color("`avgcolor'"))
-			else local texts `texts' text(`bavg' `=`x1'+0.2' "`s'", place(e) size(small) color("`avgcolor'"))
+			local texts `texts' text(`bavg' `=`x1'+0.2' "`s'", place(e) size(small) color("`avgcolor'"))
 		}
 	}
 	if "`avgafter'" != "" {
 		local plots `plots' (pci `bafter' `xa0' `bafter' `xmax', lcolor("`aftercolor'") lpattern(`afterlpattern') lwidth(medthick))
 		local ++k
-		local order `order' `k' "`lblafter'"
+		local lab "`lblafter'"
+		if "`avgvalues'" != "" {
+			local s : display string(`bafter', "`fmt'")
+			local lab "`lab' (`s')"
+		}
+		local order `order' `k' "`lab'"
 		local plots `plots' (scatteri `bafter' `xa0', msymbol(circle_hollow) mcolor("`aftercolor'"))
 		local plots `plots' (scatteri `bafter' `xmax', msymbol(circle_hollow) mcolor("`aftercolor'"))
 		local k = `k' + 2
-		if "`avgvalues'" != "" {
-			local s : display string(`bafter', "`fmt'")
-			local texts `texts' text(`bafter' `=`xmax'+0.2' "`s'", place(e) size(small) color("`aftercolor'"))
-		}
 	}
 	if "`avgpre'" != "" {
 		local plots `plots' (pci `bpre' `xmin' `bpre' `xend', lcolor("`precolor'") lpattern(`prelpattern') lwidth(medthick))
 		local ++k
-		local order `order' `k' "`lblpre'"
+		local lab "`lblpre'"
+		if "`avgvalues'" != "" & `nA' > 0 {
+			local s : display string(`bpre', "`fmt'")
+			local lab "`lab' (`s')"
+		}
+		local order `order' `k' "`lab'"
 		local plots `plots' (scatteri `bpre' `xmin', msymbol(circle_hollow) mcolor("`precolor'"))
 		local plots `plots' (scatteri `bpre' `xend', msymbol(circle_hollow) mcolor("`precolor'"))
 		local k = `k' + 2
-		if "`avgvalues'" != "" {
+		if "`avgvalues'" != "" & `nA' == 0 {
 			local s : display string(`bpre', "`fmt'")
 			local texts `texts' text(`bpre' `=`xmin'-0.2' "`s'", place(w) size(small) color("`precolor'"))
 		}
 	}
-	if "`avgvalues'" != "" {
+	if "`avgvalues'" != "" & `nA' == 0 {
 		local xl = `xmin' - 0.5
 		if "`avgpre'" != "" local xl = `xmin' - 1.5
 		local xsc xscale(range(`xl' `=`xmax'+1.5'))
@@ -647,7 +661,7 @@ program define did2s_plot
 
 	local legend legend(off)
 	if ("`avg'" != "" | "`avgpre'" != "" | "`avgafter'" != "") & "`nolegend'" == "" {
-		local legend legend(order(`order') rows(1) position(6))
+		local legend legend(order(`order') rows(`=1 + (`nA' > 0)') position(6))
 	}
 	local captions
 	if "`nocaptions'" == "" {
