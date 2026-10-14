@@ -1,6 +1,6 @@
 # stata-tools
 
-Small Stata programs by Jerg Gutmann. Each package lives in its own folder and is installed with `net install` from that folder. All packages are released under the MIT license, see [License](#license).
+Small Stata programs by Jerg Gutmann. Each package has its own folder and is installed with `net install` from that folder, as described below. All packages are released under the MIT license, see [License](#license).
 
 All commands require Stata 16 or newer. The plot commands also require the estimation command they plot, which must be installed separately and may require further packages, as documented by its authors.
 
@@ -19,9 +19,9 @@ All commands require Stata 16 or newer. The plot commands also require the estim
 
 Version 0.2.3 (beta). Package folder: [`cname_std/`](cname_std/).
 
-Standardizes the spelling of country names in a string variable (`cname` by default). A dictionary of about 2,000 spellings (English, German, French, Spanish, plus the spellings known from `kountry` and an own list) is matched ignoring case, accents, punctuation and spaces. Names that are not found are only trimmed and capitalized and are reported, so the dictionary can be extended step by step.
+Standardizes the spelling of countries and some frequently covered territories in a string variable. The primary purpose of this is preparing cross-country datasets for seamless merging. A dictionary of about 2,000 spellings (English, German, French, Spanish, and an own list of spellings and misspellings collected over years; plus the spellings known from `kountry`) is matched ignoring case, accents, punctuation, and spaces. Names that are not found are only trimmed and capitalized and are reported back to the user, so the dictionary can be extended step by step.
 
-**This is a beta version. Please report problems via GitHub issues.**
+**This is a beta version. Please report problems or missing spellings via GitHub issues.**
 
 ### Installation
 
@@ -29,7 +29,7 @@ Standardizes the spelling of country names in a string variable (`cname` by defa
 net install cname_std, from("https://raw.githubusercontent.com/jerggutmann/stata-tools/main/cname_std/") replace
 ```
 
-Run `ado update cname_std, update` to update the dictionary. Remove with `ado uninstall cname_std`.
+Run `ado update cname_std, update` to update the command and dictionary. Remove with `ado uninstall cname_std`.
 
 ### Usage
 
@@ -45,11 +45,11 @@ cname_std_add "Netherlands, The" "Netherlands"   // add a spelling to your perso
 
 ### Conventions
 
-The command standardizes spellings and does not merge entries. West Germany is Germany, the USSR is Russia, Czechoslovakia is Czechia; North/South Korea, Vietnam and Yemen and East Germany keep separate names; Serbia, Montenegro, Serbia and Montenegro and Yugoslavia are separate; Great Britain, England, Wales and the United Kingdom are separate (a note is shown if "Great Britain" occurs). Plain "Korea" is South Korea. The complete list and all options are in `help cname_std`.
+The command standardizes spellings. West Germany is considered Germany, the USSR is Russia, Czechoslovakia is Czechia, plain "Korea" is South Korea. North and South Korea, Vietnam, and Yemen, as well as East Germany keep separate names. Serbia, Montenegro, Serbia and Montenegro, and Yugoslavia are separate; Great Britain, England, Wales, and the United Kingdom are separate (a note is shown if "Great Britain" occurs). The complete list and all options are in `help cname_std`.
 
 ### Adding spellings
 
-Spellings that are not recognized (marker 2) can be added to a personal dictionary with `cname_std_add`; it is read automatically and survives updates. Suggestions for the general dictionary are welcome as [GitHub issues](https://github.com/jerggutmann/stata-tools/issues).
+Spellings that are not recognized (marker==2) can be added to a personal dictionary with `cname_std_add`; it is read automatically and survives updates. Suggestions for the general dictionary are welcome as [GitHub issues](https://github.com/jerggutmann/stata-tools/issues).
 
 ## csdid_event_plot
 
