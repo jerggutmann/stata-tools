@@ -3,4 +3,3 @@
 *.sthlp text eol=lf
 *.pkg text eol=lf
 *.toc text eol=lf
-*.dta binary

@@ -1,5 +1,5 @@
 *! cname_std 0.2.3  12oct2026  Jerg Gutmann
-*! Standardizes spellings of country names using the dictionary cname_std_dict.dta
+*! Standardizes spellings of country names using the dictionary cname_std_dict.csv
 program define cname_std, rclass
     version 16.0
     syntax [, VARname(name) REPLACE QUIet EXTRA(string) ALT(string) NOPROPER MARKer *]
@@ -86,13 +86,13 @@ program define cname_std, rclass
     }
 
     * dictionary files: package dictionary, patterns, optional personal file, optional extra()
-    capture findfile cname_std_dict.dta
+    capture findfile cname_std_dict.csv
     if _rc {
-        display as error "dictionary file cname_std_dict.dta not found in the ado path"
+        display as error "dictionary file cname_std_dict.csv not found in the ado path"
         exit 601
     }
     local dictfile `"`r(fn)'"'
-    capture findfile cname_std_patterns.dta
+    capture findfile cname_std_patterns.csv
     local patfile = cond(_rc, "", `"`r(fn)'"')
     capture findfile cname_std_extra.csv
     local personal = cond(_rc, "", `"`r(fn)'"')
@@ -164,7 +164,7 @@ program define cname_std, rclass
         local np 0
         if `"`patfile'"' != "" {
             frame `fp' {
-                quietly use `"`patfile'"', clear
+                quietly import delimited using `"`patfile'"', delimiter(";") varnames(1) stringcols(_all) bindquote(nobind) encoding("utf-8") clear
                 local np = _N
                 forvalues i = 1/`np' {
                     local pat`i' = pattern[`i']
@@ -278,12 +278,7 @@ end
 program define _cname_std_load
     version 16.0
     args file prio
-    if strlower(substr(`"`file'"', -4, 4)) == ".dta" {
-        quietly use `"`file'"', clear
-    }
-    else {
-        quietly import delimited using `"`file'"', delimiter(";") varnames(1) stringcols(_all) bindquote(nobind) encoding("utf-8") clear
-    }
+    quietly import delimited using `"`file'"', delimiter(";") varnames(1) stringcols(_all) bindquote(nobind) encoding("utf-8") clear
     quietly describe, varlist
     local vl `r(varlist)'
     if `: word count `vl'' < 2 {
