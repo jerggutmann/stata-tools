@@ -19,22 +19,22 @@ program define cname_std_add
 
     * the standard name must exist in the dictionary (typo protection)
     if "`force'" == "" & !inlist(`"`standard'"', "[keep]") {
-        capture findfile cname_std_dict.dta
+        capture findfile cname_std_dict.csv
         if _rc {
-            display as error "dictionary file cname_std_dict.dta not found in the ado path"
+            display as error "dictionary file cname_std_dict.csv not found in the ado path"
             exit 601
         }
         tempname fr
         local known 0
         quietly frame create `fr'
         frame `fr' {
-            quietly use `"`r(fn)'"', clear
+            quietly import delimited using `"`r(fn)'"', delimiter(";") varnames(1) stringcols(_all) bindquote(nobind) encoding("utf-8") clear
             quietly count if standard == `"`standard'"'
             local known = r(N) > 0
         }
         frame drop `fr'
         if !`known' {
-            display as error `"standard name "`standard'" is not used in cname_std_dict.dta; check spelling or use option force"'
+            display as error `"standard name "`standard'" is not used in cname_std_dict.csv; check spelling or use option force"'
             exit 198
         }
     }
