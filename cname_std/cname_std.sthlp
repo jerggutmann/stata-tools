@@ -95,7 +95,7 @@ The groups are:{p_end}
 {phang}{opt noproper} skips the proper-case step for names that are not recognized.
 They are still trimmed.{p_end}
 
-{phang}{opt extra(filename)} reads an additional dictionary in the format described under {help cname_std##dictionary:Modifying the dictionary}.
+{phang}{opt extra(filename)} reads an additional dictionary in the same format as {cmd:cname_std_dict.csv}.
 Its entries take precedence over everything else.{p_end}
 
 {dlgtab:Output}
@@ -187,10 +187,6 @@ If one file contains the same spelling with two different standard names, the co
 {pstd}{bf:File format.} Dictionary files are plain text (UTF-8) with a semicolon as separator and one line per spelling.
 The first line is a header.{p_end}
 
-{pstd}The package dictionary and the pattern rules are shipped as Stata datasets
-({cmd:cname_std_dict.dta}, {cmd:cname_std_patterns.dta}) with the same columns.
-Your own files and files for {opt extra()} stay plain text.{p_end}
-
 {p2colset 9 20 22 2}{...}
 {p2col:{it:variant}}the spelling as it appears in your data{p_end}
 {p2col:{it:standard}}the standard name. Each standard name also matches itself.
@@ -205,7 +201,7 @@ Leave empty in your own files.{p_end}
 {pstd}Files for {opt extra()} and {cmd:cname_std_extra.csv} need only the columns {it:variant} and {it:standard}.{p_end}
 
 {pstd}A few pattern rules for broken spellings (regular expressions on the normalized spelling,
-e.g. mangled accents in "Cote d'Ivoire") are in {cmd:cname_std_patterns.dta}.
+e.g. mangled accents in "Cote d'Ivoire") are in {cmd:cname_std_patterns.csv}.
 They apply only to spellings that are not found in the dictionary.{p_end}
 
 
