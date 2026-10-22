@@ -1,7 +1,7 @@
 v 3
 d dcdh_compare - Two did_multiplegt_dyn models in one event-study plot
 d Jerg Gutmann
-d Version 0.1.0 (beta). Runs two did_multiplegt_dyn estimations and plots both event studies in the layout of dcdh_plot; keeps the graphs and results of both models. Requires Stata 16 or newer and did_multiplegt_dyn.
-d Distribution-Date: 20261029
+d Version 0.2.0 (beta). Runs two did_multiplegt_dyn estimations and plots both event studies in the layout of dcdh_plot; keeps the graphs and results of both models. Requires Stata 16 or newer and did_multiplegt_dyn.
+d Distribution-Date: 20261031
 f dcdh_compare.ado
 f dcdh_compare.sthlp

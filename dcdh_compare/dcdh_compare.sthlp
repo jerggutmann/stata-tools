@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.1.0  11oct2026  Jerg Gutmann}{...}
+{* *! version 0.2.0  23oct2026  Jerg Gutmann}{...}
 {vieweralsosee "did_multiplegt_dyn" "help did_multiplegt_dyn"}{...}
 {vieweralsosee "dcdh_plot" "help dcdh_plot"}{...}
 {vieweralsosee "[G-2] graph twoway" "help twoway"}{...}
@@ -80,6 +80,7 @@ The two models may differ in any respect (outcome, treatment, sample, controls, 
 
 {syntab:Output}
 {synopt:{opt stub(name)}}prefix of the names of graphs and stored estimates; default is {cmd:dc}{p_end}
+{synopt:{opt fast}}add {cmd:graph_off} to every model that does not have it{p_end}
 {synopt:{opt name(name[, replace])}}name of the joint graph; default is {it:stub}{cmd:_compare}{p_end}
 {synopt:{opt saved:ata(filename)}}save the plotted data{p_end}
 {synopt:{opt exp:ort(filename)}}save the joint graph{p_end}
@@ -99,6 +100,9 @@ Each model has its own color and marker; a legend identifies them.{p_end}
 {pstd}The output of both estimations appears in the Results window.
 The graphs that {cmd:did_multiplegt_dyn} draws itself are kept under the names {it:stub}{cmd:_m1} and {it:stub}{cmd:_m2},
 so that they can be compared with the joint graph ({it:stub}{cmd:_compare}).
+To suppress the graph of a model, specify {cmd:graph_off} among the options of that model, inside its parentheses; that graph is then neither drawn nor kept.
+The option {opt fast} does this for both models.
+The joint graph is always drawn.
 The results of both models are stored with {helpb estimates store} under the same names.
 After the command, the results of model 1 are active.{p_end}
 
@@ -219,8 +223,13 @@ It has one column per model.{p_end}
 
 {phang}{opt stub(name)} sets the prefix of the names under which the graphs of {cmd:did_multiplegt_dyn}, the joint graph and the stored estimates are kept.
 The default is {cmd:dc}, giving {cmd:dc_m1}, {cmd:dc_m2} and {cmd:dc_compare}.
-Existing graphs and stored estimates with these names are replaced.
-If a model is specified with {cmd:graph_off}, there is no graph of that model to keep.{p_end}
+Existing graphs and stored estimates with these names are replaced.{p_end}
+
+{phang}{opt fast} adds the option {cmd:graph_off} to every model that does not contain it, so that {cmd:did_multiplegt_dyn} does not draw its own graph of that model.
+This speeds up the estimation, because drawing the graphs is left out; only the joint graph is drawn.
+The graphs {it:stub}{cmd:_m1} and {it:stub}{cmd:_m2} are then not kept, and {cmd:r(graph1)} and {cmd:r(graph2)} are not returned.
+Models that already contain {cmd:graph_off} are not changed.
+{cmd:fast} has no effect with {opt redraw}, because nothing is estimated then.{p_end}
 
 {phang}{opt name()} names the joint graph, overriding {it:stub}{cmd:_compare}.{p_end}
 
@@ -262,6 +271,9 @@ The graphs of {cmd:did_multiplegt_dyn} are kept as {cmd:dc_m1} and {cmd:dc_m2}, 
 
 {pstd}Intervals as bars at the 90 and 95 percent levels, with shading and the baseline line{p_end}
 {phang2}{stata "dcdh_compare ($mod1) ($mod2), $lab1 cibars level(90 95) shade vline stub(dc3)":. dcdh_compare ($mod1) ($mod2), $lab1 cibars level(90 95) shade vline stub(dc3)}{p_end}
+
+{pstd}Faster: {cmd:fast} suppresses the graphs of {cmd:did_multiplegt_dyn}; only the joint graph is drawn{p_end}
+{phang2}{stata "dcdh_compare ($mod1) ($mod2), $lab1 fast stub(dcf)":. dcdh_compare ($mod1) ($mod2), $lab1 fast stub(dcf)}{p_end}
 
 {pstd}Change only the graph, without estimating again: the stored results of the first example are plotted with the average lines and shading{p_end}
 {phang2}{stata "dcdh_compare, redraw avg avgpre shade":. dcdh_compare, redraw avg avgpre shade}{p_end}

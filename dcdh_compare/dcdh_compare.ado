@@ -1,4 +1,4 @@
-*! dcdh_compare 0.1.0  11oct2026  Jerg Gutmann
+*! dcdh_compare 0.2.0  23oct2026  Jerg Gutmann
 *! Runs two did_multiplegt_dyn models and plots both event studies in the layout of dcdh_plot
 program define dcdh_compare, rclass
 	version 16
@@ -17,6 +17,7 @@ program define dcdh_compare, rclass
 		* options of the two models that dcdh_compare needs to know
 		forvalues k = 1/2 {
 			gettoken spec mopts : m`k', parse(",") bind
+			local hasopt`k' = `"`mopts'"' != ""
 			local 0 `"`mopts'"'
 			syntax [, ci_level(real 95) graph_off by(string) by_path(string) *]
 			if `"`by'"' != "" | `"`by_path'"' != "" {
@@ -29,7 +30,7 @@ program define dcdh_compare, rclass
 	}
 
 	local 0 `"`rest'"'
-	syntax [, REDRAW SHOWEFFects(integer -1) SHOWPLAcebo(integer -1) ///
+	syntax [, REDRAW FAST SHOWEFFects(integer -1) SHOWPLAcebo(integer -1) ///
 		AVG AVGPre AVGValues PVAlues PNOte ///
 		NOCI CIBars NORMalci LEvel(string) CIOpacity(integer 20) ///
 		SHADE SHADEColor(string) VLINE ///
@@ -103,6 +104,20 @@ program define dcdh_compare, rclass
 	if "`precaption'" == "" local precaption "pre-treatment"
 	if "`postcaption'" == "" local postcaption "post-treatment"
 	if "`fmt'" == "" local fmt "%5.3f"
+
+	* ---- fast: add graph_off to every model that does not have it ----
+	if "`fast'" != "" & "`redraw'" != "" {
+		di as text "note: fast has no effect with redraw, because nothing is estimated"
+	}
+	if "`fast'" != "" & "`redraw'" == "" {
+		forvalues k = 1/2 {
+			if "`goff`k''" == "" {
+				local sep = cond(`hasopt`k'', "", ",")
+				local m`k' `"`m`k''`sep' graph_off"'
+				local goff`k' "graph_off"
+			}
+		}
+	}
 
 	* ---- estimate both models; keep their graphs and results ----
 	if "`redraw'" == "" {

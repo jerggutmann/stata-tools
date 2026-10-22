@@ -84,7 +84,7 @@ Standard errors, confidence intervals and p-values are those of `estat event` (a
 
 ## dcdh_compare
 
-Version 0.1.0 (beta). Package folder: [`dcdh_compare/`](dcdh_compare/).
+Version 0.2.0 (beta). Package folder: [`dcdh_compare/`](dcdh_compare/).
 
 Runs two `did_multiplegt_dyn` estimations and draws both event studies in one plot with the layout and options of `dcdh_plot`. Each model is a complete `did_multiplegt_dyn` specification in parentheses, so the models can differ in outcome, treatment, sample, controls or options. The graphs of `did_multiplegt_dyn` are kept as `dc_m1` and `dc_m2`, the joint graph as `dc_compare`, and both results are stored with `estimates store` (`dc_m1`, `dc_m2`; model 1 is active afterwards).
 
@@ -105,7 +105,7 @@ use favara_imbs_did_multiplegt_dyn.dta, clear
 dcdh_compare (Dl_vloans_b county year inter_bra, effects(8) placebo(3) cluster(state_n)) (Dl_vloans_b county year inter_bra, effects(8) placebo(3) cluster(state_n) only_never_switchers), lbl1("not-yet-switchers") lbl2("never-switchers") avg avgpre pvalues
 ```
 
-The plot covers the longer of the two event-time ranges. Confidence intervals are b ± z·se at the `ci_level()` of the models (95 by default), i.e. identical to those displayed by `did_multiplegt_dyn`; a different `level()` is announced by a note. `scale()` and `pctof()` take one value for both models or one per model. `lbl1()`/`lbl2()`, `color1()`/`color2()` and `msymbol1()`/`msymbol2()` set names, colors and markers; `stub()` changes the prefix of the graph and estimate names. All other options are those of `dcdh_plot`; `effects()`/`placebo()` are part of the model specifications. `dcdh_compare, redraw [options]` draws the stored results again with other graph options, without re-estimating. There is no test of the difference between the models. `by()` and `by_path()` are not supported. Details: `help dcdh_compare`.
+The plot covers the longer of the two event-time ranges. Confidence intervals are b ± z·se at the `ci_level()` of the models (95 by default), i.e. identical to those displayed by `did_multiplegt_dyn`; a different `level()` is announced by a note. `scale()` and `pctof()` take one value for both models or one per model. `lbl1()`/`lbl2()`, `color1()`/`color2()` and `msymbol1()`/`msymbol2()` set names, colors and markers; `stub()` changes the prefix of the graph and estimate names. `fast` adds `graph_off` to every model that does not have it, so that `did_multiplegt_dyn` draws no graphs of its own, which speeds up the run; only the joint graph is drawn. All other options are those of `dcdh_plot`; `effects()`/`placebo()` are part of the model specifications. `dcdh_compare, redraw [options]` draws the stored results again with other graph options, without re-estimating. There is no test of the difference between the models. `by()` and `by_path()` are not supported. Details: `help dcdh_compare`.
 
 ## dcdh_plot
 
