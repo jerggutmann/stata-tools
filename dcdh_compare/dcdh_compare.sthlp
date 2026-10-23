@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.2.0  23oct2026  Jerg Gutmann}{...}
+{* *! version 0.2.1  23oct2026  Jerg Gutmann}{...}
 {vieweralsosee "did_multiplegt_dyn" "help did_multiplegt_dyn"}{...}
 {vieweralsosee "dcdh_plot" "help dcdh_plot"}{...}
 {vieweralsosee "[G-2] graph twoway" "help twoway"}{...}

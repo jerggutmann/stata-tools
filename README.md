@@ -84,7 +84,7 @@ Standard errors, confidence intervals and p-values are those of `estat event` (a
 
 ## dcdh_compare
 
-Version 0.2.0 (beta). Package folder: [`dcdh_compare/`](dcdh_compare/).
+Version 0.2.1 (beta). Package folder: [`dcdh_compare/`](dcdh_compare/).
 
 Runs two `did_multiplegt_dyn` estimations and draws both event studies in one plot with the layout and options of `dcdh_plot`. Each model is a complete `did_multiplegt_dyn` specification in parentheses, so the models can differ in outcome, treatment, sample, controls or options. The graphs of `did_multiplegt_dyn` are kept as `dc_m1` and `dc_m2`, the joint graph as `dc_compare`, and both results are stored with `estimates store` (`dc_m1`, `dc_m2`; model 1 is active afterwards).
 

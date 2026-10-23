@@ -1,4 +1,4 @@
-*! dcdh_compare 0.2.0  23oct2026  Jerg Gutmann
+*! dcdh_compare 0.2.1  23oct2026  Jerg Gutmann
 *! Runs two did_multiplegt_dyn models and plots both event studies in the layout of dcdh_plot
 program define dcdh_compare, rclass
 	version 16
@@ -495,7 +495,7 @@ program define dcdh_compare, rclass
 				local xe = `ne`m'' - 1
 				local plots `plots' (pci `bavg`m'' `x0' `bavg`m'' `xe', lcolor("`color`m''") lpattern(`avglpattern') lwidth(medthick))
 				local ++k
-				local order `order' `k' `"`lblavg' (`lbl`m'')"'
+				local order `order' `k' `"`lblavg'"'
 				local plots `plots' (scatteri `bavg`m'' `x0', msymbol(circle_hollow) mcolor("`color`m''"))
 				local plots `plots' (scatteri `bavg`m'' `xe', msymbol(circle_hollow) mcolor("`color`m''"))
 				local k = `k' + 2
@@ -514,7 +514,7 @@ program define dcdh_compare, rclass
 				local xs = -(`np`m'' + 1)
 				local plots `plots' (pci `bpre`m'' `xs' `bpre`m'' -2, lcolor("`color`m''") lpattern(`prelpattern') lwidth(medthick))
 				local ++k
-				local order `order' `k' `"`lblpre' (`lbl`m'')"'
+				local order `order' `k' `"`lblpre'"'
 				local plots `plots' (scatteri `bpre`m'' `xs', msymbol(circle_hollow) mcolor("`color`m''"))
 				local plots `plots' (scatteri `bpre`m'' -2, msymbol(circle_hollow) mcolor("`color`m''"))
 				local k = `k' + 2
