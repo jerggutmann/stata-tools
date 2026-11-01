@@ -1,0 +1,5 @@
+*.csv text eol=lf
+*.ado text eol=lf
+*.sthlp text eol=lf
+*.pkg text eol=lf
+*.toc text eol=lf

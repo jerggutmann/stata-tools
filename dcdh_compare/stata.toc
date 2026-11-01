@@ -1,0 +1,3 @@
+v 3
+d Personal Stata programs (Jerg Gutmann)
+p dcdh_compare Two did_multiplegt_dyn models in one event-study plot (beta)

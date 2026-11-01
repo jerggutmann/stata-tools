@@ -1,0 +1,3 @@
+v 3
+d Personal Stata programs (Jerg Gutmann)
+d Each package has its own folder. Install with net install from the folder URL, see README.

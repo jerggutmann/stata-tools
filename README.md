@@ -1,0 +1,251 @@
+# stata-tools
+
+Small Stata programs by Jerg Gutmann. Each package has its own folder and is installed with `net install` from that folder, as described below. All packages are released under the MIT license, see [License](#license).
+
+All commands require Stata 16 or newer. The plot commands also require the estimation command they plot, which must be installed separately and may require further packages, as documented by its authors.
+
+## Contents
+
+| Package | Purpose |
+|---|---|
+| [`cname_std`](#cname_std) | standardize spellings of country names |
+| [`csdid_event_plot`](#csdid_event_plot) | event-study plot after `csdid` (`estat event`), same layout as `dcdh_plot` |
+| [`dcdh_compare`](#dcdh_compare) | runs two `did_multiplegt_dyn` models and plots both in one figure, same layout as `dcdh_plot` |
+| [`dcdh_plot`](#dcdh_plot) | event-study plot after `did_multiplegt_dyn` |
+| [`did2s_plot`](#did2s_plot) | event-study plot after `did2s`, same layout as `dcdh_plot` |
+| [`lpdid_plot`](#lpdid_plot) | event-study plot after `lpdid`, same layout as `dcdh_plot` |
+
+## cname_std
+
+Version 0.2.3 (beta). Package folder: [`cname_std/`](cname_std/).
+
+Standardizes the spelling of countries and some frequently covered territories in a string variable. The primary purpose of this is preparing cross-country datasets for seamless merging. A dictionary of about 2,000 spellings (English, German, French, Spanish, and an own list of spellings and misspellings collected over years; plus the spellings known from `kountry`) is matched ignoring case, accents, punctuation, and spaces. Names that are not found are only trimmed and capitalized and are reported back to the user, so the dictionary can be extended step by step.
+
+**This is a beta version. Please report problems or missing spellings via GitHub issues.**
+
+### Installation
+
+```stata
+net install cname_std, from("https://raw.githubusercontent.com/jerggutmann/stata-tools/main/cname_std/") replace
+```
+
+Run `ado update cname_std, update` to update the command and dictionary. Remove with `ado uninstall cname_std`.
+
+### Usage
+
+```stata
+cname_std                                // overwrite cname in place
+cname_std, new marker                    // result in cname_new, flag in cname_new_marker
+cname_std, varname(country) new(iso_name)
+cname_std, alt(germany ussr)             // switch historical conventions
+cname_std_add "Netherlands, The" "Netherlands"   // add a spelling to your personal dictionary
+```
+
+`marker` is 0 (recognized, unchanged), 1 (changed), 2 (not recognized, only cleaned) or 3 (ambiguous, not standardized, e.g. "Kongo" or "Virgin Islands"). Filter on 2 to find spellings that belong in the dictionary.
+
+### Conventions
+
+The command standardizes spellings. West Germany is considered Germany, the USSR is Russia, Czechoslovakia is Czechia, plain "Korea" is South Korea. North and South Korea, Vietnam, and Yemen, as well as East Germany keep separate names. Serbia, Montenegro, Serbia and Montenegro, and Yugoslavia are separate; Great Britain, England, Wales, and the United Kingdom are separate (a note is shown if "Great Britain" occurs). The complete list and all options are in `help cname_std`.
+
+### Adding spellings
+
+Spellings that are not recognized (marker==2) can be added to a personal dictionary with `cname_std_add`; it is read automatically and survives updates. Suggestions for the general dictionary are welcome as [GitHub issues](https://github.com/jerggutmann/stata-tools/issues).
+
+## csdid_event_plot
+
+Version 0.2.1 (beta). Package folder: [`csdid_event_plot/`](csdid_event_plot/).
+
+Event-study plot after `csdid` (Callaway and Sant'Anna; Stata implementation by Rios-Avila, Sant'Anna and Callaway, written for version 1.81). Counterpart of `dcdh_plot`, `lpdid_plot` and `did2s_plot` with the same layout, axis positions, defaults and options. It plots the table of `estat event` (`Tm#`, `Tp#`, `Pre_avg`, `Post_avg`). The name differs from `csdid_plot`, which belongs to the `csdid` package itself and is not touched by this package.
+
+`sdof(sample)`, `sdof(untreated)` and `sdof(nyt)` express the estimates in standard deviations of the `csdid` outcome (whole `csdid` sample, or never- and not-yet-treated observations; the two latter coincide because `csdid` treatment does not end). `within` uses the standard deviation after removing unit and time means, and `sdif()` adds a condition on the observations used. Outcome, group and time variable are read from the results of `csdid`; `y()`, `treatment()`, `id()` and `time()` override them. The command prints the standard deviation used.
+
+**This is a beta version. Please check results against the `estat event` output and report problems via GitHub issues.**
+
+### Installation
+
+```stata
+net install csdid_event_plot, from("https://raw.githubusercontent.com/jerggutmann/stata-tools/main/csdid_event_plot/") replace
+```
+
+Run `ado update csdid_event_plot, update` to update. Remove with `ado uninstall csdid_event_plot`.
+
+### Usage
+
+Directly after `estat event`, or directly after `csdid` (then `csdid_event_plot` calls `estat event` itself):
+
+```stata
+use https://friosavila.github.io/playingwithstata/drdid/mpdta.dta, clear
+csdid lemp lpop, ivar(countyreal) time(year) gvar(first_treat) method(dripw) long2
+estat event
+csdid_event_plot, avg avgpre pvalues pnote
+```
+
+Standard errors, confidence intervals and p-values are those of `estat event` (asymptotic and pointwise, also if `csdid` used `wboot`); `normalci` or `level()` switches to pointwise normal intervals. `avg` and `avgpre` draw `Post_avg` and `Pre_avg` of `csdid`. With the default short gaps, event time -1 is estimated and a warning says that the coefficients are not normalized at t-1; with `long2` in `csdid`, the baseline is zero. `pre()`/`post()` limit the plotted event times. A console note states whenever the intervals are not those of `estat event`. All other options are identical to `dcdh_plot` (see [`dcdh_plot`](#dcdh_plot)). Details: `help csdid_event_plot`.
+
+## dcdh_compare
+
+Version 0.3.0 (beta). Package folder: [`dcdh_compare/`](dcdh_compare/).
+
+Runs two `did_multiplegt_dyn` estimations and draws both event studies in one plot with the layout and options of `dcdh_plot`. Each model is a complete `did_multiplegt_dyn` specification in parentheses, so the models can differ in outcome, treatment, sample, controls or options. The graphs of `did_multiplegt_dyn` are kept as `dc_m1` and `dc_m2`, the joint graph as `dc_compare`, and both results are stored with `estimates store` (`dc_m1`, `dc_m2`; model 1 is active afterwards).
+
+**This is a beta version. Please check results against the `did_multiplegt_dyn` output and report problems via GitHub issues.**
+
+### Installation
+
+```stata
+net install dcdh_compare, from("https://raw.githubusercontent.com/jerggutmann/stata-tools/main/dcdh_compare/") replace
+```
+
+Run `ado update dcdh_compare, update` to update. Remove with `ado uninstall dcdh_compare`.
+
+### Usage
+
+```stata
+use favara_imbs_did_multiplegt_dyn.dta, clear
+dcdh_compare (Dl_vloans_b county year inter_bra, effects(8) placebo(3) cluster(state_n)) (Dl_vloans_b county year inter_bra, effects(8) placebo(3) cluster(state_n) only_never_switchers), lbl1("not-yet-switchers") lbl2("never-switchers") avg avgpre pvalues
+```
+
+The plot covers the longer of the two event-time ranges. Confidence intervals are b ± z·se at the `ci_level()` of the models (95 by default), i.e. identical to those displayed by `did_multiplegt_dyn`; a different `level()` is announced by a note. `scale()` and `pctof()` take one value for both models or one per model. `lbl1()`/`lbl2()`, `color1()`/`color2()`, `msymbol1()`/`msymbol2()` and `msize1()`/`msize2()` set names, colors, markers and marker sizes (default `medlarge`); `lpattern1()`/`lpattern2()`, `avglpattern1()`/`avglpattern2()` and `prelpattern1()`/`prelpattern2()` set the line patterns of each model, e.g. to keep the models apart in black-and-white print; `stub()` changes the prefix of the graph and estimate names. `fast` adds `graph_off` to every model that does not have it, so that `did_multiplegt_dyn` draws no graphs of its own, which speeds up the run; only the joint graph is drawn. All other options are those of `dcdh_plot`; `effects()`/`placebo()` are part of the model specifications. `dcdh_compare, redraw [options]` draws the stored results again with other graph options, without re-estimating. There is no test of the difference between the models. `by()` and `by_path()` are not supported. Details: `help dcdh_compare`.
+
+## dcdh_plot
+
+Version 0.4.1 (beta). Package folder: [`dcdh_plot/`](dcdh_plot/).
+
+Event-study plot after `did_multiplegt_dyn` (one event). Shows the effects and placebos with confidence intervals, and optionally the average total effect, the average placebo, p-values and more.
+
+`sdof(sample)`, `sdof(untreated)` and `sdof(nyt)` express the estimates in standard deviations of the outcome (all observations, untreated observations, or observations of groups that have not yet changed their treatment). Because `did_multiplegt_dyn` stores neither its variables nor its sample, the variables are given with `y()`, `treatment()`, `id()` and `time()`, and `sdif()` restricts the observations (for example to the groups marked by `save_sample`). `within` uses the standard deviation after removing group and time means. The command prints the standard deviation used.
+
+**This is a beta version and has not been extensively tested. Please check results against the `did_multiplegt_dyn` output and report problems via GitHub issues.**
+
+### Installation
+
+```stata
+net install dcdh_plot, from("https://raw.githubusercontent.com/jerggutmann/stata-tools/main/dcdh_plot/") replace
+```
+
+Run `ado update dcdh_plot, update` to update. Remove with `ado uninstall dcdh_plot`.
+
+### Usage
+
+`effects()` and `placebo()` default to the numbers estimated by `did_multiplegt_dyn` (taken from `e()`); they can be given to plot fewer periods:
+
+```stata
+did_multiplegt_dyn y id t d, effects(5) placebo(3) cluster(id)
+dcdh_plot, effects(5) placebo(3) avg avgpre pvalues shade export("event_study.png")
+```
+
+### Options
+
+**What to plot**
+
+| Option | Effect |
+|---|---|
+| `effects(#)`, `placebo(#)` | number of effects / placebos to use, default all estimated |
+| `showeffects(#)`, `showplacebo(#)` | plot only the first # effects / placebos |
+| `avg` | average total effect as dashed line over the post-treatment periods |
+| `avgpre` | average placebo (mean of the plotted placebos) as dashed line over the pre-treatment periods |
+| `avgvalues` | print the value of the average line(s) at their ends |
+| `noci`, `cibars` | no intervals / intervals as bars instead of a shaded area |
+| `level(# [#])` | confidence level, default 95 as in `did_multiplegt_dyn`, which does not store its intervals (they are recalculated as b ± z·se, with a note in the console; `normalci` is accepted for consistency with the other commands); `level(90 95)` draws a darker inner and a lighter outer band |
+| `scale(#)`, `pctof(#)` | multiply estimates by #; express estimates in percent of # (e.g. a baseline mean) |
+
+**Statistics**
+
+| Option | Effect |
+|---|---|
+| `pvalues` | table with estimates and p-values (average effect, average placebo, joint tests) in the Results window |
+| `pnote` | average-effect p-value and joint placebo test p-value as a note below the plot |
+| `fmt(%5.3f)` | number format |
+
+**Appearance**
+
+| Option | Effect |
+|---|---|
+| `shade`, `shadecolor()` | shade the post-treatment area |
+| `vline` | vertical dashed line between baseline and first effect |
+| `color("R G B")`, `avgcolor()`, `precolor()` | colors of the series, the average line, the placebo line |
+| `msymbol()`, `lpattern()`, `lwidth()` | marker and line style of the main series |
+| `avglpattern()`, `prelpattern()` | line patterns of the two average lines |
+| `ciopacity(#)` | opacity of the shaded interval in percent |
+| `nozero`, `nocaptions`, `nolegend` | drop zero line / captions / legend |
+| `precaption()`, `postcaption()` | text of the "pre-treatment" / "post-treatment" captions |
+| `lbldyn()`, `lblavg()`, `lblpre()` | legend labels |
+| `ytitle()`, `xtitle()` | axis titles (none by default) |
+| `ylab()`, `tpos()` | manual y-axis labels and caption position (`ylab()` requires `tpos()`) |
+
+**Output**
+
+| Option | Effect |
+|---|---|
+| `savedata(file)` | save the plotted data (`x`, `eventtime`, `type`, `coefname`, `b`, `se`, `lb`, `ub`, `p`) as a `.dta` file |
+| `export(file)` | save the graph via `graph export` |
+
+Periods that could not be estimated appear as gaps. `shade` and `vline` cannot be combined with `ylab()`. Any other option is passed to `twoway`. Details: `help dcdh_plot`.
+
+## did2s_plot
+
+Version 0.3.3 (beta). Package folder: [`did2s_plot/`](did2s_plot/).
+
+Event-study plot after `did2s` (Butts and Gardner; two-stage difference-in-differences). Counterpart of `dcdh_plot` and `lpdid_plot` with the same layout, axis positions, defaults and options. Because `did2s` leaves the definition of the treatment variables to the user, `did2s_plot` identifies the event-study coefficients by name (see below).
+
+**This is a beta version. Please check results against the `did2s` output and report problems via GitHub issues.**
+
+### Installation
+
+```stata
+net install did2s_plot, from("https://raw.githubusercontent.com/jerggutmann/stata-tools/main/did2s_plot/") replace
+```
+
+Run `ado update did2s_plot, update` to update. Remove with `ado uninstall did2s_plot`.
+
+### Usage
+
+With an event-time factor variable in `second_stage()` (example from the help of `did2s`):
+
+```stata
+use https://github.com/kylebutts/did2s_stata/raw/main/data/df_hom.dta, clear
+gen rel_year_shift = rel_year + 20
+replace rel_year_shift = 100 if rel_year_shift == .
+did2s dep_var, first_stage(i.state i.year) second_stage(ib100.rel_year_shift) treatment(treat) cluster(state)
+did2s_plot, eventvar(rel_year_shift) shift(20) pre(5) post(10) avg avgpre pvalues shade
+```
+
+`eventvar()` names the factor variable; level `v` is event time `v - shift()`. Base levels outside the estimated range (here the never-treated group 100) are ignored. With dummy variables, name patterns are used instead: `lead(F#_treat) lag(L#_treat)` (`F3_treat` is event time -3, `L0_treat` is event time 0). A table of the coefficients used is shown in the Results window.
+
+Event time -1 is the baseline and plotted as zero if it is the omitted reference period. If the regression estimates it, the estimate is plotted and a warning says that the coefficients are not normalized at t-1 (as in the `did2s` help example); leaving out the dummy for t-1 avoids this. Factor variable and dummies cannot be combined. `avg` and `avgpre` are unweighted means of the plotted coefficients (not the `did2s` average treatment effect); `pvalues` and `pnote` also report joint Wald tests from `e(V)`. Confidence intervals are normal-based, as displayed by `did2s` (`level()` defaults to the current `c(level)`; `level(90 95)` draws two bands; `normalci` is accepted for consistency). `pre()`/`post()` limit the plotted event times. All other options are identical to `dcdh_plot` (see [`dcdh_plot`](#dcdh_plot)), except that `eventvar()`, `shift()`, `lead()` and `lag()` identify the coefficients. Details: `help did2s_plot`.
+
+With dummy variables, `after(P#_treat)` adds a block of post-treatment dummies (`P1_treat` is the first period after the end of treatment) directly to the right of the treatment periods, labeled +1, +2, ...; `nafter()` limits it, `avgafter` adds its average line, `shade` covers only the treatment area, and `pvalues`/`pnote` report the post-treatment average and separate joint tests. Example: `did2s_plot, lead(F#_treat) lag(L#_treat) after(P#_treat) pre(5) avg avgafter shade`.
+
+`sdof(sample)`, `sdof(untreated)` and `sdof(nyt)` express the estimates in standard deviations of the `did2s` outcome: in the whole `did2s` sample, among untreated observations, or among never- and not-yet-treated observations (the latter requires `id()` and `time()`). The outcome and treatment variable are read from `e(cmdline)` unless `y()` or `treatment()` is given, and `sdif()` adds a condition on the observations used; the command prints the standard deviation used. With `within` (and `id()`, `time()`), the standard deviation is taken after removing unit and time means in the chosen sample. Not available if `did2s` was run with `unit()`.
+
+## lpdid_plot
+
+Version 0.2.0 (beta). Package folder: [`lpdid_plot/`](lpdid_plot/).
+
+Event-study plot after `lpdid` (Busch and Girardi). Counterpart of `dcdh_plot` with the same layout, axis positions, defaults and options, so that figures from `lpdid` and `did_multiplegt_dyn` are directly comparable. Baseline at -1, `pre n` at -n, `tau k` at k (labeled k+1).
+
+**This is a beta version and has not been extensively tested. Please check results against the `lpdid` output and report problems via GitHub issues.**
+
+### Installation
+
+```stata
+net install lpdid_plot, from("https://raw.githubusercontent.com/jerggutmann/stata-tools/main/lpdid_plot/") replace
+```
+
+Run `ado update lpdid_plot, update` to update. Remove with `ado uninstall lpdid_plot`.
+
+### Usage
+
+`pre()` and `post()` default to the windows of `lpdid` (taken from `e()`); they can be given to plot fewer periods:
+
+```stata
+use http://fmwww.bc.edu/repec/bocode/l/lpdidtestdata1.dta, clear
+lpdid Y, time(time) unit(unit) treat(treat) pre(5) post(10) pooled
+lpdid_plot, pre(5) post(10) avg avgpre pvalues shade export("event_study.png")
+```
+
+With `pre(U)` and `post(T-1)` in `lpdid`, the plot corresponds to `placebo(U-1)` and `effects(T)` in `dcdh_plot`. The average lines and p-values (`avg`, `avgpre`, `pvalues`, `pnote`) come from `e(pooled_results)`, which `lpdid` stores only with its option `pooled`. Confidence intervals and p-values are those stored by `lpdid` (t-based); `normalci` or `level()` switches to normal-based ones, identical to `dcdh_plot`. All other options are identical to `dcdh_plot` (see [`dcdh_plot`](#dcdh_plot)), except `pre()`/`post()` and `showpre()`/`showpost()` instead of `effects()`/`placebo()` and `showeffects()`/`showplacebo()`. The joint placebo test is the pre-trend test of `lpdid` (option `pretrend_test`). A console note states whenever the intervals are not those of `lpdid`. Details: `help lpdid_plot`.
+
+## License
+
+MIT, see [`LICENSE`](LICENSE). The license applies to all packages in this repository unless a folder states otherwise. Each help file refers to it as well.
