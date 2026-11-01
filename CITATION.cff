@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+message: "If you use these programs, please cite them as below."
+title: "stata-tools: Stata programs for event-study plots and country-name standardization"
+type: software
+authors:
+  - family-names: Gutmann
+    given-names: Jerg
+repository-code: "https://github.com/jerggutmann/stata-tools"
+license: MIT

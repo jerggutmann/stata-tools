@@ -1,0 +1,62 @@
+name: Bug report
+description: Report a problem with one of the packages
+labels: ["bug"]
+body:
+  - type: dropdown
+    id: package
+    attributes:
+      label: Package
+      options:
+        - cname_std
+        - csdid_event_plot
+        - dcdh_compare
+        - dcdh_plot
+        - did2s_plot
+        - lpdid_plot
+    validations:
+      required: true
+  - type: input
+    id: package-version
+    attributes:
+      label: Package version
+      description: The first line shown by `which <command>`, e.g. `*! dcdh_plot 0.4.1  12oct2026  Jerg Gutmann`
+    validations:
+      required: true
+  - type: input
+    id: stata-version
+    attributes:
+      label: Stata version and edition
+      description: As shown by `about`, e.g. Stata/MP 18.0
+    validations:
+      required: true
+  - type: textarea
+    id: command
+    attributes:
+      label: Command
+      description: The exact command that causes the problem
+      render: stata
+    validations:
+      required: true
+  - type: textarea
+    id: output
+    attributes:
+      label: Output or error message
+      description: The complete output, including the error message and return code
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: example
+    attributes:
+      label: Reproducible example
+      description: Code that reproduces the problem from scratch, ideally with the example data from the help file of the package or of the underlying estimation command
+      render: stata
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What you expected to happen instead
+    validations:
+      required: false
